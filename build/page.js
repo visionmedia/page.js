@@ -53,35 +53,31 @@
   page.root = '';
 
   /**
-   * Show `path` with optional `state` object.
+   * Show `path` with optional `ctx` object.
    *
    * @param {String} path
-   * @param {Object} state
-   * @param {Object} ctx
+   * @param {Context} ctx
    * @api public
    */
 
-  page.show = function(path, state, ctx){
-    state = state || {};
-    state._path = path;
-    history.pushState(state, document.title, path);
+  page.show = function(path, ctx){
+    ctx = ctx || new Context(path);
     page.dispatch(ctx);
+    history.pushState(ctx.state, document.title, path);
   };
 
   /**
-   * Replace `path` with optional `state` object.
+   * Replace `path` with optional `ctx` object.
    *
    * @param {String} path
-   * @param {Object} state
-   * @param {Object} ctx
+   * @param {Context} ctx
    * @api public
    */
 
-  page.replace = function(path, state, ctx){
-    state = state || {};
-    state._path = path;
-    history.replaceState(state, document.title, path);
+  page.replace = function(path, ctx){
+    ctx = ctx || new Context(path);
     page.dispatch(ctx);
+    history.replaceState(ctx.state, document.title, path);
   };
 
   /**
@@ -93,7 +89,6 @@
 
   page.dispatch = function(ctx){
     var i = 0;
-    ctx = ctx || {};
 
     function next() {
       var fn = middleware[i++];
@@ -105,20 +100,42 @@
   };
 
   /**
-   * Return the pathname void of `page.root`,
-   * optionally including the `query` string.
+   * Return the pathname void of `page.root`.
    *
-   * @param {Boolean} query
    * @return {String}
    * @api public
    */
 
-  page.path = function(query){
+  page.path = function(){
     var path = location.pathname;
     if (0 == path.indexOf(page.root)) path = path.replace(page.root, '');
-    return path + (query
-      ? (location.search || '')
-      : '');
+    return path;
+  };
+
+  /**
+   * Initialize a new "request" `Context`
+   * with the given `path` and optoinal initial `state`.
+   *
+   * @param {String} path
+   * @param {Object} state
+   * @api public
+   */
+
+  function Context(path, state) {
+    this.path = path;
+    this.state = state || {};
+    this.state.path = path;
+    this.params = [];
+  }
+
+  /**
+   * Save the context state.
+   *
+   * @api public
+   */
+
+  Context.prototype.save = function(){
+    history.replaceState(this.state, document.title, this.path);
   };
 
   /**
@@ -157,8 +174,6 @@
   Route.prototype.middleware = function(fn){
     var self = this;
     return function(ctx, next){
-      ctx.params = ctx.params || [];
-      ctx.path = page.path();
       if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
       next();
     }
@@ -219,7 +234,7 @@
 
   function pathtoRegexp(path, keys, sensitive, strict) {
     if (path instanceof RegExp) return path;
-    if (path instanceof Array) path = '(' + path.join('|') + ')';
+    if (path instanceof Array)  path = '(' + path.join('|') + ')';
     path = path
       .concat(strict ? '' : '/?')
       .replace(/\/\(/g, '(?:/')
@@ -244,9 +259,10 @@
 
   function onpopstate(e) {
     if (e.state) {
-      page.replace(e.state._path, null, e);
+      var path = e.state.path;
+      page.replace(path, new Context(path, e.state));
     } else {
-      page.show(page.path(true), null, e);
+      page.show(page.path());
     }
   }
 
@@ -258,7 +274,7 @@
     if ('A' != e.target.nodeName) return;
     e.preventDefault();
     var href = e.target.getAttribute('href');
-    page.show(href, null, e);
+    page.show(href);
   }
 
   /**

@@ -39,10 +39,10 @@ function text(str) {
 
 function displayIndexAfter(ms) {
   var id;
-  return function(e, next){
+  return function(ctx, next){
     id && clearTimeout(id);
 
-    if ('/' != e.path) {
+    if ('/' != ctx.path) {
       id = setTimeout(function(){
         page('/');
       }, ms);
@@ -57,16 +57,16 @@ function index() {
     .style.display = 'none';
 }
 
-function load(e, next) {
-  e.avatar = avatars[e.params.name];
+function load(ctx, next) {
+  ctx.avatar = avatars[ctx.params.name];
   next();
 }
 
-function show(e) {
+function show(ctx) {
   var img = document.querySelector('img');
-  img.src = e.avatar;
+  img.src = ctx.avatar;
   img.style.display = 'block';
-  text('Showing ' + e.params.name);
+  text('Showing ' + ctx.params.name);
 }
 
 function notfound() {

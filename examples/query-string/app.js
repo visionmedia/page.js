@@ -3,15 +3,15 @@ page('*', parse)
 page('/', show)
 page()
 
-function parse(e, next) {
-  e.query = qs.parse(location.search.slice(1));
+function parse(ctx, next) {
+  ctx.query = qs.parse(location.search.slice(1));
   next();
 }
 
-function show(e) {
-  if (Object.keys(e.query).length) {
+function show(ctx) {
+  if (Object.keys(ctx.query).length) {
     document
       .querySelector('pre')
-      .textContent = JSON.stringify(e.query, null, 2);
+      .textContent = JSON.stringify(ctx.query, null, 2);
   }
 }

@@ -23,11 +23,11 @@ function index() {
     .style.display = 'none';
 }
 
-function load(e, next) {
+function load(ctx, next) {
   // check if we have .state.avatar already available
   // this could for example be a cached html fragment.
-  if (e.state.avatar) {
-    e.avatar = e.state.avatar;
+  if (ctx.state.avatar) {
+    ctx.avatar = ctx.state.avatar;
     next();
     return;
   }
@@ -37,17 +37,17 @@ function load(e, next) {
     // you can assign properties to the context
     // for use between these functions. The .state
     // property is what's saved in history.
-    e.state.avatar = e.avatar = avatars[e.params.name];
-    e.save();
+    ctx.state.avatar = ctx.avatar = avatars[ctx.params.name];
+    ctx.save();
     next();
   }, 600);
 }
 
-function show(e) {
+function show(ctx) {
   var img = document.querySelector('img');
-  img.src = e.avatar;
+  img.src = ctx.avatar;
   img.style.display = 'block';
-  text('Showing ' + e.params.name);
+  text('Showing ' + ctx.params.name);
 }
 
 function notfound() {

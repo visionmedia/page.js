@@ -141,7 +141,7 @@
    */
 
   Context.prototype.save = function(){
-    history.replaceState(this.state, document.title, this.path);
+    history.replaceState(this.state, this.title, this.path);
   };
 
   /**

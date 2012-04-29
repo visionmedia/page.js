@@ -1,5 +1,5 @@
 
-+function(exports){
+;(function(exports){
 
   /**
    * Middleware array.
@@ -44,8 +44,19 @@
    */
 
   page.start = function(){
-    addEventListener('click', onclick, true);
+    addEventListener('click', onclick, false);
     addEventListener('popstate', onpopstate, false);
+  };
+
+  /**
+   * Stop page routing mechanism.
+   *
+   * @api public
+   */
+
+  page.stop = function(){
+    removeEventListener('click', onclick, false);
+    removeEventListener('popstate', onpopstate, false);
   };
 
   /**
@@ -278,9 +289,26 @@
 
   function onclick(e) {
     if ('A' != e.target.nodeName) return;
-    e.preventDefault();
     var href = e.target.getAttribute('href');
+    if (absolute(href) && !sameOrigin(href)) return;
+    e.preventDefault();
     page.show(href);
+  }
+
+  /**
+   * Check if `href` is the same origin.
+   */
+
+  function sameOrigin(href) {
+    return 0 == href.indexOf(location.origin);
+  }
+
+  /**
+   * Check if `href` is absolute.
+   */
+
+  function absolute(href) {
+    return ~href.indexOf('://');
   }
 
   /**
@@ -289,4 +317,4 @@
 
   exports.page = page;
 
-}(this);
+})(window);

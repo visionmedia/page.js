@@ -24,7 +24,7 @@ page();
 // everything below is not part of page.js
 // just callbacks etc..
 
-document.querySelector('#cycle').onclick = function(){
+document.querySelector('#cycle').onclick = function(e){
   var i = 0;
   var names = Object.keys(avatars);
   setInterval(function(){

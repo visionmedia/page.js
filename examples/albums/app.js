@@ -21,7 +21,9 @@ function photos(ctx) {
 function redirect(to) {
   return function(){
     console.log('redirecting to %s', to);
-    page(to); // TODO: change url...
+    setTimeout(function(){
+      page(to);
+    }, 0); // TODO: lame
   }
 }
 

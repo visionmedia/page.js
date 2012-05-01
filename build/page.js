@@ -29,27 +29,34 @@
         middleware.push(route.middleware(arguments[i]));
       }
     // show <path> with [state]
-    } else if (path) {
+    } else if ('string' == typeof path) {
       page.show(path, fn);
-    // start
+    // start [options]
     } else {
-      page.start();
+      page.start(path);
     }
   }
 
   /**
-   * Start page routing mechanism.
+   * Bind with the given `options`.
    *
+   * Options:
+   *
+   *    - `click` bind to click events [true]
+   *    - `popstate` bind to popstate [true]
+   *
+   * @param {Object} options
    * @api public
    */
 
-  page.start = function(){
-    addEventListener('click', onclick, false);
-    addEventListener('popstate', onpopstate, false);
+  page.start = function(options){
+    options = options || {};
+    if (false !== options.popstate) addEventListener('popstate', onpopstate, false);
+    if (false !== options.click) addEventListener('click', onclick, false);
   };
 
   /**
-   * Stop page routing mechanism.
+   * Unbind click and popstate event handlers.
    *
    * @api public
    */
@@ -76,8 +83,9 @@
    * @api public
    */
 
-  page.show = function(path, state){
+  page.show = function(path, state, init){
     var ctx = new Context(path, state);
+    ctx.init = init;
     page.dispatch(ctx);
     history.pushState(ctx.state, ctx.title, path);
   };
@@ -90,8 +98,9 @@
    * @api public
    */
 
-  page.replace = function(path, state){
+  page.replace = function(path, state, init){
     var ctx = new Context(path, state);
+    ctx.init = init;
     page.dispatch(ctx);
     history.replaceState(ctx.state, ctx.title, path);
   };
@@ -108,12 +117,28 @@
 
     function next() {
       var fn = middleware[i++];
-      if (!fn) return;
+      if (!fn) return unhandled(ctx);
       fn(ctx, next);
     }
 
     next();
   };
+
+  /**
+   * Unhandled `ctx`. When it's not the initial
+   * popstate then redirect. If you wish to handle
+   * 404s on your own use `page('*', callback)`.
+   *
+   * @param {Context} ctx
+   * @api private
+   */
+
+  function unhandled(ctx) {
+    if (!ctx.init) {
+      page.stop();
+      window.location = ctx.path;
+    }
+  }
 
   /**
    * Return the pathname void of `page.root`.
@@ -279,7 +304,7 @@
       var path = e.state.path;
       page.replace(path, e.state);
     } else {
-      page.show(page.path());
+      page.show(page.path(), null, true);
     }
   }
 
@@ -288,8 +313,10 @@
    */
 
   function onclick(e) {
-    if ('A' != e.target.nodeName) return;
-    var href = e.target.getAttribute('href');
+    var el = e.target;
+    while (el && 'A' != el.nodeName) el = el.parentNode;
+    if (!el || 'A' != el.nodeName) return;
+    var href = el.getAttribute('href') || '';
     if (absolute(href) && !sameOrigin(href)) return;
     e.preventDefault();
     page.show(href);

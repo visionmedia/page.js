@@ -1,0 +1,14 @@
+{
+  "name": "page.js",
+  "description": "Tiny client-side router",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/visionmedia/page.js.git"
+  },
+  "component": {
+    "scripts": {
+      "page": "build/page.js"
+    }
+  }
+}

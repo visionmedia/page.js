@@ -15,14 +15,10 @@
     </ul>
 
     <script>
-      // the "notfound" implements a catch-all
-      // with page('*', notfound). Here we have
-      // no catch-all, so page.js will redirect
-      // to the location of paths which do not
-      // match any of the following routes
       page('/', index);
       page('/about', about);
       page('/contact', contact);
+      page('*', notfound);
       page();
 
       function index() {
@@ -38,6 +34,11 @@
       function contact() {
         document.querySelector('p')
           .textContent = 'viewing contact';
+      }
+
+      function notfound() {
+        document.querySelector('p')
+          .textContent = 'not found';
       }
     </script>
   </body>

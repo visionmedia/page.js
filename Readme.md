@@ -83,4 +83,42 @@ $('.view').click(function(e){
 
   Unbind both the `popstate` and `click` handlers.
 
+### Context#save()
+
+  Saves the context using `replaceState()`. For example
+  this is useful for caching HTML or other resources
+  that were loaded for when a user presses "back".
   
+  Routes are passed `Context` objects, these may
+  be used to share state, for example `ctx.user =`,
+  as well as the history "state" `ctx.state` that
+  the `pushState` API provides.
+
+## Routing
+
+  The router uses the same string-to-regexp conversion
+  that Express does, so things like ":id", ":id?", and "*" work
+  as you might expect.
+
+  Another aspect that is much like Express is the ability to
+  pass multiple callbacks. You can use this to your advantage
+  to flatten nested callbacks, or simply to abstract components.
+
+  For example suppose you had a route to _edit_ users, and a
+  route to _view_ users. In both cases you need to load the user.
+  One way to achieve this is with several callbacks as shown here:
+
+```js
+page('/user/:user', load, show)
+page('/user/:user/edit', load, edit)
+```
+
+  Using the `*` character we could alter this to match all
+  routes prefixed with "/user" to achieve the same result:
+
+```js
+page('/user/*', load)
+page('/user/:user', show)
+page('/user/:user/edit', edit)
+```
+

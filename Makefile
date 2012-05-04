@@ -1,11 +1,13 @@
 
 all: build/page.min.js stats
 
+build:
+	@mkdir -p build
+
 build/page.min.js: build/page.js
 	uglifyjs --no-mangle < $< > $@
 
-build/page.js: lib/page.js
-	@mkdir -p build
+build/page.js: lib/page.js | build
 	cp $< $@
 
 stats:

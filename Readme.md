@@ -1,7 +1,7 @@
 
  ![page router logo](http://f.cl.ly/items/3i3n001d0s1Q031r2q1P/page.png)
 
-  The ~1200 byte Express inspired client-side router.
+  The ~1200 byte Express inspired client-side router that gets out of your way.
 
 ```js
 page('/', index)
@@ -131,7 +131,7 @@ page('/user/:user/edit', edit)
 ```js
 page('/user/:user', load, show)
 page('*', function(){
-  $('body').text('Not found!');
+  $('body').text('Not found!')
 })
 ```
 
@@ -144,5 +144,59 @@ page('*', function(){
   page.js with a multi-page application _without_
   explicitly binding to certain links.
 
-  
+### Working with parameters and contexts
+
+  Much like `request` and `response` objects are
+  passed around in Express, page.js has a single
+  "Context" object. Using the previous examples
+  of `load` and `show` for a user, we can assign
+  arbitrary properties to `ctx` to maintain state
+  between callbacks.
+
+  First to build a `load` function that will load
+  the user for subsequent routes you'll need to
+  access the ":id" passed. You can do this with
+  `ctx.params.NAME` much like Express:
+
+```js
+function load(ctx, next){
+  var id = ctx.params.id
+}
+```
+
+  Then perform some kind of action against the server,
+  assigning the user to `ctx.user` for other routes to
+  utilize. `next()` is then invoked to pass control to
+  the following matching route in sequence, if any.
+
+```js
+function load(ctx, next){
+  var id = ctx.params.id
+  $.getJSON('/user/' + id + '.json', function(user){
+    ctx.user = user
+    next()
+  })
+}
+```
+
+  The "show" function might look something like this,
+  however you may render templates or do anything you
+  want. Note that here `next()` is _not_ invoked, because
+  this is considered the "end point", and no routes
+  will be matched until another link is clicked or
+  `page(path)` is called.
+
+```js
+function show(ctx){
+  $('body')
+    .empty()
+    .append('<h1>' + ctx.user.name + '<h1>');
+}
+```
+
+  Finally using them like so:
+
+```js
+page('/user/:id', load, show)
+```
  

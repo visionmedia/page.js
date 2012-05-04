@@ -67,15 +67,6 @@
   };
 
   /**
-   * Root path. Override if your app is "mounted"
-   * at some other path.
-   *
-   * @api public
-   */
-
-  page.root = '';
-
-  /**
    * Show `path` with optional `state` object.
    *
    * @param {String} path
@@ -139,19 +130,6 @@
       window.location = ctx.path;
     }
   }
-
-  /**
-   * Return the pathname void of `page.root`.
-   *
-   * @return {String}
-   * @api public
-   */
-
-  page.path = function(){
-    var path = location.pathname;
-    if (0 == path.indexOf(page.root)) path = path.replace(page.root, '');
-    return path;
-  };
 
   /**
    * Initialize a new "request" `Context`
@@ -249,7 +227,6 @@
           ? params[key.name]
           : val;
       } else {
-        // TODO: need to empty previous?...
         params.push(val);
       }
     }
@@ -304,7 +281,7 @@
       var path = e.state.path;
       page.replace(path, e.state);
     } else {
-      page.show(page.path(), null, true);
+      page.show(location.pathname, null, true);
     }
   }
 

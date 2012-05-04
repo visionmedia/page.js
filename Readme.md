@@ -250,3 +250,32 @@ function show(ctx){
   tick (xhr, setTimeout, etc), otherwise
   it is optional and the state will be
   saved after dispatching.
+
+## Plugins
+
+  Currently there are no official plugins,
+  however _examples/query-string/query.js_
+  will provide a parsed `ctx.query` object
+  derived from [https://github.com/visionmedia/node-querystring](https://github.com/visionmedia/node-querystring).
+
+  Usage by using "*" to match any path
+  in order to parse the query-string:
+
+```js
+page('*', parse)
+page('/', show)
+page()
+
+function parse(ctx, next) {
+  ctx.query = qs.parse(location.search.slice(1));
+  next();
+}
+
+function show(ctx) {
+  if (Object.keys(ctx.query).length) {
+    document
+      .querySelector('pre')
+      .textContent = JSON.stringify(ctx.query, null, 2);
+  }
+}
+```

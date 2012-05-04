@@ -59,6 +59,25 @@ $('.view').click(function(e){
 })
 ```
 
-### page()
+### page.show(path)
 
-  Register page's `popstate` / `click` bindings.
+  Identical to `page(path)` above.
+
+### page([options])
+
+  Register page's `popstate` / `click` bindings. If you're
+  doing selective binding you'll like want to pass `{ click: false }`
+  to specify this yourself. The following options are available:
+
+    - `click` bind to click events [__true__]
+    - `popstate` bind to popstate [__true__]
+
+### page.start([options])
+
+  Identical to `page([options])` above.
+
+### page.stop()
+
+  Unbind both the `popstate` and `click` handlers.
+
+  

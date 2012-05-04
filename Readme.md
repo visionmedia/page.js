@@ -251,6 +251,63 @@ function show(ctx){
   it is optional and the state will be
   saved after dispatching.
 
+### Matching paths
+
+  Here are some examples of what's possible
+  with the string to `RegExp` conversion.
+
+  Match an explicit path:
+  
+```js
+page('/about', callback)
+```
+
+  Match with required parameter accessed via `ctx.params.name`:
+
+```js
+page('/user/:name', callback)
+```
+
+  Match with several params, for example `/user/tj/edit` or
+  `/user/tj/view`.
+
+```js
+page('/user/:name/:operation', callback)
+```
+
+  Match with one optional and one required, now `/user/tj`
+  will match the same route as `/user/tj/show` etc:
+
+```js
+page('/user/:name/:operation?', callback)
+```
+
+  Use the wildcard char "*" to match across segments,
+  available via `ctx.params[N]` where __N__ is the
+  index of "*" since you may use several. For example
+  the following will match `/user/12/edit`, `/user/12/albums/2/admin`
+  and so on.
+
+```js
+page('/user/*', loadUser)
+```
+
+  Named wildcard accessed, for example `/file/javascripts/jquery.js`
+  would provide "/javascripts/jquery.js" as `ctx.params.file`:
+
+```js
+page('/file/:file(*)', loadUser)
+```
+
+  And of course `RegExp` literals, where the capture
+  groups are available via `ctx.params[N]` where __N__
+  is the index of the capture group.
+
+```js
+page(/^\/commits\/(\d+)\.\.(\d+)/, loadUser)
+```
+
+
 ## Plugins
 
   Currently there are no official plugins,

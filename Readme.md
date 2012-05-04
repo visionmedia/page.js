@@ -72,8 +72,8 @@ $('.view').click(function(e){
   doing selective binding you'll like want to pass `{ click: false }`
   to specify this yourself. The following options are available:
 
-    - `click` bind to click events [__true__]
-    - `popstate` bind to popstate [__true__]
+  - `click` bind to click events [__true__]
+  - `popstate` bind to popstate [__true__]
 
 ### page.start([options])
 

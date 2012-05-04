@@ -199,4 +199,54 @@ function show(ctx){
 ```js
 page('/user/:id', load, show)
 ```
- 
+
+### Working with state
+
+  When working with the `pushState` API,
+  and thus page.js you may optionally provide
+  state objects available when the user navigates
+  the history.
+
+  For example if you had a photo application
+  and you performed a relatively expensive
+  search to populate a list of images,
+  normally when a user clicks "back" in
+  the browser the route would be invoked
+  and the query would be made yet-again.
+
+  Perhaps the route callback looks like this:
+
+```js
+function show(ctx){
+  $.getJSON('/photos', function(images){
+    displayImages(images)
+  })
+}
+```
+
+   You may utilize the history's state
+   object to cache this result, or any
+   other values you wish. This makes it
+   possible to completely omit the query
+   when a user presses back, providing
+   a much nicer experience.
+
+```js
+function show(ctx){
+  if (ctx.state.images) {
+    displayImages(ctx.state.images)
+  } else {
+    $.getJSON('/photos', function(images){
+      ctx.state.images = images
+      ctx.save()
+      displayImages(images)
+    })
+  }
+}
+```
+
+  __NOTE__: `ctx.save()` must be used
+  if the state changes _after_ the first
+  tick (xhr, setTimeout, etc), otherwise
+  it is optional and the state will be
+  saved after dispatching.

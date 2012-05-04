@@ -104,6 +104,8 @@ $('.view').click(function(e){
   pass multiple callbacks. You can use this to your advantage
   to flatten nested callbacks, or simply to abstract components.
 
+### Separating concerns
+
   For example suppose you had a route to _edit_ users, and a
   route to _view_ users. In both cases you need to load the user.
   One way to achieve this is with several callbacks as shown here:
@@ -122,3 +124,25 @@ page('/user/:user', show)
 page('/user/:user/edit', edit)
 ```
 
+  Likewise `*` may be used as catch-alls after all routes
+  acting as a 404 handler, before all routes, in-between and
+  so on. For example:
+
+```js
+page('/user/:user', load, show)
+page('*', function(){
+  $('body').text('Not found!');
+})
+```
+
+### Default 404 behaviour
+
+  By default when a route is not matched,
+  page.js will invoke `page.stop()` to unbind
+  itself, and proceed with redirecting to the
+  location requested. This means you may use
+  page.js with a multi-page application _without_
+  explicitly binding to certain links.
+
+  
+ 

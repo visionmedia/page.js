@@ -37,16 +37,19 @@ page()
 
 ## API
 
-### page(path, callback)
+### page(path, callback[, callback ...])
 
-  Defines a route mapping `path` to the given `callback`.
+  Defines a route mapping `path` to the given `callback(s)`.
 
 ```js
 page('/', user.list)
-page('/user/:id', user.show)
-page('/user/:id/edit', user.edit)
+page('/user/:id', user.load, user.show)
+page('/user/:id/edit', user.load, user.edit)
 page('*', notfound)
 ```
+
+  Links that are not of the same origin are disregarded
+  and will not be dispatched.
 
 ### page(path)
 

@@ -1,7 +1,7 @@
 
  ![page router logo](http://f.cl.ly/items/3i3n001d0s1Q031r2q1P/page.png)
 
-  The ~1200 byte Express inspired client-side router that gets out of your way.
+  The ~1200 byte Express-inspired client-side router that gets out of your way.
 
 ```js
 page('/', index)

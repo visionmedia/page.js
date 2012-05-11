@@ -10,5 +10,9 @@
     "scripts": {
       "page": "build/page.js"
     }
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
   }
 }

@@ -17,4 +17,9 @@ stats:
 	@wc -c build/page.gz
 	@rm -f build/page.gz
 
-.PHONY: stats
+test:
+	@./node_modules/.bin/mocha \
+		--require should \
+		--reporter spec
+
+.PHONY: stats test

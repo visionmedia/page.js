@@ -11,6 +11,7 @@
       "page": "build/page.js"
     }
   },
+  "main": "build/page.js",
   "devDependencies": {
     "mocha": "*",
     "should": "*"

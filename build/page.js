@@ -2,12 +2,6 @@
 ;(function(){
 
   /**
-   * Middleware array.
-   */
-
-  var middleware = [];
-
-  /**
    * Register `path` with callback `fn()`,
    * or route `path`, or `page.start()`.
    *
@@ -26,7 +20,7 @@
     if ('function' == typeof fn) {
       var route = new Route(path);
       for (var i = 1; i < arguments.length; ++i) {
-        middleware.push(route.middleware(arguments[i]));
+        page.callbacks.push(route.middleware(arguments[i]));
       }
     // show <path> with [state]
     } else if ('string' == typeof path) {
@@ -36,6 +30,12 @@
       page.start(path);
     }
   }
+
+  /**
+   * Callback functions.
+   */
+
+  page.callbacks = [];
 
   /**
    * Bind with the given `options`.
@@ -78,7 +78,7 @@
     var ctx = new Context(path, state);
     ctx.init = init;
     page.dispatch(ctx);
-    history.pushState(ctx.state, ctx.title, path);
+    if(!init) history.pushState(ctx.state, ctx.title, path);
   };
 
   /**
@@ -107,7 +107,7 @@
     var i = 0;
 
     function next() {
-      var fn = middleware[i++];
+      var fn = page.callbacks[i++];
       if (!fn) return unhandled(ctx);
       fn(ctx, next);
     }

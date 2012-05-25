@@ -22,4 +22,7 @@ test:
 		--require should \
 		--reporter spec
 
-.PHONY: stats test
+clean:
+	rm -fr build
+
+.PHONY: stats test clean

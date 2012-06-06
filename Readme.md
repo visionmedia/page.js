@@ -30,6 +30,7 @@ page()
    - `query-string` shows how you can integrate plugins using the router
    - `selective-binding` shows how you can bind to specific links only
    - `state` illustrates how the history state may be used to cache data
+   - `chrome` Google Chrome style administration interface
 
   __NOTE__: keep in mind these examples do not use jQuery or similar, so
   portions of the examples may be relatively verbose, though they're not

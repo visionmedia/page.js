@@ -62,12 +62,12 @@ nav ul li a {
   font-weight: 100;
   opacity: 1;
   margin-left: 0;
-  -webkit-transition: opacity 200ms, margin-left 600ms;
+  -webkit-transition: opacity 200ms, margin-left 300ms;
 }
 
 #content.hide {
   opacity: 0;
-  margin-left: -80px;
+  margin-left: -40px;
 }
 
 h2 {

@@ -75,6 +75,11 @@ $('.view').click(function(e){
 
   - `click` bind to click events [__true__]
   - `popstate` bind to popstate [__true__]
+  - `dispatch` perform initial dispatch [true]
+
+  If you wish to load serve initial content
+  from the server you likely will want to
+  set `dispatch` to __false__.
 
 ### page.start([options])
 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Basic</title>
+    <link rel="stylesheet" href="chrome.css" type="text/css">
+    <script src="/page.js"></script>
+  </head>
+  <body>
+    <aside>
+      <h1>Chrome</h1>
+      <nav>
+        <ul>
+          <li><a href="/">History</a></li>
+          <li><a href="/extensions">Extensions</a></li>
+          <li><a href="/settings">Settings</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <section id="content"></section>
+
+    <script id="settings-template" type="text/x-template">
+      <h2>Settings</h2>
+      <p>The default browser is currently Google Chrome.</p>
+    </script>
+
+    <script id="extensions-template" type="text/x-template">
+      <h2>Extensions</h2>
+      <p>You currently have no browser extensions installed.</p>
+    </script>
+
+    <script id="history-template" type="text/x-template">
+      <h2>History</h2>
+      <p>Your browsing history will display here.</p>
+    </script>
+
+    <script id="not-found-template" type="text/x-template">
+      <h2>Not Found</h2>
+      <p>Sorry! I cannot find that page.</p>
+    </script>
+
+    <script>
+      page('*', showActiveLink);
+      page('/', showHistory);
+      page('/extensions', showExtensions);
+      page('/settings', showSettings);
+      page('*', notfound);
+      page();
+
+      function showActiveLink(ctx, next) {
+        deactiveate();
+        a(ctx.path).parentNode.classList.add('active');
+        next();
+      }
+
+      function showHistory() {
+        render(template('history'));
+      }
+      
+      function showExtensions() {
+        render(template('extensions'));
+      }
+
+      function showSettings() {
+        render(template('settings'));
+      }
+
+      function notfound() {
+        render(template('not-found'));
+      }
+
+      function render(html) {
+        var el = document.getElementById('content');
+        el.classList.add('hide');
+        setTimeout(function(){
+          el.innerHTML = html;
+          el.classList.remove('hide');
+        }, 600);
+      }
+
+      function deactiveate() {
+        var el = document.querySelector('.active')
+        if (el) el.classList.remove('active');
+      }
+
+      function a(href) {
+        return document.querySelector('[href="' + href + '"]');
+      }
+
+      function template(name) {
+        return document
+          .getElementById(name + '-template')
+          .innerHTML;
+      }
+    </script>
+  </body>
+</html>

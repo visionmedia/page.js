@@ -36,6 +36,8 @@ nav ul li {
   margin: 5px 0;
   padding: 0;
   padding-left: 15px;
+  border-color: white;
+  -webkit-transition: border-left 400ms;
 }
 
 nav ul li.active {

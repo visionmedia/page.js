@@ -8,11 +8,11 @@
     <h1>Basic</h1>
     <p></p>
     <ul>
-      <li><a href="/">/</a></li>
+      <li><a href="./">/</a></li>
       <li><a href="#whoop">#whoop</a></li>
-      <li><a href="/about">/about</a></li>
-      <li><a href="/contact">/contact</a></li>
-      <li><a href="/not-found?foo=bar">/not-found</a></li>
+      <li><a href="./about">/about</a></li>
+      <li><a href="./contact">/contact</a></li>
+      <li><a href="./not-found?foo=bar">/not-found</a></li>
     </ul>
 
     <script>
@@ -21,6 +21,7 @@
       // no catch-all, so page.js will redirect
       // to the location of paths which do not
       // match any of the following routes
+      page.base('/basic');
       page('/', index);
       page('/about', about);
       page('/contact', contact);

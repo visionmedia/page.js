@@ -15,10 +15,10 @@ page()
 
 ## Running examples
 
-  To run examples do the following:
+  To run examples do the following to install dev dependencies an run the example server:
 
-    $ npm install -g serve
-    $ serve examples/profile
+    $ npm install
+    $ node examples
     $ open http://localhost:3000
 
  Currently we have examples for:
@@ -28,8 +28,8 @@ page()
    - `album` showing pagination and external links
    - `profile` simple user profiles
    - `query-string` shows how you can integrate plugins using the router
-   - `selective-binding` shows how you can bind to specific links only
    - `state` illustrates how the history state may be used to cache data
+   - `server` illustrates how to use the dispatch option to server initial content
    - `chrome` Google Chrome style administration interface
 
   __NOTE__: keep in mind these examples do not use jQuery or similar, so
@@ -88,6 +88,11 @@ $('.view').click(function(e){
 ### page.stop()
 
   Unbind both the `popstate` and `click` handlers.
+
+### page.base([path])
+
+  Get or set the base `path`. For example if page.js
+  is operating within "/blog/*" set the base path to "/blog". 
 
 ### Context#save()
 

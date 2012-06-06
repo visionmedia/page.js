@@ -1,4 +1,5 @@
 
+page.base('/query-string');
 page('*', parse)
 page('/', show)
 page()

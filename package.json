@@ -13,6 +13,8 @@
   },
   "devDependencies": {
     "mocha": "*",
-    "should": "*"
+    "should": "*",
+    "express": "3.0.0beta1",
+    "jade": "0.26.1"
   }
 }

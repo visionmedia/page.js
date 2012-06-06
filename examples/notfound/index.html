@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Basic</title>
+    <title>Not Found</title>
     <script src="/page.js"></script>
   </head>
   <body>
-    <h1>Basic</h1>
+    <h1>Not Found</h1>
     <p></p>
     <ul>
-      <li><a href="/">/</a></li>
-      <li><a href="/about">/about</a></li>
-      <li><a href="/contact">/contact</a></li>
-      <li><a href="/not-found">/not-found</a></li>
+      <li><a href="./">/</a></li>
+      <li><a href="./about">/about</a></li>
+      <li><a href="./contact">/contact</a></li>
+      <li><a href="./not-found">/not-found</a></li>
     </ul>
 
     <script>
+      page.base('/notfound');
       page('/', index);
       page('/about', about);
       page('/contact', contact);

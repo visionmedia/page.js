@@ -5,6 +5,7 @@ var avatars = {
   sal: 'http://homepage.ntlworld.com/stureek/images/sal01.jpg'
 };
 
+page.base('/state');
 page('/', index);
 page('/user/:name', load, show);
 page('*', notfound);

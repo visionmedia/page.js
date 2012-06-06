@@ -1,0 +1,15 @@
+!!! 5
+html
+  head
+    title page.js examples
+    style
+      body {
+        padding: 50px;
+        font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+  body
+    h1 Examples
+    ul
+      for name in examples
+        li
+          a(href='/#{name}')= name

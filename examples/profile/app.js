@@ -5,6 +5,7 @@ var avatars = {
   sal: 'http://homepage.ntlworld.com/stureek/images/sal01.jpg'
 };
 
+page.base('/profile');
 page('/', index);
 // display the index page again after 5s
 // only for user related pages

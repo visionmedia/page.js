@@ -10,9 +10,9 @@
       <h1>Chrome</h1>
       <nav>
         <ul>
-          <li><a href="/">History</a></li>
-          <li><a href="/extensions">Extensions</a></li>
-          <li><a href="/settings">Settings</a></li>
+          <li><a href="./">History</a></li>
+          <li><a href="./extensions">Extensions</a></li>
+          <li><a href="./settings">Settings</a></li>
         </ul>
       </nav>
     </aside>
@@ -40,6 +40,7 @@
     </script>
 
     <script>
+      page.base('/chrome');
       page('*', showActiveLink);
       page('/', showHistory);
       page('/extensions', showExtensions);
@@ -84,7 +85,7 @@
       }
 
       function a(href) {
-        return document.querySelector('[href="' + href + '"]');
+        return document.querySelector('[href=".' + href + '"]');
       }
 
       function template(name) {

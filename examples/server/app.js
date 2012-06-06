@@ -1,4 +1,5 @@
 
+page.base('/server');
 page('/', index)
 page('/contact', contact)
 page({ dispatch: false })

@@ -50,7 +50,6 @@
 
       function showActiveLink(ctx, next) {
         deactiveate();
-        console.log(ctx.path);
         a(ctx.path).parentNode.classList.add('active');
         next();
       }

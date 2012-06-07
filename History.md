@@ -5,8 +5,9 @@
   * Added `+` support to pathtoRegexp()
   * Added `page.base(path)` support
   * Added dispatch option to `page()`. Closes #10
+  * Added `Context#originalPath`
   * Fixed unhandled links when .base is present. Closes #11
-  * Fixed: default page.show() path to "/"
+  * Fixed: `Context#path` to "/"
 
 0.0.2 / 2012-06-05 
 ==================

@@ -54,29 +54,37 @@
         next();
       }
 
-      function showHistory() {
-        render(template('history'));
+      function showHistory(ctx) {
+        // !ctx.init tells render() not to
+        // add the .hide class so that the
+        // transition animation is ignored
+        // for the initial page
+        render(template('history'), !ctx.init);
       }
       
-      function showExtensions() {
-        render(template('extensions'));
+      function showExtensions(ctx) {
+        render(template('extensions'), !ctx.init);
       }
 
-      function showSettings() {
-        render(template('settings'));
+      function showSettings(ctx) {
+        render(template('settings'), !ctx.init);
       }
 
-      function notfound() {
-        render(template('not-found'));
+      function notfound(ctx) {
+        render(template('not-found'), !ctx.init);
       }
 
-      function render(html) {
+      function render(html, hide) {
         var el = document.getElementById('content');
-        el.classList.add('hide');
-        setTimeout(function(){
+        if (hide) {
+          el.classList.add('hide');
+          setTimeout(function(){
+            el.innerHTML = html;
+            el.classList.remove('hide');
+          }, 300);
+        } else {
           el.innerHTML = html;
-          el.classList.remove('hide');
-        }, 300);
+        }
       }
 
       function deactiveate() {

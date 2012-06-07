@@ -3,6 +3,7 @@ var perPage = 6
   , prev = document.querySelector('#prev')
   , next = document.querySelector('#next');
 
+page.base('/album');
 page('/', redirect('/photos/0'));
 page('/photos/:page', photos)
 page('*', notfound);
@@ -45,12 +46,12 @@ function display(photos) {
 function adjustPager(page) {
   if (page) {
     prev.style.display = 'inline-block';
-    prev.setAttribute('href', '/photos/' + (page - 1));
+    prev.setAttribute('href', '/album/photos/' + (page - 1));
   } else {
     prev.style.display = 'none';
   }
 
-  next.setAttribute('href', '/photos/' + (page + 1));
+  next.setAttribute('href', '/album/photos/' + (page + 1));
 }
 
 var images = [

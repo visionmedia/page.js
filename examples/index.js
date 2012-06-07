@@ -40,6 +40,18 @@ app.get('/', function(req, res){
 });
 
 /**
+ * GET 404 page.
+ */
+
+app.get('/basic/not-found', function(req, res){
+  // if we assume everything 404 is part
+  // of the single-page app, and do not
+  // handle the 404 on the client, it
+  // will cause cyclic redirects
+  res.send(404);
+});
+
+/**
  * GET /:example -> /:example/
  */
 

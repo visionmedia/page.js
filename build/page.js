@@ -105,7 +105,7 @@
     ctx.init = init;
     if (null == dispatch) dispatch = true;
     if (dispatch) page.dispatch(ctx);
-    if (!init) history.pushState(ctx.state, ctx.title, ctx.canonicalPath);
+    if (!init && !ctx.unhandled) history.pushState(ctx.state, ctx.title, ctx.canonicalPath);
   };
 
   /**
@@ -153,6 +153,7 @@
 
   function unhandled(ctx) {
     page.stop();
+    ctx.unhandled = true;
     window.location = ctx.canonicalPath;
   }
 

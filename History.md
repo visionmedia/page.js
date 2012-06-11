@@ -1,4 +1,12 @@
 
+1.1.1 / 2012-06-11 
+==================
+
+  * Added enterprisejs example
+  * Added: join base for `.canonicalPath`. Closes #12
+  * Fixed `location.origin` usage [fisch42]
+  * Fixed `pushState()` when unhandled
+
 1.1.0 / 2012-06-06 
 ==================
 

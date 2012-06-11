@@ -339,7 +339,8 @@
    */
 
   function sameOrigin(href) {
-    return 0 == href.indexOf(location.origin);
+    var origin = location.protocol + "//" + location.hostname + ":" + location.port;
+    return 0 == href.indexOf(origin);
   }
 
   /**

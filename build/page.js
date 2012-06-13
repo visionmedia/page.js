@@ -152,6 +152,7 @@
    */
 
   function unhandled(ctx) {
+    if (window.location.pathname == ctx.canonicalPath) return;
     page.stop();
     ctx.unhandled = true;
     window.location = ctx.canonicalPath;
@@ -339,7 +340,8 @@
    */
 
   function sameOrigin(href) {
-    var origin = location.protocol + "//" + location.hostname + ":" + location.port;
+    var port = location.port ? ':' + location.port : ''; 
+    var origin = location.protocol + '//' + location.hostname + port;
     return 0 == href.indexOf(origin);
   }
 

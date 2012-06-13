@@ -9,6 +9,7 @@ var express = require('express')
 
 var app = express();
 
+app.use(express.favicon());
 app.use(express.logger('dev'));
 
 app.set('views', __dirname);

@@ -1,4 +1,10 @@
 
+1.1.2 / 2012-06-13 
+==================
+
+  * Fixed origin portno bug preventing :80 and :443 from working properly
+  * Fixed: prevent cyclic refreshes. Closes #17
+
 1.1.1 / 2012-06-11 
 ==================
 

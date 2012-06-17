@@ -18,10 +18,7 @@ stats:
 	@rm -f build/page.gz
 
 test:
-	@./node_modules/.bin/mocha \
-		--require should \
-		--reporter spec
-
+	@./node_modules/.bin/serve test
 clean:
 	rm -fr build
 

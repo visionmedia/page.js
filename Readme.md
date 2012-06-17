@@ -348,6 +348,13 @@ function show(ctx) {
 }
 ```
 
+### Running tests
+
+```
+$ make test
+$ open http://localhost:3000
+```
+
 ## License 
 
 (The MIT License)

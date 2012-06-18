@@ -38,6 +38,7 @@ nav ul li {
   padding-left: 15px;
   border-color: white;
   -webkit-transition: border-left 400ms;
+  -moz-transition: border-left 400ms;
 }
 
 nav ul li.active {
@@ -65,6 +66,7 @@ nav ul li a {
   opacity: 1;
   margin-left: 0;
   -webkit-transition: opacity 200ms, margin-left 300ms;
+  -moz-transition: opacity 200ms, margin-left 300ms;
 }
 
 #content.hide {

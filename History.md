@@ -1,4 +1,11 @@
 
+1.1.3 / 2012-06-18 
+==================
+
+  * Added some basic client-side tests
+  * Fixed initial dispatch in Firefox
+  * Changed: no-op on subsequent `page()` calls. Closes #16
+
 1.1.2 / 2012-06-13 
 ==================
 

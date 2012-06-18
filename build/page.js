@@ -14,6 +14,12 @@
   var base = '';
 
   /**
+   * Running flag.
+   */
+
+  var running;
+
+  /**
    * Register `path` with callback `fn()`,
    * or route `path`, or `page.start()`.
    *
@@ -76,9 +82,13 @@
 
   page.start = function(options){
     options = options || {};
+    if (running) return;
+    running = true;
     if (false === options.dispatch) dispatch = false;
     if (false !== options.popstate) addEventListener('popstate', onpopstate, false);
     if (false !== options.click) addEventListener('click', onclick, false);
+    if (!dispatch) return;
+    page.replace(location.pathname, null, true, dispatch);
   };
 
   /**
@@ -88,6 +98,7 @@
    */
 
   page.stop = function(){
+    running = false;
     removeEventListener('click', onclick, false);
     removeEventListener('popstate', onpopstate, false);
   };
@@ -97,15 +108,15 @@
    *
    * @param {String} path
    * @param {Object} state
+   * @return {Context}
    * @api public
    */
 
-  page.show = function(path, state, init, dispatch){
+  page.show = function(path, state){
     var ctx = new Context(path, state);
-    ctx.init = init;
-    if (null == dispatch) dispatch = true;
-    if (dispatch) page.dispatch(ctx);
-    if (!init && !ctx.unhandled) history.pushState(ctx.state, ctx.title, ctx.canonicalPath);
+    page.dispatch(ctx);
+    if (!ctx.unhandled) ctx.pushState();
+    return ctx;
   };
 
   /**
@@ -113,14 +124,17 @@
    *
    * @param {String} path
    * @param {Object} state
+   * @return {Context}
    * @api public
    */
 
-  page.replace = function(path, state, init){
+  page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
-    page.dispatch(ctx);
-    history.replaceState(ctx.state, ctx.title, ctx.canonicalPath);
+    if (null == dispatch) dispatch = true;
+    if (dispatch) page.dispatch(ctx);
+    ctx.save();
+    return ctx;
   };
 
   /**
@@ -176,6 +190,16 @@
     this.state.path = path;
     this.params = [];
   }
+
+  /**
+   * Push state.
+   *
+   * @api private
+   */
+
+  Context.prototype.pushState = function(){
+    history.pushState(this.state, this.title, this.canonicalPath);
+  };
 
   /**
    * Save the context state.
@@ -311,8 +335,6 @@
     if (e.state) {
       var path = e.state.path;
       page.replace(path, e.state);
-    } else {
-      page.show(location.pathname, null, true, dispatch);
     }
   }
 
@@ -340,8 +362,8 @@
    */
 
   function sameOrigin(href) {
-    var port = location.port ? ':' + location.port : ''; 
-    var origin = location.protocol + '//' + location.hostname + port;
+    var origin = location.protocol + '//' + location.hostname;
+    if (location.port) origin += ':' + location.port;
     return 0 == href.indexOf(origin);
   }
 

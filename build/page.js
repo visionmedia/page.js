@@ -343,6 +343,7 @@
    */
 
   function onclick(e) {
+    if (e.defaultPrevented) return; 
     var el = e.target;
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;

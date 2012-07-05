@@ -350,7 +350,7 @@
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
     var href = el.href;
-    var path = el.pathname;
+    var path = el.pathname + el.search;
     if (el.hash) return;
     if (!sameOrigin(href)) return;
     var orig = path;

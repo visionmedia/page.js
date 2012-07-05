@@ -1,4 +1,12 @@
 
+1.2.0 / 2012-07-05 
+==================
+
+  * add `ctx.pathname`
+  * add `ctx.querystring`
+  * add support for passing a query-string through the dispatcher [ovaillancourt]
+  * add `.defaultPrevented` support, ignoring page.js handling [ovaillancourt]
+
 1.1.3 / 2012-06-18 
 ==================
 

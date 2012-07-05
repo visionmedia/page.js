@@ -1,0 +1,496 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Page.js by visionmedia</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Page.js</h1>
+        <p>Micro client-side router inspired by the Express router (~1200 bytes)</p>
+
+        <p class="view"><a href="https://github.com/visionmedia/page.js">View the Project on GitHub <small>visionmedia/page.js</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/visionmedia/page.js/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/visionmedia/page.js/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/visionmedia/page.js">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p><img src="http://f.cl.ly/items/3i3n001d0s1Q031r2q1P/page.png" alt="page router logo"></p>
+
+<p>Tiny ~1200 byte Express-inspired client-side router.</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user'</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/edit'</span><span class="p">,</span> <span class="nx">edit</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/album'</span><span class="p">,</span> <span class="nx">album</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/album/sort'</span><span class="p">,</span> <span class="nx">sort</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="nx">notfound</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">()</span>
+</pre>
+</div>
+
+
+<h2>Running examples</h2>
+
+<p>To run examples do the following to install dev dependencies an run the example server:</p>
+
+<pre><code>$ npm install
+$ node examples
+$ open http://localhost:3000
+</code></pre>
+
+<p>Currently we have examples for:</p>
+
+<ul>
+<li>
+<code>basic</code> minimal application showing basic routing</li>
+<li>
+<code>notfound</code> similar to <code>basic</code> with single-page 404 support</li>
+<li>
+<code>album</code> showing pagination and external links</li>
+<li>
+<code>profile</code> simple user profiles</li>
+<li>
+<code>query-string</code> shows how you can integrate plugins using the router</li>
+<li>
+<code>state</code> illustrates how the history state may be used to cache data</li>
+<li>
+<code>server</code> illustrates how to use the dispatch option to server initial content</li>
+<li>
+<p><code>chrome</code> Google Chrome style administration interface</p>
+
+<p><strong>NOTE</strong>: keep in mind these examples do not use jQuery or similar, so
+portions of the examples may be relatively verbose, though they're not
+directly related to page.js in any way.</p>
+</li>
+</ul><h2>API</h2>
+
+<h3>page(path, callback[, callback ...])</h3>
+
+<p>Defines a route mapping <code>path</code> to the given <code>callback(s)</code>.</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">list</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:id'</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">load</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">show</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:id/edit'</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">load</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">edit</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="nx">notfound</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>Links that are not of the same origin are disregarded
+  and will not be dispatched.</p>
+
+<h3>page(path)</h3>
+
+<p>Navigate to the given <code>path</code>.</p>
+
+<div class="highlight">
+<pre><span class="nx">$</span><span class="p">(</span><span class="s1">'.view'</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+  <span class="nx">page</span><span class="p">(</span><span class="s1">'/user/12'</span><span class="p">)</span>
+  <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">()</span>
+<span class="p">})</span>
+</pre>
+</div>
+
+
+<h3>page.show(path)</h3>
+
+<p>Identical to <code>page(path)</code> above.</p>
+
+<h3>page([options])</h3>
+
+<p>Register page's <code>popstate</code> / <code>click</code> bindings. If you're
+  doing selective binding you'll like want to pass <code>{ click: false }</code>
+  to specify this yourself. The following options are available:</p>
+
+<ul>
+<li>
+<code>click</code> bind to click events [<strong>true</strong>]</li>
+<li>
+<code>popstate</code> bind to popstate [<strong>true</strong>]</li>
+<li>
+<p><code>dispatch</code> perform initial dispatch [true]</p>
+
+<p>If you wish to load serve initial content
+from the server you likely will want to
+set <code>dispatch</code> to <strong>false</strong>.</p>
+</li>
+</ul><h3>page.start([options])</h3>
+
+<p>Identical to <code>page([options])</code> above.</p>
+
+<h3>page.stop()</h3>
+
+<p>Unbind both the <code>popstate</code> and <code>click</code> handlers.</p>
+
+<h3>page.base([path])</h3>
+
+<p>Get or set the base <code>path</code>. For example if page.js
+  is operating within "/blog/*" set the base path to "/blog". </p>
+
+<h3>Context#save()</h3>
+
+<p>Saves the context using <code>replaceState()</code>. For example
+  this is useful for caching HTML or other resources
+  that were loaded for when a user presses "back".</p>
+
+<p>Routes are passed <code>Context</code> objects, these may
+  be used to share state, for example <code>ctx.user =</code>,
+  as well as the history "state" <code>ctx.state</code> that
+  the <code>pushState</code> API provides.</p>
+
+<h2>Context#canonicalPath</h2>
+
+<p>Pathname including the "base" (if any) and query string "/admin/login?foo=bar".</p>
+
+<h2>Context#path</h2>
+
+<p>Pathname and query string "/login?foo=bar".</p>
+
+<h2>Context#querystring</h2>
+
+<p>Query string void of leading <code>?</code> such as "foo=bar", defaults to "".</p>
+
+<h2>Context#pathname</h2>
+
+<p>The pathname void of query string "/login".</p>
+
+<h2>Context#state</h2>
+
+<p>The <code>pushState</code> state object.</p>
+
+<h2>Context#title</h2>
+
+<p>The <code>pushState</code> title.</p>
+
+<h2>Routing</h2>
+
+<p>The router uses the same string-to-regexp conversion
+  that Express does, so things like ":id", ":id?", and "*" work
+  as you might expect.</p>
+
+<p>Another aspect that is much like Express is the ability to
+  pass multiple callbacks. You can use this to your advantage
+  to flatten nested callbacks, or simply to abstract components.</p>
+
+<h3>Separating concerns</h3>
+
+<p>For example suppose you had a route to <em>edit</em> users, and a
+  route to <em>view</em> users. In both cases you need to load the user.
+  One way to achieve this is with several callbacks as shown here:</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user'</span><span class="p">,</span> <span class="nx">load</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/edit'</span><span class="p">,</span> <span class="nx">load</span><span class="p">,</span> <span class="nx">edit</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>Using the <code>*</code> character we could alter this to match all
+  routes prefixed with "/user" to achieve the same result:</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/*'</span><span class="p">,</span> <span class="nx">load</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user'</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/edit'</span><span class="p">,</span> <span class="nx">edit</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>Likewise <code>*</code> may be used as catch-alls after all routes
+  acting as a 404 handler, before all routes, in-between and
+  so on. For example:</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user'</span><span class="p">,</span> <span class="nx">load</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+  <span class="nx">$</span><span class="p">(</span><span class="s1">'body'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="s1">'Not found!'</span><span class="p">)</span>
+<span class="p">})</span>
+</pre>
+</div>
+
+
+<h3>Default 404 behaviour</h3>
+
+<p>By default when a route is not matched,
+  page.js will invoke <code>page.stop()</code> to unbind
+  itself, and proceed with redirecting to the
+  location requested. This means you may use
+  page.js with a multi-page application <em>without</em>
+  explicitly binding to certain links.</p>
+
+<h3>Working with parameters and contexts</h3>
+
+<p>Much like <code>request</code> and <code>response</code> objects are
+  passed around in Express, page.js has a single
+  "Context" object. Using the previous examples
+  of <code>load</code> and <code>show</code> for a user, we can assign
+  arbitrary properties to <code>ctx</code> to maintain state
+  between callbacks.</p>
+
+<p>First to build a <code>load</code> function that will load
+  the user for subsequent routes you'll need to
+  access the ":id" passed. You can do this with
+  <code>ctx.params.NAME</code> much like Express:</p>
+
+<div class="highlight">
+<pre><span class="kd">function</span> <span class="nx">load</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">next</span><span class="p">){</span>
+  <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+
+<p>Then perform some kind of action against the server,
+  assigning the user to <code>ctx.user</code> for other routes to
+  utilize. <code>next()</code> is then invoked to pass control to
+  the following matching route in sequence, if any.</p>
+
+<div class="highlight">
+<pre><span class="kd">function</span> <span class="nx">load</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">next</span><span class="p">){</span>
+  <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span>
+  <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">'/user/'</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s1">'.json'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">){</span>
+    <span class="nx">ctx</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">user</span>
+    <span class="nx">next</span><span class="p">()</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+
+<p>The "show" function might look something like this,
+  however you may render templates or do anything you
+  want. Note that here <code>next()</code> is <em>not</em> invoked, because
+  this is considered the "end point", and no routes
+  will be matched until another link is clicked or
+  <code>page(path)</code> is called.</p>
+
+<div class="highlight">
+<pre><span class="kd">function</span> <span class="nx">show</span><span class="p">(</span><span class="nx">ctx</span><span class="p">){</span>
+  <span class="nx">$</span><span class="p">(</span><span class="s1">'body'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">empty</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">'&lt;h1&gt;'</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'&lt;h1&gt;'</span><span class="p">);</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+
+<p>Finally using them like so:</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:id'</span><span class="p">,</span> <span class="nx">load</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<h3>Working with state</h3>
+
+<p>When working with the <code>pushState</code> API,
+  and thus page.js you may optionally provide
+  state objects available when the user navigates
+  the history.</p>
+
+<p>For example if you had a photo application
+  and you performed a relatively expensive
+  search to populate a list of images,
+  normally when a user clicks "back" in
+  the browser the route would be invoked
+  and the query would be made yet-again.</p>
+
+<p>Perhaps the route callback looks like this:</p>
+
+<div class="highlight">
+<pre><span class="kd">function</span> <span class="nx">show</span><span class="p">(</span><span class="nx">ctx</span><span class="p">){</span>
+  <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">'/photos'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">images</span><span class="p">){</span>
+    <span class="nx">displayImages</span><span class="p">(</span><span class="nx">images</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+
+<p>You may utilize the history's state
+   object to cache this result, or any
+   other values you wish. This makes it
+   possible to completely omit the query
+   when a user presses back, providing
+   a much nicer experience.</p>
+
+<div class="highlight">
+<pre><span class="kd">function</span> <span class="nx">show</span><span class="p">(</span><span class="nx">ctx</span><span class="p">){</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">images</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">displayImages</span><span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">images</span><span class="p">)</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">'/photos'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">images</span><span class="p">){</span>
+      <span class="nx">ctx</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">images</span> <span class="o">=</span> <span class="nx">images</span>
+      <span class="nx">ctx</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+      <span class="nx">displayImages</span><span class="p">(</span><span class="nx">images</span><span class="p">)</span>
+    <span class="p">})</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+
+<p><strong>NOTE</strong>: <code>ctx.save()</code> must be used
+  if the state changes <em>after</em> the first
+  tick (xhr, setTimeout, etc), otherwise
+  it is optional and the state will be
+  saved after dispatching.</p>
+
+<h3>Matching paths</h3>
+
+<p>Here are some examples of what's possible
+  with the string to <code>RegExp</code> conversion.</p>
+
+<p>Match an explicit path:</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/about'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>Match with required parameter accessed via <code>ctx.params.name</code>:</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:name'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>Match with several params, for example <code>/user/tj/edit</code> or
+  <code>/user/tj/view</code>.</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:name/:operation'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>Match with one optional and one required, now <code>/user/tj</code>
+  will match the same route as <code>/user/tj/show</code> etc:</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:name/:operation?'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>Use the wildcard char "<em>" to match across segments,
+  available via <code>ctx.params[N]</code> where <strong>N</strong> is the
+  index of "</em>" since you may use several. For example
+  the following will match <code>/user/12/edit</code>, <code>/user/12/albums/2/admin</code>
+  and so on.</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/*'</span><span class="p">,</span> <span class="nx">loadUser</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>Named wildcard accessed, for example <code>/file/javascripts/jquery.js</code>
+  would provide "/javascripts/jquery.js" as <code>ctx.params.file</code>:</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/file/:file(*)'</span><span class="p">,</span> <span class="nx">loadUser</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>And of course <code>RegExp</code> literals, where the capture
+  groups are available via <code>ctx.params[N]</code> where <strong>N</strong>
+  is the index of the capture group.</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="sr">/^\/commits\/(\d+)\.\.(\d+)/</span><span class="p">,</span> <span class="nx">loadUser</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<h2>Plugins</h2>
+
+<p>Currently there are no official plugins,
+  however <em>examples/query-string/query.js</em>
+  will provide a parsed <code>ctx.query</code> object
+  derived from <a href="https://github.com/visionmedia/node-querystring">https://github.com/visionmedia/node-querystring</a>.</p>
+
+<p>Usage by using "*" to match any path
+  in order to parse the query-string:</p>
+
+<div class="highlight">
+<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="nx">parse</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
+<span class="nx">page</span><span class="p">()</span>
+
+<span class="kd">function</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">ctx</span><span class="p">.</span><span class="nx">query</span> <span class="o">=</span> <span class="nx">qs</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+  <span class="nx">next</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">show</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">query</span><span class="p">).</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">document</span>
+      <span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'pre'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">query</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+
+<h3>Running tests</h3>
+
+<pre><code>$ make test
+$ open http://localhost:3000
+</code></pre>
+
+<h2>License</h2>
+
+<p>(The MIT License)</p>
+
+<p>Copyright (c) 2012 TJ Holowaychuk &lt;<a href="mailto:tj@vision-media.ca">tj@vision-media.ca</a>&gt;</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/visionmedia">visionmedia</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>

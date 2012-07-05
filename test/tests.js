@@ -153,6 +153,10 @@ describe('page', function(){
       page('/forum/1/thread/2');
     })
   })
+
+  after(function(){
+    page('/');
+  })
 })
 
 page();

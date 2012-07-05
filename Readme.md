@@ -105,6 +105,30 @@ $('.view').click(function(e){
   as well as the history "state" `ctx.state` that
   the `pushState` API provides.
 
+## Context#canonicalPath
+
+  Pathname including the "base" (if any) and query string "/admin/login?foo=bar".
+
+## Context#path
+
+  Pathname and query string "/login?foo=bar".
+
+## Context#querystring
+
+  Query string void of leading `?` such as "foo=bar", defaults to "".
+
+## Context#pathname
+
+  The pathname void of query string "/login".
+
+## Context#state
+
+  The `pushState` state object.
+
+## Context#title
+
+  The `pushState` title.
+
 ## Routing
 
   The router uses the same string-to-regexp conversion
@@ -317,7 +341,6 @@ page('/file/:file(*)', loadUser)
 ```js
 page(/^\/commits\/(\d+)\.\.(\d+)/, loadUser)
 ```
-
 
 ## Plugins
 

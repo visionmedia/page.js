@@ -88,7 +88,7 @@
     if (false !== options.popstate) addEventListener('popstate', onpopstate, false);
     if (false !== options.click) addEventListener('click', onclick, false);
     if (!dispatch) return;
-    page.replace(location.pathname, null, true, dispatch);
+    page.replace(location.pathname + location.search, null, true, dispatch);
   };
 
   /**

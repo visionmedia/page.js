@@ -15,6 +15,26 @@ describe('page', function(){
     })
   })
 
+  describe('ctx.querystring', function(){
+    it('should default to ""', function(done){
+      page('/querystring-default', function(ctx){
+        expect(ctx.querystring).to.equal('');
+        done();
+      });
+
+      page('/querystring-default');
+    })
+
+    it('should expose the query string', function(done){
+      page('/querystring', function(ctx){
+        expect(ctx.querystring).to.equal('hello=there');
+        done();
+      });
+
+      page('/querystring?hello=there');
+    })
+  })
+
   describe('when matching routes', function(){
     describe('when the path contains a query string', function(){
       it('should not consider the query string when matching', function(done){

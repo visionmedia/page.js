@@ -35,6 +35,26 @@ describe('page', function(){
     })
   })
 
+  describe('ctx.pathname', function(){
+    it('should default to ctx.path', function(done){
+      page('/pathname-default', function(ctx){
+        expect(ctx.pathname).to.equal('/pathname-default');
+        done();
+      });
+
+      page('/pathname-default');
+    })
+
+    it('should omit the query string', function(done){
+      page('/pathname', function(ctx){
+        expect(ctx.pathname).to.equal('/pathname');
+        done();
+      });
+
+      page('/pathname?hello=there');
+    })
+  })
+
   describe('when matching routes', function(){
     describe('when the path contains a query string', function(){
       it('should not consider the query string when matching', function(done){

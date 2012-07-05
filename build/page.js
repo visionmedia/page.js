@@ -88,7 +88,7 @@
     if (false !== options.popstate) addEventListener('popstate', onpopstate, false);
     if (false !== options.click) addEventListener('click', onclick, false);
     if (!dispatch) return;
-    page.replace(location.pathname, null, true, dispatch);
+    page.replace(location.pathname + location.search, null, true, dispatch);
   };
 
   /**
@@ -264,8 +264,10 @@
 
   Route.prototype.match = function(path, params){
     var keys = this.keys
-      , m = this.regexp.exec(path);
-
+      , qsIndex = path.indexOf('?')
+      , pathname = ~qsIndex ? path.slice(0, qsIndex) : path
+      , m = this.regexp.exec(pathname);
+  
     if (!m) return false;
 
     for (var i = 1, len = m.length; i < len; ++i) {
@@ -348,7 +350,7 @@
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
     var href = el.href;
-    var path = el.pathname;
+    var path = el.pathname + el.search;
     if (el.hash) return;
     if (!sameOrigin(href)) return;
     var orig = path;

@@ -15,6 +15,42 @@ describe('page', function(){
     })
   })
 
+  describe('when matching routes', function(){
+    describe('when the path contains a query string', function(){
+      it('should not consider the query string when matching', function(done){
+        page('/qs', function(ctx){
+          done();
+        });
+
+        page('/qs?test=true');
+      })
+
+      it('should not consider the query string when matching a route ending with a named param', function(done){
+        page('/qs/:testParam', function(ctx){
+          done();
+        });
+
+        page('/qs/test?test=true');
+      })
+
+      it('should not consider the query string when matching a route ending with a named wildcard param', function(done){
+        page('/qs/named/wildcard/:testParam(*)', function(ctx){
+          done();
+        });
+
+        page('/qs/named/wildcard/something/else?test=true');
+      })
+
+      it('should not consider the query string when matching a route ending with a wildcard', function(done){
+        page('/qs/wildcard/end/*', function(ctx){
+          done();
+        });
+
+        page('/qs/wildcard/end/with/something/here?test=true');
+      });
+    })
+  })
+
   describe('when the route matches', function(){
     it('should invoke the callback', function(done){
       page('/user/:name', function(ctx){
@@ -32,6 +68,28 @@ describe('page', function(){
 
       page('/blog/post/something');
     })
+
+    describe('when the match has a query string', function(){
+
+      it('should not include the query string inside ctx.params for named param values', function(done){
+        page('/query/string/:name', function(ctx){
+          expect(ctx.params.name).to.equal('something');
+          done();
+        })
+
+        page('/query/string/something?test=true');
+      })
+
+      it('should not include the query string inside ctx.params for named wildcard params', function(done){
+        page('/query/string/wildcard/:name(*)', function(ctx){
+          expect(ctx.params.name).to.equal('something');
+          done();
+        })
+
+        page('/query/string/wildcard/something?test=true');
+      })
+    })
+
   })
 
   describe('when next() is called', function(){

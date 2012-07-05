@@ -55,44 +55,25 @@ describe('page', function(){
     })
   })
 
-  describe('when matching routes', function(){
-    describe('when the path contains a query string', function(){
-      it('should not consider the query string when matching', function(done){
-        page('/qs', function(ctx){
-          done();
-        });
-
-        page('/qs?test=true');
-      })
-
-      it('should not consider the query string when matching a route ending with a named param', function(done){
-        page('/qs/:testParam', function(ctx){
-          done();
-        });
-
-        page('/qs/test?test=true');
-      })
-
-      it('should not consider the query string when matching a route ending with a named wildcard param', function(done){
-        page('/qs/named/wildcard/:testParam(*)', function(ctx){
-          done();
-        });
-
-        page('/qs/named/wildcard/something/else?test=true');
-      })
-
-      it('should not consider the query string when matching a route ending with a wildcard', function(done){
-        page('/qs/wildcard/end/*', function(ctx){
-          done();
-        });
-
-        page('/qs/wildcard/end/with/something/here?test=true');
+  describe('dispatcher', function(){
+    it('should ignore query strings', function(done){
+      page('/qs', function(ctx){
+        done();
       });
-    })
-  })
 
-  describe('when the route matches', function(){
-    it('should invoke the callback', function(done){
+      page('/qs?test=true');
+    })
+
+    it('should ignore query strings with params', function(done){
+      page('/qs/:name', function(ctx){
+        expect(ctx.params.name).to.equal('tobi');
+        done();
+      });
+
+      page('/qs/tobi?test=true');
+    })
+
+    it('should invoke the matching callback', function(done){
       page('/user/:name', function(ctx){
         done();
       })
@@ -109,48 +90,25 @@ describe('page', function(){
       page('/blog/post/something');
     })
 
-    describe('when the match has a query string', function(){
+    describe('when next() is invoked', function(){
+      it('should invoke subsequent matching middleware', function(done){
+        page('/forum/*', function(ctx, next){
+          ctx.fullPath = ctx.params[0];
+          next();
+        });
 
-      it('should not include the query string inside ctx.params for named param values', function(done){
-        page('/query/string/:name', function(ctx){
-          expect(ctx.params.name).to.equal('something');
+        page('/user', function(){
+
+        });
+
+        page('/forum/:fid/thread/:tid', function(ctx){
+          expect(ctx.fullPath).to.equal('1/thread/2');
+          expect(ctx.params.tid).to.equal('2');
           done();
-        })
+        });
 
-        page('/query/string/something?test=true');
+        page('/forum/1/thread/2');
       })
-
-      it('should not include the query string inside ctx.params for named wildcard params', function(done){
-        page('/query/string/wildcard/:name(*)', function(ctx){
-          expect(ctx.params.name).to.equal('something');
-          done();
-        })
-
-        page('/query/string/wildcard/something?test=true');
-      })
-    })
-
-  })
-
-  describe('when next() is called', function(){
-    it('should invoke the next matching route', function(done){
-
-      page('/forum/*', function(ctx, next){
-        ctx.fullPath = ctx.params[0];
-        next();
-      });
-
-      page('/user', function(){
-        
-      });
-
-      page('/forum/:fid/thread/:tid', function(ctx){
-        expect(ctx.fullPath).to.equal('1/thread/2');
-        expect(ctx.params.tid).to.equal('2');
-        done();
-      });
-
-      page('/forum/1/thread/2');
     })
   })
 

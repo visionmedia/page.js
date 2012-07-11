@@ -1,4 +1,3 @@
-
  ![page router logo](http://f.cl.ly/items/3i3n001d0s1Q031r2q1P/page.png)
 
   Tiny ~1200 byte Express-inspired client-side router.
@@ -31,7 +30,7 @@ page()
    - `state` illustrates how the history state may be used to cache data
    - `server` illustrates how to use the dispatch option to server initial content
    - `chrome` Google Chrome style administration interface
-   - `transitinos` Shows off a simple technique for adding transitions between "pages"
+   - `transitions` Shows off a simple technique for adding transitions between "pages"
 
   __NOTE__: keep in mind these examples do not use jQuery or similar, so
   portions of the examples may be relatively verbose, though they're not

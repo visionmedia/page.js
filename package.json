@@ -19,8 +19,5 @@
     "express": "3.0.0beta1",
     "jade": "0.26.1",
     "serve": "*"
-  },
-  "scripts": {
-    "test": "mocha test/tests.js"
   }
 }

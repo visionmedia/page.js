@@ -1,7 +1,7 @@
 
 var inBrowser = true;
 
-if (typeof window == 'undefined') {
+if ('undefined' == typeof document) {
   inBrowser = false;
   var chai = require('chai');
   var page = require('../lib/page');

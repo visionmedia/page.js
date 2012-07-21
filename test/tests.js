@@ -1,4 +1,12 @@
 
+var inBrowser = true;
+
+if (typeof window == 'undefined') {
+  inBrowser = false;
+  var chai = require('chai');
+  var page = require('../lib/page');
+}
+
 var expect = chai.expect;
 var called;
 
@@ -117,4 +125,4 @@ describe('page', function(){
   })
 })
 
-page();
+inBrowser ? page() : page('/'); // explicit dispatch if not in browser

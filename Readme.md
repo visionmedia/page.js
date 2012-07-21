@@ -374,6 +374,12 @@ function show(ctx) {
 ### Running tests
 
 ```
+npm test
+```
+
+Or, in the browser:
+
+```
 $ make test
 $ open http://localhost:3000
 ```

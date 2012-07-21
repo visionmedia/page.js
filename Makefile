@@ -17,8 +17,12 @@ stats:
 	@wc -c build/page.gz
 	@rm -f build/page.gz
 
-test:
+test-browser:
 	@./node_modules/.bin/serve test
+
+test:
+	@./node_modules/.bin/mocha test/tests.js
+
 clean:
 	rm -fr build
 

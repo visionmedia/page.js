@@ -13,6 +13,7 @@
   },
   "main": "build/page.js",
   "devDependencies": {
+    "chai": "*",
     "mocha": "*",
     "should": "*",
     "express": "3.0.0beta1",

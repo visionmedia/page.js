@@ -152,7 +152,7 @@
     var i = 0;
 
     function next() {
-      var fn = page.callbacks[i++];console.log( fn );
+      var fn = page.callbacks[i++];
       if (!fn) return unhandled(ctx);
       fn(ctx, next);
     }

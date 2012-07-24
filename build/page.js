@@ -84,6 +84,8 @@
     options = options || {};
     if (running) return;
     running = true;
+    // Add better cross browser handling and use normal clicks and routing as fallback
+    if (!(window.addEventListener && window.history && window.history.pushState)) options.popstate = options.click = false;
     if (false === options.dispatch) dispatch = false;
     if (false !== options.popstate) addEventListener('popstate', onpopstate, false);
     if (false !== options.click) addEventListener('click', onclick, false);
@@ -99,8 +101,10 @@
 
   page.stop = function(){
     running = false;
-    removeEventListener('click', onclick, false);
-    removeEventListener('popstate', onpopstate, false);
+    if (window.removeEventListener) {
+      removeEventListener('click', onclick, false);
+      removeEventListener('popstate', onpopstate, false);
+    }
   };
 
   /**
@@ -201,6 +205,8 @@
    */
 
   Context.prototype.pushState = function(){
+    // Fallback to redirect in case History API is not supported
+    if(!(window.history && window.history.pushState)) location = this.canonicalPath;
     history.pushState(this.state, this.title, this.canonicalPath);
   };
 
@@ -211,7 +217,8 @@
    */
 
   Context.prototype.save = function(){
-    history.replaceState(this.state, this.title, this.canonicalPath);
+    // Save only if History API is supported (no need to otherwise)
+    if(window.history && window.history.replaceState) history.replaceState(this.state, this.title, this.canonicalPath);
   };
 
   /**

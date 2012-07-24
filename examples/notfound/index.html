@@ -6,7 +6,7 @@
   </head>
   <body>
     <h1>Not Found</h1>
-    <p></p>
+    <p id="p"></p>
     <ul>
       <li><a href="./">/</a></li>
       <li><a href="./about">/about</a></li>
@@ -23,23 +23,23 @@
       page();
 
       function index() {
-        document.querySelector('p')
-          .textContent = 'viewing index';
+        document.getElementById('p')
+          .innerHTML = 'viewing index';
       }
       
       function about() {
-        document.querySelector('p')
-          .textContent = 'viewing about';
+        document.getElementById('p')
+          .innerHTML = 'viewing about';
       }
 
       function contact() {
-        document.querySelector('p')
-          .textContent = 'viewing contact';
+        document.getElementById('p')
+          .innerHTML = 'viewing contact';
       }
 
       function notfound() {
-        document.querySelector('p')
-          .textContent = 'not found';
+        document.getElementById('p')
+          .innerHTML = 'not found';
       }
     </script>
   </body>

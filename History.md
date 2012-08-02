@@ -1,4 +1,11 @@
 
+1.2.1 / 2012-08-02 
+==================
+
+  * add transitions example
+  * add exposing of `Context` and `Route` constructors
+  * fix infinite loop issue unhandled paths containing query-strings
+
 1.2.0 / 2012-07-05 
 ==================
 

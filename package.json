@@ -8,10 +8,9 @@
   },
   "component": {
     "scripts": {
-      "page": "build/page.js"
+      "page": "index.js"
     }
   },
-  "main": "build/page.js",
   "devDependencies": {
     "mocha": "*",
     "should": "*",

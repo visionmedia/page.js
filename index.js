@@ -166,7 +166,7 @@
    */
 
   function unhandled(ctx) {
-    if (window.location.pathname == ctx.canonicalPath) return;
+    if (window.location.pathname + window.location.search == ctx.canonicalPath) return;
     page.stop();
     ctx.unhandled = true;
     window.location = ctx.canonicalPath;

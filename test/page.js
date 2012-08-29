@@ -1,1 +1,1 @@
-../lib/page.js
+../index.js

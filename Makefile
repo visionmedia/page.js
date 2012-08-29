@@ -1,5 +1,5 @@
 
 test:
-	@./node_modules/.bin/serve
+	@./node_modules/.bin/serve test
 
 .PHONY: test

@@ -23,17 +23,24 @@
    * Register `path` with callback `fn()`,
    * or route `path`, or `page.start()`.
    *
+   *   page(fn);
+   *   page('*', fn);
    *   page('/user/:id', load, user);
    *   page('/user/' + user.id, { some: 'thing' });
    *   page('/user/' + user.id);
    *   page();
    *
-   * @param {String} path
+   * @param {String|Function} path
    * @param {Function} fn...
    * @api public
    */
 
   function page(path, fn) {
+    // <callback>
+    if ('function' == typeof path) {
+      return page('*', path);
+    }
+
     // route <path> to <callback ...>
     if ('function' == typeof fn) {
       var route = new Route(path);

@@ -52,6 +52,10 @@ page('*', notfound)
   Links that are not of the same origin are disregarded
   and will not be dispatched.
 
+### page(callback)
+
+  This is equivalent to `page('*', callback)` for generic "middleware".
+
 ### page(path)
 
   Navigate to the given `path`.

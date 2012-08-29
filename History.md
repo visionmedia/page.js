@@ -1,4 +1,12 @@
 
+1.3.0 / 2012-08-29 
+==================
+
+  * add `page(fn)` support. Closes #27
+  * add component.json
+  * fix tests
+  * fix examples
+
 1.2.1 / 2012-08-02 
 ==================
 

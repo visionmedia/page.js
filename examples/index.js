@@ -29,7 +29,7 @@ var examples = fs.readdirSync(__dirname).filter(function(file){
  */
 
 app.get('/page.js', function(req, res){
-  res.sendfile(join(__dirname, '..', 'lib', 'page.js'));
+  res.sendfile(join(__dirname, '..', 'index.js'));
 });
 
 /**

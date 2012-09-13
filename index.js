@@ -373,6 +373,7 @@
     if (!el || 'A' != el.nodeName) return;
     var href = el.href;
     var path = el.pathname + el.search;
+    if (path[0] !== '/') path = '/' + path;
     if (el.hash) return;
     if (!sameOrigin(href)) return;
     var orig = path;

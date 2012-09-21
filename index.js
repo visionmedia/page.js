@@ -367,6 +367,7 @@
    */
 
   function onclick(e) {
+    if (1 != which(e)) return;
     if (e.defaultPrevented) return; 
     var el = e.target;
     while (el && 'A' != el.nodeName) el = el.parentNode;
@@ -380,6 +381,17 @@
     if (base && orig == path) return;
     e.preventDefault();
     page.show(orig);
+  }
+
+  /**
+   * Event button.
+   */
+
+  function which(e) {
+    e = e || window.event;
+    return null == e.which
+      ? e.button
+      : e.which;
   }
 
   /**

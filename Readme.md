@@ -98,38 +98,40 @@ $('.view').click(function(e){
   Get or set the base `path`. For example if page.js
   is operating within "/blog/*" set the base path to "/blog". 
 
-### Context#save()
+### Context
 
-  Saves the context using `replaceState()`. For example
-  this is useful for caching HTML or other resources
-  that were loaded for when a user presses "back".
-  
   Routes are passed `Context` objects, these may
   be used to share state, for example `ctx.user =`,
   as well as the history "state" `ctx.state` that
   the `pushState` API provides.
 
-## Context#canonicalPath
+#### Context#save()
+
+  Saves the context using `replaceState()`. For example
+  this is useful for caching HTML or other resources
+  that were loaded for when a user presses "back".
+
+#### Context#canonicalPath
 
   Pathname including the "base" (if any) and query string "/admin/login?foo=bar".
 
-## Context#path
+#### Context#path
 
   Pathname and query string "/login?foo=bar".
 
-## Context#querystring
+#### Context#querystring
 
   Query string void of leading `?` such as "foo=bar", defaults to "".
 
-## Context#pathname
+#### Context#pathname
 
   The pathname void of query string "/login".
 
-## Context#state
+#### Context#state
 
   The `pushState` state object.
 
-## Context#title
+#### Context#title
 
   The `pushState` title.
 

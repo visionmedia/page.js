@@ -321,9 +321,9 @@ page('/user/:name/:operation', callback)
 page('/user/:name/:operation?', callback)
 ```
 
-  Use the wildcard char "*" to match across segments,
+  Use the wildcard char `*` to match across segments,
   available via `ctx.params[N]` where __N__ is the
-  index of "*" since you may use several. For example
+  index of `*` since you may use several. For example
   the following will match `/user/12/edit`, `/user/12/albums/2/admin`
   and so on.
 

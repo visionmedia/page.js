@@ -368,13 +368,13 @@
 
   function onclick(e) {
     if (1 != which(e)) return;
-    if (e.defaultPrevented) return; 
+    if (e.defaultPrevented) return;
     var el = e.target;
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
     var href = el.href;
     var path = el.pathname + el.search;
-    if (el.hash) return;
+    if (el.hash || '#' == el.getAttribute('href')) return;
     if (!sameOrigin(href)) return;
     var orig = path;
     path = path.replace(base, '');

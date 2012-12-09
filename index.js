@@ -1,4 +1,3 @@
-
 ;(function(){
 
   /**
@@ -373,8 +372,8 @@
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
     var href = el.href;
-    var path = el.pathname + el.search;
-    if (el.hash || '#' == el.getAttribute('href')) return;
+    var path = el.pathname + el.search + el.hash;
+    if (el.pathname == location.pathname && (el.hash || '#' == el.getAttribute('href'))) return;
     if (!sameOrigin(href)) return;
     var orig = path;
     path = path.replace(base, '');

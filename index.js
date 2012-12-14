@@ -334,7 +334,6 @@
     path = path
       .concat(strict ? '' : '/?')
       .replace(/\/\(/g, '(?:/')
-      .replace(/\+/g, '__plus__')
       .replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, function(_, slash, format, key, capture, optional){
         keys.push({ name: key, optional: !! optional });
         slash = slash || '';
@@ -346,7 +345,6 @@
           + (optional || '');
       })
       .replace(/([\/.])/g, '\\$1')
-      .replace(/__plus__/g, '(.+)')
       .replace(/\*/g, '(.*)');
     return new RegExp('^' + path + '$', sensitive ? '' : 'i');
   };

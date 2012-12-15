@@ -245,7 +245,7 @@
     options = options || {};
     this.path = path;
     this.method = 'GET';
-    this.regexp = pathtoRegexp(path
+    this.regexp = pathToRegex(path
       , this.keys = []
       , options.sensitive
       , options.strict);
@@ -327,27 +327,79 @@
    * @return {RegExp}
    * @api private
    */
-
-  function pathtoRegexp(path, keys, sensitive, strict) {
+  
+  function pathToRegex(path, keys, sensitive, strict){
     if (path instanceof RegExp) return path;
-    if (path instanceof Array) path = '(' + path.join('|') + ')';
-    path = path
-      .concat(strict ? '' : '/?')
-      .replace(/\/\(/g, '(?:/')
-      .replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, function(_, slash, format, key, capture, optional){
-        keys.push({ name: key, optional: !! optional });
-        slash = slash || '';
-        return ''
-          + (optional ? '' : slash)
-          + '(?:'
-          + (optional ? slash : '')
-          + (format || '') + (capture || (format && '([^/.]+?)' || '([^/]+?)')) + ')'
-          + (optional || '');
-      })
-      .replace(/([\/.])/g, '\\$1')
-      .replace(/\*/g, '(.*)');
-    return new RegExp('^' + path + '$', sensitive ? '' : 'i');
-  };
+    
+    var pieces = arrayifyPath(path);
+    pieces = pieces.map(function(piece, index){
+      if (~piece.search(/^\(.*\)$/)) // It is an inline regex
+        return "(?:" + piece.substring(1, piece.length);
+      else
+      {
+        return piece
+          .replace(/\+/g, '(.+)')
+          .replace(/\*/g, '(.*)')
+          .replace(/(\/)?(\.)?:(\w+)(\?)?(\*)?/g, function(_, slash, format, key, optional, star){
+              keys.push({ name: key, optional: !! optional });
+              slash = slash || '';
+              return ''
+                + (optional ? '' : slash)
+                + '(?:'
+                + (optional ? slash : '')
+                + (format || '') + (format && '([^/.]+?)' || '([^/]+?)') + ')'
+                + (optional || '')
+                + (star ? '(/*)?' : '');
+            })
+          .replace(/([\/.])/g, '\\$1');
+      }
+    })
+    
+    var regex = pieces.join('')
+      .concat(strict ? '' : '/?');
+    
+    return new RegExp("^" + regex + "$", sensitive ? '' : 'i');
+  }
+  
+  /**
+   * Separates inline regex from path strings by spliting into an array
+   */
+
+  function arrayifyPath(path){
+    var balance = 0, starts = null;
+    var arr = path.split(/(?=\()/g);
+    var rtrn = [];
+    
+    arr.forEach(function(element, index){
+      if (element[0] === "(")
+      {
+        if (balance === 0)
+          starts = index;
+        balance += 1;
+      }
+      if (typeof starts === 'number')
+      {
+        var ends = (element.match(/\)/g) || []).length;
+        
+        balance -= ends;
+        if (balance === 0)
+        {
+          var portion = arr.slice(starts, index+1).join('');
+          var lastIndexOfEnd = portion.lastIndexOf(")")+1;
+          rtrn.push(portion.slice(0, lastIndexOfEnd));
+          if (portion.slice(lastIndexOfEnd))
+            rtrn.push(portion.slice(lastIndexOfEnd));
+          start = null;
+        }
+      }
+      else
+      {
+        rtrn.push(element);
+      }
+    });
+    
+    return rtrn;
+  }
 
   /**
    * Handle "populate" events.

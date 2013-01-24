@@ -31,6 +31,7 @@ page()
    - `server` illustrates how to use the dispatch option to server initial content
    - `chrome` Google Chrome style administration interface
    - `transitions` Shows off a simple technique for adding transitions between "pages"
+   - `partials` using hogan.js to render mustache partials client side
 
   __NOTE__: keep in mind these examples do not use jQuery or similar, so
   portions of the examples may be relatively verbose, though they're not

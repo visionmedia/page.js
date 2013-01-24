@@ -1,0 +1,14 @@
+* { margin: 0; padding: 0; outline: 0; }
+
+body { font-family: Arial, Helvetica, Sans-Serif; }
+
+
+.shell { width: 800px; margin: 0 auto; }
+
+#navigation { height: 100%; overflow: hidden; }
+#navigation ul { list-style: none; display: inline-block; padding: 20px 0; }
+#navigation li { display: inline; font-size: 16px; line-height: 19px; padding-right: 10px; }
+#navigation li.active a { color: #c06; }
+#navigation a { display: inline-block; color: #39f; text-decoration: none; }
+#navigation ul:last-child { float: right; }
+#navigation ul:first-child { float: none; }

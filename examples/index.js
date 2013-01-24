@@ -33,6 +33,14 @@ app.get('/page.js', function(req, res){
 });
 
 /**
+ * GET test libraries.
+ */
+
+app.get(/^\/(mocha|chai)\.(css|js)$/i, function(req, res){
+  res.sendfile(join(__dirname, '../test/', req.params.join('.')));
+});
+
+/**
  * GET list of examples.
  */
 

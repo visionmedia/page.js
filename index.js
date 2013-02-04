@@ -115,13 +115,14 @@
    *
    * @param {String} path
    * @param {Object} state
+   * @param {Boolean} dispatch
    * @return {Context}
    * @api public
    */
 
-  page.show = function(path, state){
+  page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
-    page.dispatch(ctx);
+    if (false !== dispatch) page.dispatch(ctx);
     if (!ctx.unhandled) ctx.pushState();
     return ctx;
   };
@@ -289,7 +290,7 @@
       , qsIndex = path.indexOf('?')
       , pathname = ~qsIndex ? path.slice(0, qsIndex) : path
       , m = this.regexp.exec(pathname);
-  
+
     if (!m) return false;
 
     for (var i = 1, len = m.length; i < len; ++i) {

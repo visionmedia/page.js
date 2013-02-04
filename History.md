@@ -1,4 +1,10 @@
 
+1.3.4 / 2013-02-04 
+==================
+
+  * add tmp .show() dispatch argument
+  * add keywords to component.json
+
 1.3.3 / 2012-12-14 
 ==================
 

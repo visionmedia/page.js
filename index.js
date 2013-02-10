@@ -367,6 +367,7 @@
 
   function onclick(e) {
     if (1 != which(e)) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
     var el = e.target;
     while (el && 'A' != el.nodeName) el = el.parentNode;

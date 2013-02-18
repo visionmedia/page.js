@@ -375,7 +375,7 @@
     var href = el.href;
     var path = el.pathname + el.search;
     if (el.hash || '#' == el.getAttribute('href')) return;
-    if (el.target == "_blank") return;
+    if ('_blank' == el.target) return;
     if (!sameOrigin(href)) return;
     var orig = path;
     path = path.replace(base, '');

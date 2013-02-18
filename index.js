@@ -369,17 +369,28 @@
     if (1 != which(e)) return;
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
+
+    // ensure link
     var el = e.target;
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
+
+    // ensure non-hash
     var href = el.href;
     var path = el.pathname + el.search;
     if (el.hash || '#' == el.getAttribute('href')) return;
+
+    // ensure target
     if ('_blank' == el.target) return;
+
+    // x-origin
     if (!sameOrigin(href)) return;
+
+    // same page
     var orig = path;
     path = path.replace(base, '');
     if (base && orig == path) return;
+
     e.preventDefault();
     page.show(orig);
   }

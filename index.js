@@ -380,8 +380,8 @@
     var path = el.pathname + el.search;
     if (el.hash || '#' == el.getAttribute('href')) return;
 
-    // ensure target
-    if ('_blank' == el.target) return;
+    // check target
+    if (el.target) return;
 
     // x-origin
     if (!sameOrigin(href)) return;

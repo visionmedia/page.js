@@ -110,6 +110,21 @@ describe('page', function(){
         page('/forum/1/thread/2');
       })
     })
+
+    describe('with gc callback', function(){
+      it('should be invoked on a new page', function(done){
+        var calls = [];
+
+        page('/pet/:id', function(){
+          calls.push('in');
+        }, function(){
+          calls.push('out');
+          done();
+        });
+
+        page('/pet/1');
+      })
+    })
   })
 
   after(function(){

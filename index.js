@@ -2,6 +2,12 @@
 ;(function(){
 
   /**
+   * require('noop')
+   */
+
+  function noop(){}
+
+  /**
    * Perform initial dispatch.
    */
 
@@ -25,28 +31,35 @@
    *
    *   page(fn);
    *   page('*', fn);
+   *   page('*', setup, teardown);
    *   page('/user/:id', load, user);
    *   page('/user/' + user.id, { some: 'thing' });
    *   page('/user/' + user.id);
    *   page();
    *
+   * A second `gc` callback may be provided, which
+   * is invoked on the next dispatch allowing you
+   * to remove views or any other teardown.
+   *
    * @param {String|Function} path
-   * @param {Function} fn...
+   * @param {Function} [fn]
+   * @param {Function} [gc]
    * @api public
    */
 
-  function page(path, fn) {
+  function page(path, fn, gc) {
     // <callback>
     if ('function' == typeof path) {
       return page('*', path);
     }
 
-    // route <path> to <callback ...>
+    // route <path> to <callback>
     if ('function' == typeof fn) {
       var route = new Route(path);
-      for (var i = 1; i < arguments.length; ++i) {
-        page.callbacks.push(route.middleware(arguments[i]));
-      }
+      page.callbacks.push({
+        setup: route.middleware(fn),
+        teardown: route.middleware(gc || noop)
+      });
     // show <path> with [state]
     } else if ('string' == typeof path) {
       page.show(path, fn);
@@ -122,7 +135,8 @@
 
   page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
-    if (false !== dispatch) page.dispatch(ctx);
+    page.dispatch(ctx, 'teardown');
+    if (false !== dispatch) page.dispatch(ctx, 'setup');
     if (!ctx.unhandled) ctx.pushState();
     return ctx;
   };
@@ -139,8 +153,9 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
+    if (!init) page.dispatch(ctx, 'teardown');
     if (null == dispatch) dispatch = true;
-    if (dispatch) page.dispatch(ctx);
+    if (dispatch) page.dispatch(ctx, 'setup');
     ctx.save();
     return ctx;
   };
@@ -149,14 +164,16 @@
    * Dispatch the given `ctx`.
    *
    * @param {Object} ctx
+   * @param {String} state
    * @api private
    */
 
-  page.dispatch = function(ctx){
+  page.dispatch = function(ctx, state){
     var i = 0;
 
     function next() {
-      var fn = page.callbacks[i++];
+      var callbacks = page.callbacks[i++];
+      var fn = callbacks[state];
       if (!fn) return unhandled(ctx);
       fn(ctx, next);
     }

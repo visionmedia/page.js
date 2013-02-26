@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Basic</title>
+    <script src="/page.js"></script>
+  </head>
+  <body>
+    <h1>Teardown</h1>
+    <ul>
+      <li><a href="/teardown">index</a></li>
+      <li><a href="/teardown/about">about</a></li>
+    </ul>
+    <div id="content"></div>
+    <script>
+      page.base('/teardown');
+
+      var content = document.querySelector('#content');
+
+      // index page view
+
+      function IndexView() {
+        this.path = '/';
+      }
+
+      IndexView.prototype.render = function(){
+        var p = document.createElement('p');
+        p.textContent = 'Index page';
+        return p;
+      };
+
+      IndexView.prototype.destroy = function(){
+        console.log('cleanup handlers here');
+      };
+
+      // about page view
+
+      function AboutView() {
+        this.path = '/about';
+      }
+
+      AboutView.prototype.render = function(){
+        var p = document.createElement('p');
+        p.textContent = 'About page';
+        return p;
+      };
+
+      AboutView.prototype.destroy = function(){
+        console.log('cleanup handlers here');
+      };
+
+      // create a view registration helper
+      // to help automate a bit of boilerplate
+
+      function register(view) {
+        console.log('register %s', view.path);
+        page(view.path, function(){
+          var el = view.render();
+          content.innerHTML = '';
+          content.appendChild(el);
+        }, function(){
+          view.destroy();
+        });
+      }
+
+      // register views
+
+      register(new IndexView);
+      register(new AboutView);
+      page();
+
+    </script>
+  </body>
+</html>

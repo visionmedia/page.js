@@ -1,4 +1,11 @@
 
+2.0.0 / 2013-02-26 
+==================
+
+  * add second callback support for teardown
+  * ^-- breaks multiple regular callback support
+  * fix `target` support, ignore dispatching these  
+
 1.3.5 / 2013-02-12 
 ==================
 

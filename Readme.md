@@ -39,19 +39,59 @@ page()
 
 ## API
 
-### page(path, callback[, callback ...])
+### page(path, callback)
 
   Defines a route mapping `path` to the given `callback(s)`.
 
 ```js
 page('/', user.list)
-page('/user/:id', user.load, user.show)
-page('/user/:id/edit', user.load, user.edit)
+page('/user/:id', user.show)
+page('/user/:id/edit', user.edit)
 page('*', notfound)
 ```
 
   Links that are not of the same origin are disregarded
   and will not be dispatched.
+
+### page(path, callback, teardown)
+
+  Optionally a second `teardown` callback may be passed, this is
+  invoked on the _next_ dispatch, allowing you to perform cleanup
+  operations from the previous dispatch. For example here we delegate
+  to a `view`'s `.render()` and `.destroy()` methods:
+
+```js
+page('/user/:id', function(){
+  view.render();
+}, function(){
+  view.destroy();
+});
+```
+
+  With this a more opinionated API specific to your framework may be
+  created to minimize boilerplate. The following example uses an element
+  returned by the view's `.render()` method and replaces a content div,
+  then arbitrary cleanup is performed with `view.destroy()` as previously
+  shown.
+
+```js
+function register(view) {
+  page(view.path, function(){
+    var el = view.render();
+    content.innerHTML = '';
+    content.appendChild(el);
+  }, function(){
+    view.destroy();
+  });
+}
+
+// register views
+
+register(new IndexView);
+register(new UserView);
+register(new CollectionsView);
+page();
+````
 
 ### page(callback)
 
@@ -148,33 +188,14 @@ $('.view').click(function(e){
 
 ### Separating concerns
 
-  For example suppose you had a route to _edit_ users, and a
-  route to _view_ users. In both cases you need to load the user.
-  One way to achieve this is with several callbacks as shown here:
-
-```js
-page('/user/:user', load, show)
-page('/user/:user/edit', load, edit)
-```
-
-  Using the `*` character we could alter this to match all
-  routes prefixed with "/user" to achieve the same result:
+  Using the `*` character you could match all
+  routes prefixed with "/user" to optimistically
+  load the user:
 
 ```js
 page('/user/*', load)
 page('/user/:user', show)
 page('/user/:user/edit', edit)
-```
-
-  Likewise `*` may be used as catch-alls after all routes
-  acting as a 404 handler, before all routes, in-between and
-  so on. For example:
-
-```js
-page('/user/:user', load, show)
-page('*', function(){
-  $('body').text('Not found!')
-})
 ```
 
 ### Default 404 behaviour

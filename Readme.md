@@ -14,7 +14,7 @@ page()
 
 ## Running examples
 
-  To run examples do the following to install dev dependencies an run the example server:
+  To run examples do the following to install dev dependencies and run the example server:
 
     $ npm install
     $ node examples

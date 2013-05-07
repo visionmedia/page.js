@@ -1,4 +1,3 @@
-
 ;(function(){
 
   /**
@@ -18,6 +17,12 @@
    */
 
   var running;
+
+  /**
+   * To work properly with the URL
+   * history.location generated polyfill in https://github.com/devote/HTML5-History-API
+   */
+  var location = history.location || window.location;
 
   /**
    * Register `path` with callback `fn()`,
@@ -92,8 +97,8 @@
     if (running) return;
     running = true;
     if (false === options.dispatch) dispatch = false;
-    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
-    if (false !== options.click) window.addEventListener('click', onclick, false);
+    if (false !== options.popstate) addEvent(window, 'popstate', onpopstate);
+    if (false !== options.click) addEvent(document, 'click', onclick);
     if (!dispatch) return;
     page.replace(location.pathname + location.search, null, true, dispatch);
   };
@@ -106,8 +111,8 @@
 
   page.stop = function(){
     running = false;
-    removeEventListener('click', onclick, false);
-    removeEventListener('popstate', onpopstate, false);
+    removeEvent(document, 'click', onclick);
+    removeEvent(window, 'popstate', onpopstate);
   };
 
   /**
@@ -174,7 +179,7 @@
    */
 
   function unhandled(ctx) {
-    if (window.location.pathname + window.location.search == ctx.canonicalPath) return;
+    if (location.pathname + location.search == ctx.canonicalPath) return;
     page.stop();
     ctx.unhandled = true;
     window.location = ctx.canonicalPath;
@@ -366,18 +371,21 @@
    */
 
   function onclick(e) {
-    if (1 != which(e)) return;
+    if (!which(e)) return;
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
 
-    // ensure link
-    var el = e.target;
+    var el = e.target || e.srcElement;
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
 
     // ensure non-hash
     var href = el.href;
     var path = el.pathname + el.search;
+
+    // on non-html5 browsers (IE9-), `el.pathname` doesn't include leading '/'
+    if (path[0] !== '/') path = '/' + path;
+
     if (el.hash || '#' == el.getAttribute('href')) return;
 
     // check target
@@ -390,8 +398,7 @@
     var orig = path;
     path = path.replace(base, '');
     if (base && orig == path) return;
-
-    e.preventDefault();
+    e.preventDefault ? e.preventDefault() : e.returnValue = false;
     page.show(orig);
   }
 
@@ -402,10 +409,10 @@
   function which(e) {
     e = e || window.event;
     return null == e.which
-      ? e.button
-      : e.which;
+      ? e.button == 0
+      : e.which == 1;
   }
-
+  
   /**
    * Check if `href` is the same origin.
    */
@@ -415,6 +422,26 @@
     if (location.port) origin += ':' + location.port;
     return 0 == href.indexOf(origin);
   }
+  
+  /**
+   * Basic cross browser event code
+   */
+
+   function addEvent(obj, type, fn) {
+     if (obj.addEventListener) {
+       obj.addEventListener(type, fn, false);
+     } else {
+       obj.attachEvent('on' + type, fn);
+     }
+   }
+
+   function removeEvent(obj, type, fn) {
+     if (obj.removeEventListener) {
+       obj.removeEventListener(type, fn, false);
+     } else {
+       obj.detachEvent('on' + type, fn);
+     }
+   }
 
   /**
    * Expose `page`.

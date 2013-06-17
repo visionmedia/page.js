@@ -37,6 +37,11 @@
   var lock = false;
 
   /**
+   * history api flag.
+   */
+  var historyApi = (history.pushState && 'file:' != location.protocol);
+
+  /**
    * Register `path` with callback `fn()`,
    * or route `path`, or `page.start()`.
    *
@@ -110,7 +115,7 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false !== options.popstate) {
-      if (null === window.onpopstate) {
+      if (historyApi) {
         window.addEventListener('popstate', onpopstate, false);
       }
       else {
@@ -218,6 +223,19 @@
 
   function Context(path, state) {
     if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
+    // fixes android 3.0 which does not prepend a slash
+    path = '/' != path[0] ? '/' + path : path;
+    // if file is the protocol, rewrite url
+    if ('file:' == location.protocol) {
+      // root
+      if (path == location.pathname) {
+        path = '/';
+      }
+      // other paths have the drive prepended, ensure we get only the last part
+      else {
+        path = path.substr(path.lastIndexOf('/'));
+      }
+    }
     var i = path.indexOf('?');
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
@@ -242,17 +260,15 @@
    */
 
   Context.prototype.pushState = function() {
-    if (history.pushState) {
+    if (historyApi) {
       history.pushState(this.state, this.title, this.canonicalPath);
     }
     else {
       lock = true;
-      var url = this.canonicalPath;
-      url = '/' != url[0] ? '/' + url : url;
       // stores state in session storage with the url as key
-      sessionStorage.setItem(url, JSON.stringify(this.state));
+      sessionStorage.setItem(this.canonicalPath, JSON.stringify(this.state));
       // uses hash as a fallback
-      location = location.href.split('#')[0] + '#' + url;
+      location = location.href.split('#')[0] + '#' + this.canonicalPath;
     }
   };
 
@@ -263,16 +279,14 @@
    */
 
   Context.prototype.save = function() {
-    if (history.replaceState) {
+    if (historyApi) {
       history.replaceState(this.state, this.title, this.canonicalPath);
     }
     else {
-      var url = this.canonicalPath;
-      url = '/' != url[0] ? '/' + url : url;
       // stores state in session storage with the url as key
-      sessionStorage.setItem(url, JSON.stringify(this.state));
+      sessionStorage.setItem(this.canonicalPath, JSON.stringify(this.state));
       // uses hash as a fallback
-      location.replace(location.href.split('#')[0] + '#' + url);
+      location.replace(location.href.split('#')[0] + '#' + this.canonicalPath);
     }
   };
 

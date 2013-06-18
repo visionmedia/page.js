@@ -69,10 +69,10 @@
       for (var i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
-    // show <path> with [state]
+      // show <path> with [state]
     } else if ('string' == typeof path) {
       page.show(path, fn);
-    // start [options]
+      // start [options]
     } else {
       page.start(path);
     }

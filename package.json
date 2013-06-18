@@ -4,7 +4,7 @@
   "version": "1.3.6",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ngryman/page.js.git"
+    "url": "https://github.com/ngryman/page.js.git"
   },
   "component": {
     "scripts": {

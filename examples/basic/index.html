@@ -10,7 +10,7 @@
     <ul>
       <li><a href="./">/</a></li>
       <li><a href="#whoop">#whoop</a></li>
-      <li><a href="./about">/about</a></li>
+      <li><a href="./about#pepe">/about</a></li>
       <li><a href="./contact">/contact</a></li>
       <li><a href="./not-found?foo=bar">/not-found</a></li>
     </ul>
@@ -23,7 +23,7 @@
       // match any of the following routes
       page.base('/basic');
       page('/', index);
-      page('/about', about);
+      page('/about#pepe', about);
       page('/contact', contact);
       page();
 

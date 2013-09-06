@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hash</title>
+    <style>
+      body p {
+        color: #333;
+        font-family: verdana;
+      }
+      #sections p {
+        height: 500px;
+        margin: 30px;
+        padding: 30px;
+        line-height: 40px;
+        background-color: #eee;
+        border: 1px solid #ccb;
+        font-size: 30px;
+      }
+
+      #sections p a {
+        display: block;
+        float: right;
+        font-size: 14px;
+      }
+
+    </style>
+    <script src="/page.js"></script>
+  </head>
+  <body>
+    <h1 id="top">Hash</h1>
+
+    <ul>
+      <li><a href="section-1">Link</a></li>
+      <li><a href="section-1#subsection-C">Link + #hash</a></li>
+      <li><a href="#subsection-C">#hash</a></li>
+    </ul>
+
+    <div id="sections">
+      <p id="subsection-A"><strong>A</strong><a href="#top">top</a></p>
+      <p id="subsection-B"><strong>B</strong><a href="#top">top</a></p>
+      <p id="subsection-C"><strong>C</strong><a href="#top">top</a></p>
+    </div>
+
+    <script>
+      page.base('/hash');
+      page('/:section', section);
+      page();
+
+      function section(ctx, next) {
+        console.log('-> ctx.path -> ', ctx.path);
+        console.log('-> ctx.hash -> ', ctx.hash);
+        console.log('-> ctx.querystring -> ', ctx.querystring);
+      }
+    </script>
+  </body>
+</html>

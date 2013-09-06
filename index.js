@@ -389,8 +389,13 @@
 
     // ensure non-hash
     var href = el.href;
-    var path = el.pathname + el.search;
-    if (el.hash || '#' == el.getAttribute('href')) return;
+    var link = el.getAttribute('href');
+
+    // empty hash
+    if ('#' == link) return;
+
+    // only hash
+    if (el.hash == link) return;
 
     // check target
     if (el.target) return;
@@ -398,12 +403,15 @@
     // x-origin
     if (!sameOrigin(href)) return;
 
+    // rebuild path
+    var path = el.pathname + el.search + (el.hash || '');
+
     // same page
-    var orig = path;
+    var orig = path + '#' + el.hash;
     path = path.replace(base, '');
     if (base && orig == path) return;
 
-    e.preventDefault();
+    if (!el.hash) e.preventDefault();
     page.show(orig);
   }
 

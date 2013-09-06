@@ -95,7 +95,9 @@
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (!dispatch) return;
-    page.replace(location.pathname + location.search, null, true, dispatch);
+
+    var url = location.pathname + location.search + location.hash;
+    page.replace(url, null, true, dispatch);
   };
 
   /**
@@ -192,14 +194,24 @@
   function Context(path, state) {
     if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
+
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
+
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? path.slice(i + 1) : '';
     this.pathname = ~i ? path.slice(0, i) : path;
     this.params = [];
+
+    // add hash property and clean it from path and querystring
+    if (/\#/.test(this.path)) {
+      var parts = this.path.split('#');
+      this.path = parts[0];
+      this.hash = parts[1] || '';
+      this.querystring = this.querystring.split('#')[0];
+    }
   }
 
   /**
@@ -272,7 +284,7 @@
     return function(ctx, next){
       if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
       next();
-    }
+    };
   };
 
   /**
@@ -348,7 +360,7 @@
       .replace(/([\/.])/g, '\\$1')
       .replace(/\*/g, '(.*)');
     return new RegExp('^' + path + '$', sensitive ? '' : 'i');
-  };
+  }
 
   /**
    * Handle "populate" events.

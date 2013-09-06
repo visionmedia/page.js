@@ -388,18 +388,15 @@
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
 
-    // ensure non-hash
-    var href = el.href;
+    // ensure non-hash for the same path
     var link = el.getAttribute('href');
-
-    // check #hash
     if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
 
     // check target
     if (el.target) return;
 
     // x-origin
-    if (!sameOrigin(href)) return;
+    if (!sameOrigin(el.href)) return;
 
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');

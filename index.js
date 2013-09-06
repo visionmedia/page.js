@@ -205,6 +205,7 @@
     this.pathname = ~i ? path.slice(0, i) : path;
     this.params = [];
 
+    this.hash = '';
     // add hash property and clean it from path and querystring
     if (/\#/.test(this.path)) {
       var parts = this.path.split('#');
@@ -391,11 +392,8 @@
     var href = el.href;
     var link = el.getAttribute('href');
 
-    // empty hash
-    if ('#' == link) return;
-
-    // only hash
-    if (el.hash == link) return;
+    // check #hash
+    if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
 
     // check target
     if (el.target) return;
@@ -407,11 +405,12 @@
     var path = el.pathname + el.search + (el.hash || '');
 
     // same page
-    var orig = path + '#' + el.hash;
+    var orig = path + el.hash;
+
     path = path.replace(base, '');
     if (base && orig == path) return;
 
-    if (!el.hash) e.preventDefault();
+    e.preventDefault();
     page.show(orig);
   }
 

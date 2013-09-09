@@ -72,5 +72,5 @@ app.get('/:example/*', function(req, res){
   res.sendfile(join(__dirname, name, 'index.html'));
 });
 
-app.listen(3000);
-console.log('Example server listening on port 3000');
+app.listen(4000);
+console.log('Example server listening on port 4000');

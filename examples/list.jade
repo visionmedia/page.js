@@ -13,3 +13,10 @@ html
       for name in examples
         li
           a(href='/#{name}')= name
+          if ('hash' == name)
+            span
+              |  - 
+              a(href="/hash/section?query=string") section
+            span
+              |  - 
+              a(href="/hash/section?query=string#subsection") subsection

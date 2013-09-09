@@ -95,7 +95,8 @@
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (!dispatch) return;
-    page.replace(location.pathname + location.search, null, true, dispatch);
+    var url = location.pathname + location.search + location.hash;
+    page.replace(url, null, true, dispatch);
   };
 
   /**
@@ -174,7 +175,8 @@
    */
 
   function unhandled(ctx) {
-    if (window.location.pathname + window.location.search == ctx.canonicalPath) return;
+    var current = window.location.pathname + window.location.search;
+    if (current == ctx.canonicalPath) return;
     page.stop();
     ctx.unhandled = true;
     window.location = ctx.canonicalPath;
@@ -192,14 +194,24 @@
   function Context(path, state) {
     if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
+
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
+
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? path.slice(i + 1) : '';
     this.pathname = ~i ? path.slice(0, i) : path;
     this.params = [];
+
+    // fragment
+    this.hash = '';
+    if (!~this.path.indexOf('#')) return;
+    var parts = this.path.split('#');
+    this.path = parts[0];
+    this.hash = parts[1] || '';
+    this.querystring = this.querystring.split('#')[0];
   }
 
   /**
@@ -272,7 +284,7 @@
     return function(ctx, next){
       if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
       next();
-    }
+    };
   };
 
   /**
@@ -348,7 +360,7 @@
       .replace(/([\/.])/g, '\\$1')
       .replace(/\*/g, '(.*)');
     return new RegExp('^' + path + '$', sensitive ? '' : 'i');
-  };
+  }
 
   /**
    * Handle "populate" events.
@@ -375,19 +387,22 @@
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
 
-    // ensure non-hash
-    var href = el.href;
-    var path = el.pathname + el.search;
-    if (el.hash || '#' == el.getAttribute('href')) return;
+    // ensure non-hash for the same path
+    var link = el.getAttribute('href');
+    if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
 
     // check target
     if (el.target) return;
 
     // x-origin
-    if (!sameOrigin(href)) return;
+    if (!sameOrigin(el.href)) return;
+
+    // rebuild path
+    var path = el.pathname + el.search + (el.hash || '');
 
     // same page
-    var orig = path;
+    var orig = path + el.hash;
+
     path = path.replace(base, '');
     if (base && orig == path) return;
 

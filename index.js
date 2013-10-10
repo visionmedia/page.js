@@ -71,7 +71,7 @@
 
   page.base = function(path){
     if (0 == arguments.length) return base;
-    base = path;
+    base = path.replace(/\/$/, '');
   };
 
   /**
@@ -147,6 +147,17 @@
   };
 
   /**
+   * Alias to `history.back`.
+   *
+   * @param {Number} count
+   * @api public
+   */
+
+  page.back = function(count) {
+    history.back(-(count || 1));
+  }
+
+  /**
    * Dispatch the given `ctx`.
    *
    * @param {Object} ctx
@@ -192,7 +203,14 @@
    */
 
   function Context(path, state) {
-    if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
+    if (0 != path.indexOf(base)) {
+      if ('/' == path[0]) {
+        path = base + path;
+      } else if (path.replace(base, '')[0] != '/') {
+        path = base + '/' + path;
+      }
+    }
+
     var i = path.indexOf('?');
 
     this.canonicalPath = path;

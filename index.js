@@ -400,14 +400,9 @@
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');
 
-    // same page
-    var orig = path + el.hash;
-
-    path = path.replace(base, '');
-    if (base && orig == path) return;
-
     e.preventDefault();
-    page.show(orig);
+ 
+    page.show(path);
   }
 
   /**

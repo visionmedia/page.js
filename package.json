@@ -14,7 +14,7 @@
   "devDependencies": {
     "mocha": "*",
     "should": "*",
-    "express": "3.0.0beta1",
+    "express": "3.4.4",
     "jade": "0.26.1",
     "serve": "*"
   }

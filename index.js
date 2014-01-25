@@ -20,6 +20,12 @@
   var running;
 
   /**
+   * HashBang option
+   */
+
+  var hashbang = false;
+
+  /**
    * Register `path` with callback `fn()`,
    * or route `path`, or `page.start()`.
    *
@@ -94,8 +100,14 @@
     if (false === options.dispatch) dispatch = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) window.addEventListener('click', onclick, false);
+    if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = location.pathname + location.search + location.hash;
+
+    if (hashbang && location.hash.indexOf('#!') === 0)
+      var url = location.hash.substr(2) + location.search;
+    else
+      var url = location.pathname + location.search + location.hash;
+
     page.replace(url, null, true, dispatch);
   };
 
@@ -227,7 +239,7 @@
    */
 
   Context.prototype.pushState = function(){
-    history.pushState(this.state, this.title, this.canonicalPath);
+    history.pushState(this.state, this.title, (hashbang ? '#!'+this.canonicalPath : this.canonicalPath));
   };
 
   /**
@@ -237,7 +249,7 @@
    */
 
   Context.prototype.save = function(){
-    history.replaceState(this.state, this.title, this.canonicalPath);
+    history.replaceState(this.state, this.title, (hashbang ? '#!'+this.canonicalPath : this.canonicalPath));
   };
 
   /**

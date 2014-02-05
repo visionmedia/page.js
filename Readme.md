@@ -21,7 +21,7 @@ page()
     $ open http://localhost:3000
 
  Currently we have examples for:
- 
+
    - `basic` minimal application showing basic routing
    - `notfound` similar to `basic` with single-page 404 support
    - `album` showing pagination and external links
@@ -71,6 +71,10 @@ $('.view').click(function(e){
 
   Identical to `page(path)` above.
 
+### page.back(count)
+
+  Alias to `history.back`. Defaults count to `-1`.
+
 ### page([options])
 
   Register page's `popstate` / `click` bindings. If you're
@@ -96,7 +100,7 @@ $('.view').click(function(e){
 ### page.base([path])
 
   Get or set the base `path`. For example if page.js
-  is operating within "/blog/*" set the base path to "/blog". 
+  is operating within "/blog/*" set the base path to "/blog".
 
 ### Context
 
@@ -298,7 +302,7 @@ function show(ctx){
   with the string to `RegExp` conversion.
 
   Match an explicit path:
-  
+
 ```js
 page('/about', callback)
 ```
@@ -385,7 +389,7 @@ $ make test
 $ open http://localhost:3000/
 ```
 
-## License 
+## License
 
 (The MIT License)
 

@@ -37,7 +37,7 @@
 
   function page(path, fn) {
     // <callback>
-    if ('function' == typeof path) {
+    if (arguments.length === 1 && 'function' == typeof path) {
       return page('*', path);
     }
 
@@ -354,7 +354,7 @@
           + (optional ? '' : slash)
           + '(?:'
           + (optional ? slash : '')
-          + (format || '') + (capture || (format && '([^/.]+?)' || '([^/]+?)')) + ')'
+          + (format || '') + (capture || (format && '([^/.]+)' || '([^/]+)')) + ')'
           + (optional || '');
       })
       .replace(/([\/.])/g, '\\$1')

@@ -11,6 +11,8 @@
       "page": "index.js"
     }
   },
+  "ender": "ender.js",
+  "main": "index.js",
   "devDependencies": {
     "mocha": "*",
     "should": "*",

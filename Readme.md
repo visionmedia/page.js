@@ -389,8 +389,8 @@ $ open http://localhost:3000/
 
   * Break commits into a single objective.
   * An objective should be a chunk of code that is related but requires explaination.
-  * Should be in the form of what-it-is: how-it-does-it and or why-it's-needed.
-  * Pull requests should read like a guide to the code.
+  * Commits should be in the form of what-it-is: how-it-does-it and or why-it's-needed or what-it-is for trivial changes
+  * Pull requests and commits should be a guide to the code.
 
 ## License 
 

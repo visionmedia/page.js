@@ -197,12 +197,13 @@
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
+    if ('/' !== this.path[0]) this.path = '/' + this.path;
 
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;
-    this.querystring = ~i ? path.slice(i + 1) : '';
-    this.pathname = ~i ? path.slice(0, i) : path;
+    this.querystring = ~i ? this.path.slice(i + 1) : '';
+    this.pathname = ~i ? this.path.slice(0, i) : this.path;
     this.params = [];
 
     // fragment
@@ -212,6 +213,7 @@
     this.path = parts[0];
     this.hash = parts[1] || '';
     this.querystring = this.querystring.split('#')[0];
+    this.pathname = this.pathname.split('#')[0];
   }
 
   /**

@@ -197,6 +197,7 @@
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
+    if ('/' !== this.path[0]) this.path = '/' + this.path;
 
     this.title = document.title;
     this.state = state || {};
@@ -209,7 +210,7 @@
     this.hash = '';
     if (!~this.path.indexOf('#')) return;
     var parts = this.path.split('#');
-    this.path = parts[0] || '/';
+    this.path = parts[0];
     this.hash = parts[1] || '';
     this.querystring = this.querystring.split('#')[0];
   }

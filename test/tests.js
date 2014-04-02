@@ -1,11 +1,24 @@
+var isNode = typeof window !== "object";
+
+if (isNode) {
+  require('./support/jsdom');
+  global.chai = require('chai');
+  global.page = require('../index');
+}
 
 var expect = chai.expect;
 var called;
 
 // XXX: super lame hack
 
-page('/', function(){
-  called = true;
+before(function() {
+  page('/', function(){
+    called = true;
+  })
+})
+
+before(function() {
+  page();
 })
 
 describe('page', function(){
@@ -116,5 +129,3 @@ describe('page', function(){
     page('/');
   })
 })
-
-page();

@@ -12,10 +12,13 @@
     }
   },
   "devDependencies": {
-    "mocha": "*",
+    "mocha": "^1.18.2",
+    "chai": "^1.9.0",
     "should": "*",
     "express": "3.4.4",
     "jade": "0.26.1",
-    "serve": "*"
+    "serve": "*",
+    "jscoverage": "^0.3.8",
+    "jsdom": "^0.10.4"
   }
 }

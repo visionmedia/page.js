@@ -11,6 +11,9 @@
       "page": "index.js"
     }
   },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha 2>&1 | grep -v process.nextTick"
+  },
   "devDependencies": {
     "mocha": "^1.18.2",
     "chai": "^1.9.0",

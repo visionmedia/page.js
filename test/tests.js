@@ -18,7 +18,13 @@ before(function() {
 })
 
 before(function() {
-  page();
+  if (isNode) {
+    // jsdom seems to trigger popstate when replaceState happens, which should
+    // not be the case
+    page({ popstate: false });
+  } else {
+    page();
+  }
 })
 
 describe('page', function(){

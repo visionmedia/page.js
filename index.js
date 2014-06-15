@@ -195,6 +195,9 @@
     if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
 
+    if (state && state.body) {
+      this.body = state.body;
+    }
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
 
@@ -384,33 +387,110 @@
 
     // ensure link
     var el = e.target;
-    while (el && 'A' != el.nodeName) el = el.parentNode;
-    if (!el || 'A' != el.nodeName) return;
+    while (el && 'A' != el.nodeName && 'BUTTON' != el.nodeName && 'INPUT' != el.nodeName) el = el.parentNode;
 
-    // ensure non-hash for the same path
-    var link = el.getAttribute('href');
-    if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
+    if (!el) return;
 
-    // Check for mailto: in the href
-    if (link.indexOf("mailto:") > -1) return;
+    switch (el.nodeName) {
+      case 'A':
+        // ensure non-hash for the same path
+        var link = el.getAttribute('href');
+        if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
 
-    // check target
-    if (el.target) return;
+        // check target
+        if (el.target) return;
 
-    // x-origin
-    if (!sameOrigin(el.href)) return;
+        // Check for mailto: in the href
+        if (link.indexOf('mailto:') > -1) return;
 
-    // rebuild path
-    var path = el.pathname + el.search + (el.hash || '');
+        // x-origin
+        if (!sameOrigin(el.href)) return;
 
-    // same page
-    var orig = path + el.hash;
+        // rebuild path
+        var path = el.pathname + el.search + (el.hash || '');
 
-    path = path.replace(base, '');
-    if (base && orig == path) return;
+        // same page
+        var orig = path + el.hash;
 
-    e.preventDefault();
-    page.show(orig);
+        path = path.replace(base, '');
+        if (base && orig == path) return;
+
+        e.preventDefault();
+        page.show(orig);
+        break;
+      case 'INPUT':
+      case 'BUTTON':
+        // not an actionable button
+        if (!el.getAttribute('type')) return;
+        if (el.getAttribute('type') != 'submit') return;
+
+        // find parent form
+        var form = el.parentNode, body = {}, i, l, control;
+        while (form && 'FORM' != form.nodeName) form = form.parentNode;
+
+        // no parent form
+        if (!form) return;
+
+        var link = form.action;
+
+        // strip protocol
+        var proto = link.split('://');
+        if (proto) {
+          if (proto[1]) {
+            link = proto[1];
+            form.pathname = link = proto[1].replace(location.host, '');
+          }
+        }
+
+        // normalize hash / search
+        if (!form.hash) {
+          form.hash = '';
+        }
+        if (!form.search) {
+          form.search = '';
+        }
+
+        // ensure non-hash for the same path
+        if (form.pathname == location.pathname && (form.hash || '#' == link)) return;
+
+        // x-origin
+        if (!sameOrigin(form.action)) return;
+
+        // rebuild path
+        var path = form.pathname + form.search + (form.hash || '');
+
+        // same page
+        var orig = path + form.hash;
+
+        path = path.replace(base, '');
+        if (base && orig == path) return;
+
+        // build req.body
+        l = form.elements.length;
+        for (i = 0; i < l; i++) {
+          control = form.elements[i];
+          if (control.nodeName != 'BUTTON' && control.type != 'submit') {
+            if (control.name) {
+              body[control.name] = control.value;
+            }
+            else if (control.id) {
+              body[control.id] = control.value;
+            }
+          }
+        }
+        if (control.name) {
+          body[el.name] = el.value;
+        }
+        else if (control.id) {
+          body[el.id] = el.value;
+        }
+
+        e.preventDefault();
+        page.show(orig, {body: body});
+        break;
+      default:
+        return;
+    }
   }
 
   /**

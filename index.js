@@ -2,6 +2,13 @@
 ;(function(){
 
   /**
+   * To work properly with the URL
+   * history.location generated polyfill in https://github.com/devote/HTML5-History-API
+   */
+
+  var location = window.history.location || window.location;
+
+  /**
    * Perform initial dispatch.
    */
 
@@ -175,11 +182,11 @@
    */
 
   function unhandled(ctx) {
-    var current = window.location.pathname + window.location.search;
+    var current = location.pathname + location.search;
     if (current == ctx.canonicalPath) return;
     page.stop();
     ctx.unhandled = true;
-    window.location = ctx.canonicalPath;
+    location.href = ctx.canonicalPath;
   }
 
   /**

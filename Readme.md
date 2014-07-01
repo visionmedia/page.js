@@ -385,6 +385,12 @@ $ make test
 $ open http://localhost:3000/
 ```
 
+### Support in IE8+
+If you want the router to work in older version of Internet Explorer that don't support pushState, you can use the [HTML5-History-API](https://github.com/devote/HTML5-History-API) polyfill:
+```bash
+  npm install html5-history-api
+```
+
 ### Pull Requests
 
   * Break commits into a single objective.

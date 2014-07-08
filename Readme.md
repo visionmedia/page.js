@@ -33,6 +33,8 @@ page()
 
   To run examples do the following to install dev dependencies and run the example server:
 
+    $ git clone git://github.com/visionmedia/page.js
+    $ cd page.js
     $ npm install
     $ node examples
     $ open http://localhost:3000

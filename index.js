@@ -2,12 +2,6 @@
 ;(function(){
 
   /**
-   * Define global scope.
-   */
-
-  var window = typeof window === 'undefined' ? global : window;
-
-  /**
    * To work properly with the URL
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */

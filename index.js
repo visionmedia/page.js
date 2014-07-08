@@ -40,6 +40,10 @@
    *   page('/user/:id', load, user);
    *   page('/user/' + user.id, { some: 'thing' });
    *   page('/user/' + user.id);
+   *   page({
+   *     '/user':fn1, 
+   *     '/user/:id':[fn2,fn3]
+   *   })
    *   page();
    *
    * @param {String|Function} path
@@ -49,8 +53,22 @@
 
   function page(path, fn) {
     // <callback>
-    if ('function' == typeof path) {
+    var path_type = typeof path;
+
+    if ('function' == path_type) {
       return page('*', path);
+    }
+    
+    if ('object' == path_type) {
+        for(var i in path){
+            page(i,path[i])
+        }
+        return
+    }
+    if (toString.call(fn) == "[object Array]") {
+        fn.unshift(path)
+        page.apply(fn)
+        return
     }
 
     // route <path> to <callback ...>
@@ -60,7 +78,7 @@
         page.callbacks.push(route.middleware(arguments[i]));
       }
     // show <path> with [state]
-    } else if ('string' == typeof path) {
+    } else if ('string' == path_type) {
       page.show(path, fn);
     // start [options]
     } else {

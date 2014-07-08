@@ -15,7 +15,11 @@
     "test": "./node_modules/.bin/mocha",
     "coverage": "(cp index.js index.js~; ./node_modules/.bin/jscoverage index.js; mv index-cov.js index.js; ./node_modules/.bin/mocha -R html-cov > coverage.html); mv index.js~ index.js"
   },
+  "dependencies": {
+    "path-to-regexp": "~0.2.0"
+  },
   "devDependencies": {
+    "browserify": "~4.2.0",
     "mocha": "^1.18.2",
     "chai": "^1.9.0",
     "should": "*",

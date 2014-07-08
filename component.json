@@ -5,5 +5,8 @@
   "description": "Tiny client-side router (~1200 bytes)",
   "keywords": ["page", "route", "router", "routes", "pushState"],
   "scripts": ["index.js"],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "component/path-to-regexp": "0.2.1"
+  }
 }

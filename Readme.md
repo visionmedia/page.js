@@ -12,21 +12,21 @@ page('*', notfound)
 page()
 ```
 
-## Installation 
+## Installation
 
   There are multiple ways to install `page.js`.
   With package managers:
-  
+
   ```bash
   $ npm install page # for browserify
   $ component install visionmedia/page.js
   $ bower install visionmedia/page.js
   ```
-  
+
   Via CDN and script tag:
-  
+
   ```html
-  <script src="https://cdn.rawgit.com/visionmedia/page.js/1.3.7/index.js">
+  <script src="https://cdn.rawgit.com/visionmedia/page.js/1.4.0/page.js">
   ```
 
 ## Running examples
@@ -38,7 +38,7 @@ page()
     $ open http://localhost:3000
 
  Currently we have examples for:
- 
+
    - `basic` minimal application showing basic routing
    - `notfound` similar to `basic` with single-page 404 support
    - `album` showing pagination and external links
@@ -113,7 +113,7 @@ $('.view').click(function(e){
 ### page.base([path])
 
   Get or set the base `path`. For example if page.js
-  is operating within "/blog/*" set the base path to "/blog". 
+  is operating within "/blog/*" set the base path to "/blog".
 
 ### Context
 
@@ -315,7 +315,7 @@ function show(ctx){
   with the string to `RegExp` conversion.
 
   Match an explicit path:
-  
+
 ```js
 page('/about', callback)
 ```
@@ -409,7 +409,7 @@ $ open http://localhost:3000/
   * Commits should be in the form of what-it-is: how-it-does-it and or why-it's-needed or what-it-is for trivial changes
   * Pull requests and commits should be a guide to the code.
 
-## License 
+## License
 
 (The MIT License)
 

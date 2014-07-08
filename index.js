@@ -1,4 +1,6 @@
 
+  /* jshint browser:true */
+
   /**
    * Module dependencies.
    */

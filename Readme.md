@@ -12,6 +12,23 @@ page('*', notfound)
 page()
 ```
 
+## Installation 
+
+  There are multiple ways to install `page.js`.
+  With package managers:
+  
+  ```bash
+  $ npm install page # for browserify
+  $ component install visionmedia/page.js
+  $ bower install visionmedia/page.js
+  ```
+  
+  Via CDN and script tag:
+  
+  ```html
+  <script src="https://cdn.rawgit.com/visionmedia/page.js/1.3.7/index.js">
+  ```
+
 ## Running examples
 
   To run examples do the following to install dev dependencies and run the example server:

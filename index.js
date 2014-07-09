@@ -268,9 +268,9 @@
 
   function Route(path, options) {
     options = options || {};
-    this.path = path;
+    this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
-    this.regexp = pathtoRegexp(path
+    this.regexp = pathtoRegexp(this.path
       , this.keys = []
       , options.sensitive
       , options.strict);

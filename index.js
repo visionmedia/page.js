@@ -1,5 +1,7 @@
 
   /* jshint browser:true */
+  /* jshint -W079 */ // history.location
+  /* globals require, module */
 
   /**
    * Module dependencies.
@@ -229,8 +231,12 @@
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;
-    this.querystring = ~i ? path.slice(i + 1) : '';
-    this.pathname = ~i ? path.slice(0, i) : path;
+    this.querystring = ~i
+      ? path.slice(i + 1)
+      : '';
+    this.pathname = ~i
+      ? path.slice(0, i)
+      : path;
     this.params = [];
 
     // fragment
@@ -294,10 +300,10 @@
     options = options || {};
     this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
-    this.regexp = pathtoRegexp(this.path
-      , this.keys = []
-      , options.sensitive
-      , options.strict);
+    this.regexp = pathtoRegexp(this.path,
+      this.keys = [],
+      options.sensitive,
+      options.strict);
   }
 
   /**
@@ -334,10 +340,12 @@
    */
 
   Route.prototype.match = function(path, params){
-    var keys = this.keys
-      , qsIndex = path.indexOf('?')
-      , pathname = ~qsIndex ? path.slice(0, qsIndex) : path
-      , m = this.regexp.exec(decodeURIComponent(pathname));
+    var keys = this.keys,
+        qsIndex = path.indexOf('?'),
+        pathname = ~qsIndex
+          ? path.slice(0, qsIndex)
+          : path,
+        m = this.regexp.exec(decodeURIComponent(pathname));
 
     if (!m) return false;
 
@@ -429,7 +437,7 @@
   function sameOrigin(href) {
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
-    return (href && (0 === href.indexOf(origin)));
+    return href && (0 === href.indexOf(origin));
   }
 
   page.sameOrigin = sameOrigin;

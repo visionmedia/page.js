@@ -363,7 +363,7 @@
     if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
 
     // Check for mailto: in the href
-    if (link.indexOf("mailto:") > -1) return;
+    if (link && link.indexOf("mailto:") > -1) return;
 
     // check target
     if (el.target) return;
@@ -400,7 +400,7 @@
   function sameOrigin(href) {
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
-    return 0 === href.indexOf(origin);
+    return (href && (0 === href.indexOf(origin)));
   }
 
 },{"path-to-regexp":2}],2:[function(_dereq_,module,exports){

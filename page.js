@@ -1,6 +1,8 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.page=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 
   /* jshint browser:true */
+  /* jshint -W079 */ // history.location
+  /* globals require, module */
 
   /**
    * Module dependencies.
@@ -13,6 +15,13 @@
    */
 
   module.exports = page;
+
+  /**
+   * To work properly with the URL
+   * history.location generated polyfill in https://github.com/devote/HTML5-History-API
+   */
+
+  var location = window.history.location || window.location;
 
   /**
    * Perform initial dispatch.
@@ -162,8 +171,7 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
-    if (null === dispatch) dispatch = true;
-    if (dispatch) page.dispatch(ctx);
+    if (false !== dispatch) page.dispatch(ctx);
     ctx.save();
     return ctx;
   };
@@ -197,11 +205,11 @@
    */
 
   function unhandled(ctx) {
-    var current = window.location.pathname + window.location.search;
+    var current = location.pathname + location.search;
     if (current == ctx.canonicalPath) return;
     page.stop();
     ctx.unhandled = true;
-    window.location = ctx.canonicalPath;
+    location.href = ctx.canonicalPath;
   }
 
   /**
@@ -223,8 +231,12 @@
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;
-    this.querystring = ~i ? path.slice(i + 1) : '';
-    this.pathname = ~i ? path.slice(0, i) : path;
+    this.querystring = ~i
+      ? path.slice(i + 1)
+      : '';
+    this.pathname = ~i
+      ? path.slice(0, i)
+      : path;
     this.params = [];
 
     // fragment
@@ -288,10 +300,10 @@
     options = options || {};
     this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
-    this.regexp = pathtoRegexp(this.path
-      , this.keys = []
-      , options.sensitive
-      , options.strict);
+    this.regexp = pathtoRegexp(this.path,
+      this.keys = [],
+      options.sensitive,
+      options.strict);
   }
 
   /**
@@ -328,10 +340,12 @@
    */
 
   Route.prototype.match = function(path, params){
-    var keys = this.keys
-      , qsIndex = path.indexOf('?')
-      , pathname = ~qsIndex ? path.slice(0, qsIndex) : path
-      , m = this.regexp.exec(decodeURIComponent(pathname));
+    var keys = this.keys,
+        qsIndex = path.indexOf('?'),
+        pathname = ~qsIndex
+          ? path.slice(0, qsIndex)
+          : path,
+        m = this.regexp.exec(decodeURIComponent(pathname));
 
     if (!m) return false;
 
@@ -381,7 +395,6 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (link === null) return;
     if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
 
     // Check for mailto: in the href
@@ -424,7 +437,7 @@
   function sameOrigin(href) {
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
-    return (href && (0 === href.indexOf(origin)));
+    return href && (0 === href.indexOf(origin));
   }
 
   page.sameOrigin = sameOrigin;

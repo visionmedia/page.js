@@ -1,6 +1,7 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.page=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 
   /* jshint browser:true */
+  /* globals require, module */
 
   /**
    * Module dependencies.
@@ -83,7 +84,7 @@
    */
 
   page.base = function(path){
-    if (0 == arguments.length) return base;
+    if (0 === arguments.length) return base;
     base = path;
   };
 
@@ -136,8 +137,8 @@
 
   page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
-    if (false !== dispatch) page.dispatch(ctx);
     if (!ctx.unhandled) ctx.pushState();
+    if (false !== dispatch) page.dispatch(ctx);
     return ctx;
   };
 
@@ -153,8 +154,7 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
-    if (null == dispatch) dispatch = true;
-    if (dispatch) page.dispatch(ctx);
+    if (false !== dispatch) page.dispatch(ctx);
     ctx.save();
     return ctx;
   };
@@ -205,7 +205,7 @@
    */
 
   function Context(path, state) {
-    if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
+    if ('/' == path[0] && 0 !== path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
@@ -271,10 +271,10 @@
     options = options || {};
     this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
-    this.regexp = pathtoRegexp(this.path
-      , this.keys = []
-      , options.sensitive
-      , options.strict);
+    this.regexp = pathtoRegexp(this.path,
+      this.keys = [],
+      options.sensitive,
+      options.strict);
   }
 
   /**
@@ -311,24 +311,20 @@
    */
 
   Route.prototype.match = function(path, params){
-    var keys = this.keys
-      , qsIndex = path.indexOf('?')
-      , pathname = ~qsIndex ? path.slice(0, qsIndex) : path
-      , m = this.regexp.exec(decodeURIComponent(pathname));
+    var keys = this.keys,
+        qsIndex = path.indexOf('?'),
+        pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
+        m = this.regexp.exec(decodeURIComponent(pathname));
 
     if (!m) return false;
 
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' == typeof m[i]
-        ? decodeURIComponent(m[i])
-        : m[i];
+      var val = 'string' == typeof m[i] ? decodeURIComponent(m[i]) : m[i];
 
       if (key) {
-        params[key.name] = undefined !== params[key.name]
-          ? params[key.name]
-          : val;
+        params[key.name] = undefined !== params[key.name] ? params[key.name] : val;
       } else {
         params.push(val);
       }
@@ -394,9 +390,7 @@
 
   function which(e) {
     e = e || window.event;
-    return null == e.which
-      ? e.button
-      : e.which;
+    return null === e.which ? e.button : e.which;
   }
 
   /**
@@ -406,7 +400,7 @@
   function sameOrigin(href) {
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
-    return 0 == href.indexOf(origin);
+    return 0 === href.indexOf(origin);
   }
 
 },{"path-to-regexp":2}],2:[function(_dereq_,module,exports){
@@ -415,6 +409,11 @@
  */
 module.exports = pathtoRegexp;
 
+/**
+ * The main path matching regexp utility.
+ *
+ * @type {RegExp}
+ */
 var PATH_REGEXP = new RegExp([
   // Match already escaped characters that would otherwise incorrectly appear
   // in future matches. This allows the user to escape special characters that
@@ -441,6 +440,19 @@ function escapeGroup (group) {
 }
 
 /**
+ * Attach the keys as a property of the regexp.
+ *
+ * @param  {RegExp} re
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+var attachKeys = function (re, keys) {
+  re.keys = keys;
+
+  return re;
+};
+
+/**
  * Normalize the given path string, returning a regular expression.
  *
  * An empty array should be passed in, which will contain the placeholder key
@@ -452,6 +464,11 @@ function escapeGroup (group) {
  * @return {RegExp}
  */
 function pathtoRegexp (path, keys, options) {
+  if (keys && !Array.isArray(keys)) {
+    options = keys;
+    keys = null;
+  }
+
   keys = keys || [];
   options = options || {};
 
@@ -475,7 +492,7 @@ function pathtoRegexp (path, keys, options) {
     }));
 
     // Return the source back to the user.
-    return path;
+    return attachKeys(path, keys);
   }
 
   if (Array.isArray(path)) {
@@ -487,7 +504,7 @@ function pathtoRegexp (path, keys, options) {
     });
 
     // Generate a new regexp instance by joining all the parts together.
-    return new RegExp('(?:' + path.join('|') + ')', flags);
+    return attachKeys(new RegExp('(?:' + path.join('|') + ')', flags), keys);
   }
 
   // Alter the path string into a usable regexp.
@@ -552,7 +569,7 @@ function pathtoRegexp (path, keys, options) {
     path += strict && endsWithSlash ? '' : '(?=\\/|$)';
   }
 
-  return new RegExp('^' + path + (end ? '$' : ''), flags);
+  return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
 },{}]},{},[1])

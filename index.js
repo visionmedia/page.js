@@ -153,8 +153,7 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
-    if (null === dispatch) dispatch = true;
-    if (dispatch) page.dispatch(ctx);
+    if (false !== dispatch) page.dispatch(ctx);
     ctx.save();
     return ctx;
   };

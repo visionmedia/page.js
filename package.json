@@ -16,7 +16,7 @@
     "coverage": "(cp index.js index.js~; ./node_modules/.bin/jscoverage index.js; mv index-cov.js index.js; ./node_modules/.bin/mocha -R html-cov > coverage.html); mv index.js~ index.js"
   },
   "dependencies": {
-    "path-to-regexp": "~0.2.0"
+    "path-to-regexp": "~1.0.1"
   },
   "devDependencies": {
     "browserify": "^4.2.0",

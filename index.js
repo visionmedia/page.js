@@ -407,3 +407,5 @@
     if (location.port) origin += ':' + location.port;
     return (href && (0 == href.indexOf(origin)));
   }
+
+  page.sameOrigin = sameOrigin;

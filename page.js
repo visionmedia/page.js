@@ -364,6 +364,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
+    if (link === null) return;
     if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
 
     // Check for mailto: in the href

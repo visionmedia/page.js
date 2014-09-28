@@ -1,3 +1,12 @@
+1.4.0 / 2014-09-28
+==================
+ 
+ * add hashbang support. Closes #112
+ * make sameOrigin public
+ * update path-to-regexp
+ * allow for missing href in anchors.
+ * update examples
+
 
 1.3.7 / 2013-09-09 
 ==================

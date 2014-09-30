@@ -89,7 +89,7 @@
    */
 
   page.base = function(path){
-    if (0 == arguments.length) return base;
+    if (0 === arguments.length) return base;
     base = path;
   };
 
@@ -115,12 +115,9 @@
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-
-    if (hashbang && location.hash.indexOf('#!') === 0)
-      var url = location.hash.substr(2) + location.search;
-    else
-      var url = location.pathname + location.search + location.hash;
-
+    var url = (hashbang && location.hash.indexOf('#!') === 0)
+      ? location.hash.substr(2) + location.search
+      : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -148,8 +145,8 @@
 
   page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
-    if (false !== dispatch) page.dispatch(ctx);
     if (!ctx.unhandled) ctx.pushState();
+    if (false !== dispatch) page.dispatch(ctx);
     return ctx;
   };
 
@@ -165,7 +162,7 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
-    if (null == dispatch) dispatch = true;
+    if (null === dispatch) dispatch = true;
     if (dispatch) page.dispatch(ctx);
     ctx.save();
     return ctx;
@@ -217,7 +214,7 @@
    */
 
   function Context(path, state) {
-    if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
@@ -252,7 +249,11 @@
    */
 
   Context.prototype.pushState = function(){
-    history.pushState(this.state, this.title, (hashbang && this.canonicalPath != '/' ? '#!' + this.canonicalPath : this.canonicalPath));
+    history.pushState(this.state
+      , this.title
+      , hashbang && this.canonicalPath !== '/'
+        ? '#!' + this.canonicalPath
+        : this.canonicalPath);
   };
 
   /**
@@ -262,7 +263,11 @@
    */
 
   Context.prototype.save = function(){
-    history.replaceState(this.state, this.title, (hashbang && this.canonicalPath != '/' ? '#!' + this.canonicalPath : this.canonicalPath));
+    history.replaceState(this.state
+      , this.title
+      , hashbang && this.canonicalPath !== '/'
+        ? '#!' + this.canonicalPath
+        : this.canonicalPath);
   };
 
   /**
@@ -379,7 +384,7 @@
     if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
 
     // Check for mailto: in the href
-    if (link.indexOf("mailto:") > -1) return;
+    if (link && link.indexOf("mailto:") > -1) return;
 
     // check target
     if (el.target) return;
@@ -406,7 +411,7 @@
 
   function which(e) {
     e = e || window.event;
-    return null == e.which
+    return null === e.which
       ? e.button
       : e.which;
   }
@@ -418,8 +423,10 @@
   function sameOrigin(href) {
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
-    return 0 == href.indexOf(origin);
+    return (href && (0 === href.indexOf(origin)));
   }
+
+  page.sameOrigin = sameOrigin;
 
 },{"path-to-regexp":2}],2:[function(_dereq_,module,exports){
 /**
@@ -427,6 +434,11 @@
  */
 module.exports = pathtoRegexp;
 
+/**
+ * The main path matching regexp utility.
+ *
+ * @type {RegExp}
+ */
 var PATH_REGEXP = new RegExp([
   // Match already escaped characters that would otherwise incorrectly appear
   // in future matches. This allows the user to escape special characters that
@@ -453,6 +465,19 @@ function escapeGroup (group) {
 }
 
 /**
+ * Attach the keys as a property of the regexp.
+ *
+ * @param  {RegExp} re
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+var attachKeys = function (re, keys) {
+  re.keys = keys;
+
+  return re;
+};
+
+/**
  * Normalize the given path string, returning a regular expression.
  *
  * An empty array should be passed in, which will contain the placeholder key
@@ -464,6 +489,11 @@ function escapeGroup (group) {
  * @return {RegExp}
  */
 function pathtoRegexp (path, keys, options) {
+  if (keys && !Array.isArray(keys)) {
+    options = keys;
+    keys = null;
+  }
+
   keys = keys || [];
   options = options || {};
 
@@ -487,7 +517,7 @@ function pathtoRegexp (path, keys, options) {
     }));
 
     // Return the source back to the user.
-    return path;
+    return attachKeys(path, keys);
   }
 
   if (Array.isArray(path)) {
@@ -499,7 +529,7 @@ function pathtoRegexp (path, keys, options) {
     });
 
     // Generate a new regexp instance by joining all the parts together.
-    return new RegExp('(?:' + path.join('|') + ')', flags);
+    return attachKeys(new RegExp('(?:' + path.join('|') + ')', flags), keys);
   }
 
   // Alter the path string into a usable regexp.
@@ -564,7 +594,7 @@ function pathtoRegexp (path, keys, options) {
     path += strict && endsWithSlash ? '' : '(?=\\/|$)';
   }
 
-  return new RegExp('^' + path + (end ? '$' : ''), flags);
+  return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
 },{}]},{},[1])

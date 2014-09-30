@@ -2,13 +2,15 @@ var isNode = typeof window !== "object";
 
 if (isNode) {
   require('./support/jsdom');
-  global.chai = require('chai');
-  global.page = process.env.PAGE_COV
-    ? require('../index-cov')
-    : require('../index');
+  before(function () {
+    global.chai = require('chai');
+    global.expect = chai.expect;
+    global.page = process.env.PAGE_COV
+      ? require('../index-cov')
+      : require('../index');
+  });
 }
 
-var expect = chai.expect;
 var called;
 
 // XXX: super lame hack

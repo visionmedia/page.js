@@ -9,6 +9,8 @@ if (isNode) {
       ? require('../index-cov')
       : require('../index');
   });
+} else {
+  expect = chai.expect;
 }
 
 var called;

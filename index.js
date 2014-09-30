@@ -1,4 +1,3 @@
-
   /* jshint browser:true */
 
   /**
@@ -82,7 +81,7 @@
    */
 
   page.base = function(path){
-    if (0 == arguments.length) return base;
+    if (0 === arguments.length) return base;
     base = path;
   };
 
@@ -152,7 +151,7 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
-    if (null == dispatch) dispatch = true;
+    if (null === dispatch) dispatch = true;
     if (dispatch) page.dispatch(ctx);
     ctx.save();
     return ctx;
@@ -204,7 +203,7 @@
    */
 
   function Context(path, state) {
-    if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
@@ -393,7 +392,7 @@
 
   function which(e) {
     e = e || window.event;
-    return null == e.which
+    return null === e.which
       ? e.button
       : e.which;
   }
@@ -405,7 +404,7 @@
   function sameOrigin(href) {
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
-    return (href && (0 == href.indexOf(origin)));
+    return (href && (0 === href.indexOf(origin)));
   }
 
   page.sameOrigin = sameOrigin;

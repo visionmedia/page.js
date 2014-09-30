@@ -2,3 +2,4 @@ node_modules
 testing
 .jshint
 coverage.html
+index-cov.js

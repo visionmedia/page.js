@@ -2,8 +2,9 @@
   /* jshint browser:true */
   /* jshint -W079 */ // history.location
   /* globals require, module */
-
-  /**
+  /* jshint -W079 */ // for history.location
+  
+/**
    * Module dependencies.
    */
 

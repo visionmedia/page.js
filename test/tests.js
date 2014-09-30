@@ -18,8 +18,8 @@ var called;
 before(function() {
   page('/', function(){
     called = true;
-  })
-})
+  });
+});
 
 before(function() {
   if (isNode) {
@@ -29,14 +29,14 @@ before(function() {
   } else {
     page();
   }
-})
+});
 
 describe('page', function(){
   describe('on page load', function(){
     it('should invoke the matching callback', function(){
       expect(called).to.equal(true);
-    })
-  })
+    });
+  });
 
   describe('ctx.querystring', function(){
     it('should default to ""', function(done){
@@ -46,7 +46,7 @@ describe('page', function(){
       });
 
       page('/querystring-default');
-    })
+    });
 
     it('should expose the query string', function(done){
       page('/querystring', function(ctx){
@@ -55,8 +55,8 @@ describe('page', function(){
       });
 
       page('/querystring?hello=there');
-    })
-  })
+    });
+  });
 
   describe('ctx.pathname', function(){
     it('should default to ctx.path', function(done){
@@ -66,7 +66,7 @@ describe('page', function(){
       });
 
       page('/pathname-default');
-    })
+    });
 
     it('should omit the query string', function(done){
       page('/pathname', function(ctx){
@@ -75,8 +75,8 @@ describe('page', function(){
       });
 
       page('/pathname?hello=there');
-    })
-  })
+    });
+  });
 
   describe('dispatcher', function(){
     it('should ignore query strings', function(done){
@@ -85,7 +85,7 @@ describe('page', function(){
       });
 
       page('/qs?test=true');
-    })
+    });
 
     it('should ignore query strings with params', function(done){
       page('/qs/:name', function(ctx){
@@ -94,24 +94,24 @@ describe('page', function(){
       });
 
       page('/qs/tobi?test=true');
-    })
+    });
 
     it('should invoke the matching callback', function(done){
       page('/user/:name', function(ctx){
         done();
-      })
+      });
 
       page('/user/tj');
-    })
+    });
 
     it('should populate ctx.params', function(done){
       page('/blog/post/:name', function(ctx){
         expect(ctx.params.name).to.equal('something');
         done();
-      })
+      });
 
       page('/blog/post/something');
-    })
+    });
 
     describe('when next() is invoked', function(){
       it('should invoke subsequent matching middleware', function(done){
@@ -131,11 +131,11 @@ describe('page', function(){
         });
 
         page('/forum/1/thread/2');
-      })
-    })
-  })
+      });
+    });
+  });
 
   after(function(){
     page('/');
-  })
-})
+  });
+});

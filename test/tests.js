@@ -3,7 +3,9 @@ var isNode = typeof window !== "object";
 if (isNode) {
   require('./support/jsdom');
   global.chai = require('chai');
-  global.page = require('../index');
+  global.page = process.env.PAGE_COV
+    ? require('../index-cov')
+    : require('../index');
 }
 
 var expect = chai.expect;

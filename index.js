@@ -1,5 +1,6 @@
 
   /* jshint browser:true */
+  /* globals require, module */
 
   /**
    * Module dependencies.
@@ -89,7 +90,7 @@
    */
 
   page.base = function(path){
-    if (0 == arguments.length) return base;
+    if (0 === arguments.length) return base;
     base = path;
   };
 
@@ -159,8 +160,7 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
-    if (null == dispatch) dispatch = true;
-    if (dispatch) page.dispatch(ctx);
+    if (false !== dispatch) page.dispatch(ctx);
     ctx.save();
     return ctx;
   };
@@ -211,7 +211,7 @@
    */
 
   function Context(path, state) {
-    if ('/' == path[0] && 0 != path.indexOf(base)) path = base + path;
+    if ('/' == path[0] && 0 !== path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
@@ -277,10 +277,10 @@
     options = options || {};
     this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
-    this.regexp = pathtoRegexp(this.path
-      , this.keys = []
-      , options.sensitive
-      , options.strict);
+    this.regexp = pathtoRegexp(this.path,
+      this.keys = [],
+      options.sensitive,
+      options.strict);
   }
 
   /**
@@ -317,24 +317,20 @@
    */
 
   Route.prototype.match = function(path, params){
-    var keys = this.keys
-      , qsIndex = path.indexOf('?')
-      , pathname = ~qsIndex ? path.slice(0, qsIndex) : path
-      , m = this.regexp.exec(decodeURIComponent(pathname));
+    var keys = this.keys,
+        qsIndex = path.indexOf('?'),
+        pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
+        m = this.regexp.exec(decodeURIComponent(pathname));
 
     if (!m) return false;
 
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' == typeof m[i]
-        ? decodeURIComponent(m[i])
-        : m[i];
+      var val = 'string' == typeof m[i] ? decodeURIComponent(m[i]) : m[i];
 
       if (key) {
-        params[key.name] = undefined !== params[key.name]
-          ? params[key.name]
-          : val;
+        params[key.name] = undefined !== params[key.name] ? params[key.name] : val;
       } else {
         params.push(val);
       }
@@ -400,9 +396,7 @@
 
   function which(e) {
     e = e || window.event;
-    return null == e.which
-      ? e.button
-      : e.which;
+    return null === e.which ? e.button : e.which;
   }
 
   /**
@@ -412,7 +406,7 @@
   function sameOrigin(href) {
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
-    return (href && (0 == href.indexOf(origin)));
+    return (href && (0 === href.indexOf(origin)));
   }
 
   page.sameOrigin = sameOrigin;

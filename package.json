@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha test/tests.js",
-    "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha -R html-cov > coverage.html",
+    "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
     "make": "browserify index.js --standalone page -o page.js"
   },
   "dependencies": {

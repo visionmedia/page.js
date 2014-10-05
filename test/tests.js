@@ -135,6 +135,16 @@ describe('page', function(){
         page('/forum/1/thread/2');
       });
     });
+
+    describe('on redirect', function () {
+      it('should load destination page', function () {
+        page('/from', 'to');
+        page('/to', function () {
+          done();
+        });
+        page('/from');
+      });
+    });
   });
 
   after(function(){

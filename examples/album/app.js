@@ -1,10 +1,9 @@
-
 var perPage = 6
   , prev = document.querySelector('#prev')
   , next = document.querySelector('#next');
 
 page.base('/album');
-page('/', redirect('/photos/0'));
+page('/', '/photos/0');
 page('/photos/:page', photos)
 page('*', notfound);
 page();
@@ -17,15 +16,6 @@ function photos(ctx) {
   var photos = images.slice(from, to);
   display(photos);
   adjustPager(page);
-}
-
-function redirect(to) {
-  return function(){
-    console.log('redirecting to %s', to);
-    setTimeout(function(){
-      page(to);
-    }, 0); // TODO: lame
-  }
 }
 
 function notfound() {

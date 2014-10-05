@@ -170,9 +170,9 @@
    * @api private
    */
   page.redirect = function(from, to) {
-    page(from, function () {
+    page(from, function (e) {
       setTimeout(function() {
-        page(to);
+        page.replace(to);
       });
     });
   };

@@ -167,7 +167,7 @@
    *
    * @param {String} from
    * @param {String} to
-   * @api private
+   * @api public
    */
   page.redirect = function(from, to) {
     page(from, function (e) {

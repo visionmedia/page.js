@@ -92,7 +92,11 @@ $('.view').click(function(e){
 
 ### page(fromPath, toPath)
 
-Setup redirect form one path to other.
+  Setup redirect form one path to other.
+
+### page.redirect(fromPath, toPath)
+
+  Identical to `page(fromPath, toPath)`
 
 ### page.show(path)
 

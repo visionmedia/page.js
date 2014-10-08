@@ -353,10 +353,14 @@
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' == typeof m[i] ? decodeURIComponent(m[i]) : m[i];
+      var val = 'string' == typeof m[i]
+        ? decodeURIComponent(m[i])
+        : m[i];
 
       if (key) {
-        params[key.name] = undefined !== params[key.name] ? params[key.name] : val;
+        params[key.name] = undefined !== params[key.name]
+          ? params[key.name]
+          : val;
       } else {
         params.push(val);
       }

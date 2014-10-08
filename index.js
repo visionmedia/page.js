@@ -1,6 +1,8 @@
 
   /* jshint browser:true */
+  /* jshint laxcomma:true */
   /* jshint -W079 */ // history.location
+  /* jshint -W014 */
   /* globals require, module */
 
 /**
@@ -170,8 +172,8 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
+    ctx.save(); // save before dispatching, which may redirect
     if (false !== dispatch) page.dispatch(ctx);
-    ctx.save();
     return ctx;
   };
 
@@ -436,7 +438,7 @@
   function sameOrigin(href) {
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
-    return href && (0 === href.indexOf(origin));
+    return (href && (0 === href.indexOf(origin)));
   }
 
   page.sameOrigin = sameOrigin;

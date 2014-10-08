@@ -172,8 +172,8 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
+    ctx.save(); // save before dispatching, which may redirect
     if (false !== dispatch) page.dispatch(ctx);
-    ctx.save();
     return ctx;
   };
 

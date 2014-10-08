@@ -1,7 +1,7 @@
 {
   "name": "page",
   "description": "Tiny client-side router (~1200 bytes)",
-  "version": "1.3.7",
+  "version": "1.4.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/visionmedia/page.js.git"
@@ -12,21 +12,27 @@
     }
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha",
-    "coverage": "(cp index.js index.js~; ./node_modules/.bin/jscoverage index.js; mv index-cov.js index.js; ./node_modules/.bin/mocha -R html-cov > coverage.html); mv index.js~ index.js"
+    "test": "./node_modules/.bin/mocha test/tests.js",
+    "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
+    "make": "browserify index.js --standalone page -o page.js"
   },
   "dependencies": {
-    "path-to-regexp": "~0.2.0"
+    "path-to-regexp": "~1.0.1"
   },
   "devDependencies": {
     "browserify": "^4.2.0",
-    "mocha": "^1.18.2",
     "chai": "^1.9.0",
-    "should": "*",
+    "coveralls": "^2.11.2",
     "express": "3.4.4",
     "jade": "0.26.1",
+    "jscoverage": "^0.5.6",
+    "jsdom": "~0.11.1",
+    "mocha": "^1.18.2",
+    "mocha-lcov-reporter": "0.0.1",
     "serve": "*",
-    "jscoverage": "~0.5.4",
-    "jsdom": "~0.11.1"
-  }
+    "should": "*"
+  },
+  "files": [
+    "index.js"
+  ]
 }

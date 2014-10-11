@@ -1,6 +1,9 @@
  ![page router logo](http://f.cl.ly/items/3i3n001d0s1Q031r2q1P/page.png)
 
-  Tiny ~1200 byte Express-inspired client-side router.
+Tiny ~1200 byte Express-inspired client-side router.
+
+ [![Build Status](https://travis-ci.org/visionmedia/page.js.svg?branch=master)](https://travis-ci.org/visionmedia/page.js)
+[![Coverage Status](https://coveralls.io/repos/visionmedia/page.js/badge.png?branch=master)](https://coveralls.io/r/visionmedia/page.js?branch=master)
 
 ```js
 page('/', index)
@@ -404,6 +407,19 @@ $ npm install
 $ make test
 $ open http://localhost:3000/
 ```
+
+### Support in IE8+
+
+If you want the router to work in older version of Internet Explorer that don't support pushState, you can use the [HTML5-History-API](https://github.com/devote/HTML5-History-API) polyfill:
+```bash
+  npm install html5-history-api
+```
+
+##### How to use a Polyfill together with router (OPTIONAL):
+If your site is operating within not root path, you will need to specify the `basepath` for the HTML5-History-API polyfill.
+Before calling `page.base()` use: `history.redirect([prefixType], [basepath])` - Translation link if required.
+  * `prefixType`: `[string|null]` - Substitute the string after the anchor (#) by default "/".
+  * `basepath`: `[string|null]` - Set the base path. See `page.base()` by default "/". (Note: Slash after `pathname` required)
 
 ### Pull Requests
 

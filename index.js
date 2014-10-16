@@ -155,7 +155,7 @@
 
   page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
-    if (!ctx.unhandled) ctx.pushState();
+    ctx.pushState();
     if (false !== dispatch) page.dispatch(ctx);
     return ctx;
   };
@@ -206,8 +206,6 @@
    */
 
   function unhandled(ctx) {
-    var current = location.pathname + location.search;
-    if (current == ctx.canonicalPath) return;
     page.stop();
     ctx.unhandled = true;
     location.href = ctx.canonicalPath;

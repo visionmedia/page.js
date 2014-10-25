@@ -2,7 +2,7 @@
 
 Tiny ~1200 byte Express-inspired client-side router.
 
- [![Build Status](https://travis-ci.org/visionmedia/page.js.svg?branch=master)](https://travis-ci.org/visionmedia/page.js)
+ [![Build Status](https://travis-ci.org/tj/page.js.svg?branch=master)](https://travis-ci.org/tj/page.js)
 [![Coverage Status](https://coveralls.io/repos/visionmedia/page.js/badge.png?branch=master)](https://coveralls.io/r/visionmedia/page.js?branch=master)
 
 ```js

@@ -55,7 +55,7 @@
       window.location.href = 'http://localhost:3000/partials/test/';
     },
     examples: function (ctx, next) {
-      window.location.href = 'http://localhost:3000/';
+      window.location.href = 'http://localhost:4000/';
     }
   };
 

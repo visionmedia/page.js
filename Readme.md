@@ -373,10 +373,9 @@ page(/^\/commits\/(\d+)\.\.(\d+)/, loadUser)
 
 ## Plugins
 
-  Currently there are no official plugins,
-  however _examples/query-string/query.js_
-  will provide a parsed `ctx.query` object
-  derived from [https://github.com/visionmedia/node-querystring](https://github.com/visionmedia/node-querystring).
+  An example plugin _examples/query-string/query.js_
+  demonstrates how to make plugins. It will provide a parsed `ctx.query` object
+  derived from [node-querystring](https://github.com/visionmedia/node-querystring).
 
   Usage by using "*" to match any path
   in order to parse the query-string:
@@ -399,6 +398,14 @@ function show(ctx) {
   }
 }
 ```
+
+### Available plugins
+
+- [querystring](https://github.com/visionmedia/page.js/blob/master/examples/query-string/query.js): provides a parsed `ctx.query` object derived from [node-querystring](https://github.com/visionmedia/node-querystring).
+- [body-parser](https://github.com/kethinov/page.js-body-parser.js): provides a `req.body` object for routes derived from [body-parser](https://github.com/expressjs/body-parser).
+- [express-mapper](https://github.com/kethinov/page.js-express-mapper.js): provides a direct imitation of the [Express](http://expressjs.com/) API so you can share controller code on the client and the server with your Express application without modification.
+
+Please submit pull requests to add more to this list.
 
 ### Running tests
 

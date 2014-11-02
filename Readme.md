@@ -29,7 +29,7 @@ page()
   Via CDN and script tag:
 
   ```html
-  <script src="https://cdn.rawgit.com/visionmedia/page.js/1.4.0/page.js">
+  <script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
   ```
 
 ## Running examples

@@ -61,18 +61,18 @@
 
   function page(path, fn) {
     // <callback>
-    if ('function' == typeof path) {
+    if ('function' === typeof path) {
       return page('*', path);
     }
 
     // route <path> to <callback ...>
-    if ('function' == typeof fn) {
+    if ('function' === typeof fn) {
       var route = new Route(path);
       for (var i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
     // show <path> with [state]
-    } else if ('string' == typeof path) {
+    } else if ('string' === typeof path) {
       page.show(path, fn);
     // start [options]
     } else {
@@ -202,7 +202,7 @@
 
   function unhandled(ctx) {
     var current = window.location.pathname + window.location.search;
-    if (current == ctx.canonicalPath) return;
+    if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.unhandled = true;
     location.href = ctx.canonicalPath;
@@ -348,7 +348,7 @@
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' == typeof m[i]
+      var val = 'string' === typeof m[i]
         ? decodeURIComponent(m[i])
         : m[i];
 
@@ -391,7 +391,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
+    if (el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
     // Check for mailto: in the href
     if (link && link.indexOf("mailto:") > -1) return;
@@ -409,7 +409,7 @@
     var orig = path + el.hash;
 
     path = path.replace(base, '');
-    if (base && orig == path) return;
+    if (base && orig === path) return;
 
     e.preventDefault();
     page.show(orig);

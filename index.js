@@ -1,8 +1,3 @@
-
-  /* jshint browser:true */
-  /* jshint laxcomma:true */
-  /* jshint -W079 */ // history.location
-  /* jshint -W014 */
   /* globals require, module */
 
 /**

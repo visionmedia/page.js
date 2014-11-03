@@ -1,7 +1,3 @@
-/* jshint -W014 */
-/* jshint expr: true*/
-/* jshint laxcomma: true */
-
 var isNode = typeof window !== "object";
 
 if (isNode) {

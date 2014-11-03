@@ -1,4 +1,4 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.page=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.page=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
   /* jshint browser:true */
   /* jshint laxcomma:true */
@@ -10,7 +10,7 @@
    * Module dependencies.
    */
 
-  var pathtoRegexp = _dereq_('path-to-regexp');
+  var pathtoRegexp = require('path-to-regexp');
 
   /**
    * Module exports.
@@ -77,9 +77,10 @@
       for (var i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
+      return route;
     // show <path> with [state]
     } else if ('string' == typeof path) {
-      page.show(path, fn);
+      page.currentCtx = page.show(path, fn);
     // start [options]
     } else {
       page.start(path);
@@ -91,6 +92,18 @@
    */
 
   page.callbacks = [];
+
+  /**
+   * keep track current context
+   */
+  
+  page.currentCtx;
+
+  /**
+   * Exit callback functions.
+   */
+  
+  page.exitHandlers = [];
 
   /**
    * Get or set basepath to `path`.
@@ -129,7 +142,7 @@
     var url = (hashbang && location.hash.indexOf('#!') === 0)
       ? location.hash.substr(2) + location.search
       : location.pathname + location.search + location.hash;
-    page.replace(url, null, true, dispatch);
+    page.currentCtx = page.replace(url, null, true, dispatch);
   };
 
   /**
@@ -158,6 +171,10 @@
     var ctx = new Context(path, state);
     ctx.pushState();
     if (false !== dispatch) page.dispatch(ctx);
+
+    if (page.currentCtx) {
+      page.dispatchExit(page.currentCtx)
+    }
     return ctx;
   };
 
@@ -175,6 +192,9 @@
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
     if (false !== dispatch) page.dispatch(ctx);
+    if (page.currentCtx) {
+      page.dispatchExit(page.currentCtx)
+    }
     return ctx;
   };
 
@@ -196,6 +216,23 @@
 
     next();
   };
+
+  /**
+   * Dispatch exit events of given `ctx`
+   * @param  {Object} ctx
+   * @api private
+   */
+  
+  page.dispatchExit = function(ctx){
+    var i = 0;
+
+    function next() {
+      var fn = page.exitHandlers[i++];
+      fn(ctx, next);
+    }
+
+    next();
+  }
 
   /**
    * Unhandled `ctx`. When it's not the initial
@@ -368,6 +405,12 @@
     return true;
   };
 
+  Route.prototype.exit = function(){
+    for (var i = 0; i < arguments.length; ++i) {
+      page.exitHandlers.push(this.middleware(arguments[i]));
+    }
+  }
+
   /**
    * Handle "populate" events.
    */
@@ -416,7 +459,7 @@
     if (base && orig == path) return;
 
     e.preventDefault();
-    page.show(orig);
+    page.currentCtx = page.show(orig);
   }
 
   /**
@@ -442,7 +485,7 @@
 
   page.sameOrigin = sameOrigin;
 
-},{"path-to-regexp":2}],2:[function(_dereq_,module,exports){
+},{"path-to-regexp":2}],2:[function(require,module,exports){
 /**
  * Expose `pathtoRegexp`.
  */
@@ -611,6 +654,5 @@ function pathtoRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
-},{}]},{},[1])
-(1)
+},{}]},{},[1])(1)
 });

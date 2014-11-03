@@ -76,9 +76,10 @@
       for (var i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
+      return route;
     // show <path> with [state]
     } else if ('string' == typeof path) {
-      page.show(path, fn);
+      page.currentCtx = page.show(path, fn);
     // start [options]
     } else {
       page.start(path);
@@ -90,6 +91,18 @@
    */
 
   page.callbacks = [];
+
+  /**
+   * keep track current context
+   */
+  
+  page.currentCtx;
+
+  /**
+   * Exit callback functions.
+   */
+  
+  page.exitHandlers = [];
 
   /**
    * Get or set basepath to `path`.
@@ -128,7 +141,7 @@
     var url = (hashbang && location.hash.indexOf('#!') === 0)
       ? location.hash.substr(2) + location.search
       : location.pathname + location.search + location.hash;
-    page.replace(url, null, true, dispatch);
+    page.currentCtx = page.replace(url, null, true, dispatch);
   };
 
   /**
@@ -157,6 +170,10 @@
     var ctx = new Context(path, state);
     ctx.pushState();
     if (false !== dispatch) page.dispatch(ctx);
+
+    if (page.currentCtx) {
+      page.dispatchExit(page.currentCtx)
+    }
     return ctx;
   };
 
@@ -174,6 +191,9 @@
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
     if (false !== dispatch) page.dispatch(ctx);
+    if (page.currentCtx) {
+      page.dispatchExit(page.currentCtx)
+    }
     return ctx;
   };
 
@@ -195,6 +215,23 @@
 
     next();
   };
+
+  /**
+   * Dispatch exit events of given `ctx`
+   * @param  {Object} ctx
+   * @api private
+   */
+  
+  page.dispatchExit = function(ctx){
+    var i = 0;
+
+    function next() {
+      var fn = page.exitHandlers[i++];
+      fn(ctx, next);
+    }
+
+    next();
+  }
 
   /**
    * Unhandled `ctx`. When it's not the initial
@@ -367,6 +404,12 @@
     return true;
   };
 
+  Route.prototype.exit = function(){
+    for (var i = 0; i < arguments.length; ++i) {
+      page.exitHandlers.push(this.middleware(arguments[i]));
+    }
+  }
+
   /**
    * Handle "populate" events.
    */
@@ -415,7 +458,7 @@
     if (base && orig == path) return;
 
     e.preventDefault();
-    page.show(orig);
+    page.currentCtx = page.show(orig);
   }
 
   /**

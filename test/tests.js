@@ -1,3 +1,7 @@
+/* jshint -W014 */
+/* jshint expr: true*/
+/* jshint laxcomma: true */
+
 var isNode = typeof window !== "object";
 
 if (isNode) {
@@ -133,6 +137,17 @@ describe('page', function(){
         });
 
         page('/forum/1/thread/2');
+      });
+      it('should not redirect to page will be already dispatched', function() {
+        // hacky test
+        var _ctx;
+        page('/page/:page', function(ctx, next) {
+          _ctx = ctx;
+          next();
+        });
+        page('/page/:page');
+        var unhandled = _ctx.unhandled;
+        expect(unhandled).to.not.exist;
       });
     });
   });

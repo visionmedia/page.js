@@ -150,8 +150,8 @@
 
   page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
-    if (!ctx.unhandled) ctx.pushState();
     if (false !== dispatch) page.dispatch(ctx);
+    if (!ctx.unhandled) ctx.pushState();
     return ctx;
   };
 

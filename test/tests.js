@@ -138,6 +138,7 @@ describe('page', function(){
         // hacky test
         var _ctx;
         page('/page/:page', function(ctx, next) {
+          ctx.pushState();
           _ctx = ctx;
           next();
         });

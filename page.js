@@ -1,7 +1,4 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.page=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-
-  /* jshint browser:true */
-  /* jshint -W079 */ // history.location
   /* globals require, module */
 
 /**
@@ -65,23 +62,21 @@
 
   function page(path, fn) {
     // <callback>
-    if ('function' == typeof path) {
+    if ('function' === typeof path) {
       return page('*', path);
     }
 
     // route <path> to <callback ...>
-    if ('function' == typeof fn) {
+    if ('function' === typeof fn) {
       var route = new Route(path);
       for (var i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
     // show <path> with [state]
     } else if ('string' == typeof path) {
-      if ('string' === typeof fn) {
-        page.redirect(path, fn);
-      } else {
-        page.show(path, fn);
-      }
+      'string' === typeof fn
+        ? page.redirect(path, fn)
+        : page.show(path, fn);
     // start [options]
     } else {
       page.start(path);
@@ -168,7 +163,7 @@
    *
    * @param {String} from
    * @param {String} to
-   * @api private
+   * @api public
    */
   page.redirect = function(from, to) {
     page(from, function (e) {
@@ -190,8 +185,8 @@
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     ctx.init = init;
+    ctx.save(); // save before dispatching, which may redirect
     if (false !== dispatch) page.dispatch(ctx);
-    ctx.save();
     return ctx;
   };
 
@@ -224,8 +219,8 @@
    */
 
   function unhandled(ctx) {
-    var current = location.pathname + location.search;
-    if (current == ctx.canonicalPath) return;
+    var current = window.location.pathname + window.location.search;
+    if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.unhandled = true;
     location.href = ctx.canonicalPath;
@@ -371,7 +366,7 @@
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' == typeof m[i]
+      var val = 'string' === typeof m[i]
         ? decodeURIComponent(m[i])
         : m[i];
 
@@ -414,7 +409,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (el.pathname == location.pathname && (el.hash || '#' == link)) return;
+    if (el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
     // Check for mailto: in the href
     if (link && link.indexOf("mailto:") > -1) return;
@@ -432,7 +427,7 @@
     var orig = path + el.hash;
 
     path = path.replace(base, '');
-    if (base && orig == path) return;
+    if (base && orig === path) return;
 
     e.preventDefault();
     page.show(orig);
@@ -456,7 +451,7 @@
   function sameOrigin(href) {
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
-    return href && (0 === href.indexOf(origin));
+    return (href && (0 === href.indexOf(origin)));
   }
 
   page.sameOrigin = sameOrigin;

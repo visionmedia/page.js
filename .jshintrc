@@ -1,0 +1,7 @@
+{
+  "browser": true,
+  "expr": true,
+  "laxcomma": true,
+  "-W079": true,
+  "-W014": true
+}

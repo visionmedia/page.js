@@ -4,6 +4,7 @@ Tiny ~1200 byte Express-inspired client-side router.
 
  [![Build Status](https://travis-ci.org/visionmedia/page.js.svg?branch=master)](https://travis-ci.org/visionmedia/page.js)
 [![Coverage Status](https://coveralls.io/repos/visionmedia/page.js/badge.png?branch=master)](https://coveralls.io/r/visionmedia/page.js?branch=master)
+[![Code Climate](https://codeclimate.com/github/visionmedia/page.js/badges/gpa.svg)](https://codeclimate.com/github/visionmedia/page.js)
 
 ```js
 page('/', index)
@@ -29,7 +30,7 @@ page()
   Via CDN and script tag:
 
   ```html
-  <script src="https://cdn.rawgit.com/visionmedia/page.js/1.4.0/page.js">
+  <script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
   ```
 
 ## Running examples
@@ -373,10 +374,9 @@ page(/^\/commits\/(\d+)\.\.(\d+)/, loadUser)
 
 ## Plugins
 
-  Currently there are no official plugins,
-  however _examples/query-string/query.js_
-  will provide a parsed `ctx.query` object
-  derived from [https://github.com/visionmedia/node-querystring](https://github.com/visionmedia/node-querystring).
+  An example plugin _examples/query-string/query.js_
+  demonstrates how to make plugins. It will provide a parsed `ctx.query` object
+  derived from [node-querystring](https://github.com/visionmedia/node-querystring).
 
   Usage by using "*" to match any path
   in order to parse the query-string:
@@ -399,6 +399,14 @@ function show(ctx) {
   }
 }
 ```
+
+### Available plugins
+
+- [querystring](https://github.com/visionmedia/page.js/blob/master/examples/query-string/query.js): provides a parsed `ctx.query` object derived from [node-querystring](https://github.com/visionmedia/node-querystring).
+- [body-parser](https://github.com/kethinov/page.js-body-parser.js): provides a `req.body` object for routes derived from [body-parser](https://github.com/expressjs/body-parser).
+- [express-mapper](https://github.com/kethinov/page.js-express-mapper.js): provides a direct imitation of the [Express](http://expressjs.com/) API so you can share controller code on the client and the server with your Express application without modification.
+
+Please submit pull requests to add more to this list.
 
 ### Running tests
 

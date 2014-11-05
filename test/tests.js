@@ -40,6 +40,23 @@ describe('page', function(){
     });
   });
 
+  describe('on redirect', function () {
+    it('should load destination page', function (done) {
+      page.redirect('/from', '/to');
+      page('/to', function () {
+        done();
+      });
+      page('/from');
+    });
+    it('should work with short alias', function(done) {
+      page('/one', '/two');
+      page('/two', function () {
+        done();
+      });
+      page('/two');
+    });
+  });
+
   describe('ctx.querystring', function(){
     it('should default to ""', function(done){
       page('/querystring-default', function(ctx){
@@ -146,6 +163,7 @@ describe('page', function(){
         expect(unhandled).to.not.exist;
       });
     });
+
   });
 
   after(function(){

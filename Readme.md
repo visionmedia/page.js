@@ -410,9 +410,18 @@ Please submit pull requests to add more to this list.
 
 ### Running tests
 
+In the console:
+
 ```
 $ npm install
-$ make test
+$ npm test
+```
+
+In the browser:
+
+```
+$ npm install
+$ npm run serve
 $ open http://localhost:3000/
 ```
 

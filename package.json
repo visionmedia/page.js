@@ -12,8 +12,10 @@
     }
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha test/tests.js",
+    "test": "mocha test/tests.js",
+    "serve": "serve test",
     "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
+    "prepublish": "npm run make",
     "make": "browserify index.js --standalone page -o page.js"
   },
   "dependencies": {

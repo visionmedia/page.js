@@ -157,6 +157,11 @@
     var ctx = new Context(path, state);
     ctx.pushState();
     if (false !== dispatch) page.dispatch(ctx);
+    if ( ctx.unhandled ) {
+      ctx.popState();
+      page.stop();
+      location.href = ctx.canonicalPath;
+    }
     return ctx;
   };
 
@@ -206,9 +211,7 @@
    */
 
   function unhandled(ctx) {
-    page.stop();
     ctx.unhandled = true;
-    location.href = ctx.canonicalPath;
   }
 
   /**
@@ -265,6 +268,16 @@
       , hashbang && this.canonicalPath !== '/'
         ? '#!' + this.canonicalPath
         : this.canonicalPath);
+  };
+
+  /**
+   * Pop state.
+   *
+   * @api private
+   */
+
+  Context.prototype.popState = function(){
+    history.go(-1);
   };
 
   /**

@@ -97,6 +97,17 @@ describe('page', function(){
     });
   });
 
+  describe('ctx.handled', function() {
+    it('should skip unhandled redirect if exists', function() {
+      page('/page/:page', function(ctx, next) {
+        ctx.handled = true;
+        next();
+      });
+      var ctx = page.show('/page/1');
+      expect(ctx.handled).to.be.ok;
+    });
+  });
+
   describe('dispatcher', function(){
     it('should ignore query strings', function(done){
       page('/qs', function(ctx){
@@ -150,17 +161,6 @@ describe('page', function(){
         });
 
         page('/forum/1/thread/2');
-      });
-      it('should not redirect to page will be already dispatched', function() {
-        // hacky test
-        var _ctx;
-        page('/page/:page', function(ctx, next) {
-          _ctx = ctx;
-          next();
-        });
-        page('/page/:page');
-        var unhandled = _ctx.unhandled;
-        expect(unhandled).to.not.exist;
       });
     });
 

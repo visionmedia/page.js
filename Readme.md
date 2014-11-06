@@ -146,7 +146,7 @@ $('.view').click(function(e){
 #### Context#handled
 
   If `true`, marks the context as handled to prevent [defauld 404 behaviour][404].
-  For example this is useful for the routes with interminate qount of the
+  For example this is useful for the routes with interminate quantity of the
   callbacks.
 
 [404]: https://github.com/visionmedia/page.js#default-404-behaviour

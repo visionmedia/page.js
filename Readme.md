@@ -143,6 +143,14 @@ $('.view').click(function(e){
   this is useful for caching HTML or other resources
   that were loaded for when a user presses "back".
 
+#### Context#handled
+
+  If `true`, marks the context as handled to prevent [defauld 404 behaviour][404].
+  For example this is useful for the routes with interminate quantity of the
+  callbacks.
+
+[404]: https://github.com/visionmedia/page.js#default-404-behaviour
+
 #### Context#canonicalPath
 
   Pathname including the "base" (if any) and query string "/admin/login?foo=bar".

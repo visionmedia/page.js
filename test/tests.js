@@ -40,6 +40,23 @@ describe('page', function(){
     });
   });
 
+  describe('on redirect', function () {
+    it('should load destination page', function (done) {
+      page.redirect('/from', '/to');
+      page('/to', function () {
+        done();
+      });
+      page('/from');
+    });
+    it('should work with short alias', function(done) {
+      page('/one', '/two');
+      page('/two', function () {
+        done();
+      });
+      page('/two');
+    });
+  });
+
   describe('ctx.querystring', function(){
     it('should default to ""', function(done){
       page('/querystring-default', function(ctx){
@@ -77,6 +94,17 @@ describe('page', function(){
       });
 
       page('/pathname?hello=there');
+    });
+  });
+
+  describe('ctx.handled', function() {
+    it('should skip unhandled redirect if exists', function() {
+      page('/page/:page', function(ctx, next) {
+        ctx.handled = true;
+        next();
+      });
+      var ctx = page.show('/page/1');
+      expect(ctx.handled).to.be.ok;
     });
   });
 
@@ -134,18 +162,8 @@ describe('page', function(){
 
         page('/forum/1/thread/2');
       });
-      it('should not redirect to page will be already dispatched', function() {
-        // hacky test
-        var _ctx;
-        page('/page/:page', function(ctx, next) {
-          _ctx = ctx;
-          next();
-        });
-        page('/page/:page');
-        var unhandled = _ctx.unhandled;
-        expect(unhandled).to.not.exist;
-      });
     });
+
   });
 
   after(function(){

@@ -91,6 +91,14 @@ $('.view').click(function(e){
 })
 ```
 
+### page(fromPath, toPath)
+
+  Setup redirect form one path to other.
+
+### page.redirect(fromPath, toPath)
+
+  Identical to `page(fromPath, toPath)`
+
 ### page.show(path)
 
   Identical to `page(path)` above.
@@ -134,6 +142,14 @@ $('.view').click(function(e){
   Saves the context using `replaceState()`. For example
   this is useful for caching HTML or other resources
   that were loaded for when a user presses "back".
+
+#### Context#handled
+
+  If `true`, marks the context as handled to prevent [defauld 404 behaviour][404].
+  For example this is useful for the routes with interminate quantity of the
+  callbacks.
+
+[404]: https://github.com/visionmedia/page.js#default-404-behaviour
 
 #### Context#canonicalPath
 
@@ -410,9 +426,18 @@ Please submit pull requests to add more to this list.
 
 ### Running tests
 
+In the console:
+
 ```
 $ npm install
-$ make test
+$ npm test
+```
+
+In the browser:
+
+```
+$ npm install
+$ npm run serve
 $ open http://localhost:3000/
 ```
 

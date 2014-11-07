@@ -72,8 +72,10 @@
         page.callbacks.push(route.middleware(arguments[i]));
       }
     // show <path> with [state]
-    } else if ('string' === typeof path) {
-      page.show(path, fn);
+    } else if ('string' == typeof path) {
+      'string' === typeof fn
+        ? page.redirect(path, fn)
+        : page.show(path, fn);
     // start [options]
     } else {
       page.start(path);
@@ -152,12 +154,27 @@
     var ctx = new Context(path, state);
     ctx.pushState();
     if (false !== dispatch) page.dispatch(ctx);
-    if ( ctx.unhandled ) {
+    if (false === ctx.handled) {
       ctx.popState();
       page.stop();
       location.href = ctx.canonicalPath;
     }
     return ctx;
+  };
+
+  /**
+   * Show `path` with optional `state` object.
+   *
+   * @param {String} from
+   * @param {String} to
+   * @api public
+   */
+  page.redirect = function(from, to) {
+    page(from, function (e) {
+      setTimeout(function() {
+        page.replace(to);
+      });
+    });
   };
 
   /**
@@ -206,7 +223,8 @@
    */
 
   function unhandled(ctx) {
-    ctx.unhandled = true;
+    if (ctx.handled) return;
+    ctx.handled = false;
   }
 
   /**

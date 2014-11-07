@@ -152,8 +152,13 @@
 
   page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
-    if (false !== ctx.handled) ctx.pushState();
+    ctx.pushState();
     if (false !== dispatch) page.dispatch(ctx);
+    if (false === ctx.handled) {
+      ctx.popState();
+      page.stop();
+      location.href = ctx.canonicalPath;
+    }
     return ctx;
   };
 
@@ -219,11 +224,7 @@
 
   function unhandled(ctx) {
     if (ctx.handled) return;
-    var current = location.pathname + location.search;
-    if (current === ctx.canonicalPath) return;
-    page.stop();
     ctx.handled = false;
-    location.href = ctx.canonicalPath;
   }
 
   /**
@@ -280,6 +281,16 @@
       , hashbang && this.canonicalPath !== '/'
         ? '#!' + this.canonicalPath
         : this.canonicalPath);
+  };
+
+  /**
+   * Pop state.
+   *
+   * @api private
+   */
+
+  Context.prototype.popState = function(){
+    history.go(-1);
   };
 
   /**

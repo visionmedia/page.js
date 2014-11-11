@@ -5,7 +5,7 @@
  * add page.redirect() method
  * add plugins list to readme
  * add Context#handled option
- * Fix an issue where redirects in dispatch can be overwritten by ctx.save() #
+ * Fix an issue where redirects in dispatch can be overwritten by ctx.save()
  * add support HTML5-History-API polyfill
  * make sameOrigin public 
  * update path-to-regexp

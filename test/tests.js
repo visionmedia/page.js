@@ -1,4 +1,27 @@
-var isNode = typeof window !== "object";
+var isNode = typeof window !== "object",
+    called = false,
+    beforeTests = function(options) {
+
+      options = options || {};
+
+      called = false;
+      page.stop();
+
+      page('/', function(){
+        called = true;
+      });
+
+      if (isNode) {
+        // jsdom seems to trigger popstate when replaceState happens, which should
+        // not be the case
+        options.popstate = false;
+      }
+
+      page(options);
+    },
+    afterTests = function() {
+      page('/');
+    };
 
 if (isNode) {
   require('./support/jsdom');
@@ -13,26 +36,11 @@ if (isNode) {
   expect = chai.expect;
 }
 
+
 describe('Html5 history navigation', function(){
 
-  var called;
-
-  // XXX: super lame hack
-
-  before(function() {
-    page('/', function(){
-      called = true;
-    });
-  });
-
-  before(function() {
-    if (isNode) {
-      // jsdom seems to trigger popstate when replaceState happens, which should
-      // not be the case
-      page({ popstate: false });
-    } else {
-      page();
-    }
+  before(function(){
+    beforeTests();
   });
 
   describe('on page load', function(){
@@ -41,22 +49,22 @@ describe('Html5 history navigation', function(){
     });
   });
 
-  describe('on redirect', function () {
-    it('should load destination page', function (done) {
-      page.redirect('/from', '/to');
-      page('/to', function () {
-        done();
-      });
-      page('/from');
-    });
-    it('should work with short alias', function(done) {
-      page('/one', '/two');
-      page('/two', function () {
-        done();
-      });
-      page('/two');
-    });
-  });
+  // describe('on redirect', function () {
+  //   it('should load destination page', function (done) {
+  //     page.redirect('/from', '/to');
+  //     page('/to', function () {
+  //       done();
+  //     });
+  //     page('/from');
+  //   });
+  //   it('should work with short alias', function(done) {
+  //     page('/one', '/two');
+  //     page('/two', function () {
+  //       done();
+  //     });
+  //     page('/two');
+  //   });
+  // });
 
   describe('ctx.querystring', function(){
     it('should default to ""', function(done){
@@ -168,35 +176,17 @@ describe('Html5 history navigation', function(){
   });
 
   after(function(){
-    page('/');
+    afterTests();
   });
+
 });
 
 describe('Hashbang option enabled', function(){
 
-  var called;
-
-  // XXX: super lame hack
-
-  before(function() {
-    page('/', function(){
-      called = true;
+  before(function(){
+    beforeTests({
+      hashbang:true
     });
-  });
-
-  before(function() {
-    if (isNode) {
-      // jsdom seems to trigger popstate when replaceState happens, which should
-      // not be the case
-      page({
-        popstate: false,
-        hashbang:true
-      });
-    } else {
-      page({
-        hashbang:true
-      });
-    }
   });
 
   describe('on page load', function(){
@@ -332,6 +322,7 @@ describe('Hashbang option enabled', function(){
   });
 
   after(function(){
-    page('/');
+    afterTests();
   });
+
 });

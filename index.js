@@ -114,8 +114,8 @@
    */
 
   page.start = function(options){
-    options = options || {};
     if (running) return;
+    options = options || {};
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
@@ -135,9 +135,10 @@
    */
 
   page.stop = function(){
+    if (!running) return;
     running = false;
-    removeEventListener('click', onclick, false);
-    removeEventListener('popstate', onpopstate, false);
+    window.removeEventListener('click', onclick, false);
+    window.removeEventListener('popstate', onpopstate, false);
   };
 
   /**

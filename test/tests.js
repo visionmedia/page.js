@@ -1,8 +1,7 @@
+var isNode = false;
 
-if (typeof window !== 'object') {
+if (isNode = typeof window !== 'object') {
   require('./support/jsdom');
-
-  isNode = true;
 
   before(function () {
 
@@ -20,6 +19,7 @@ if (typeof window !== 'object') {
 }
 
 var called = false,
+    htmlWrapper,
     html = '',
     beforeTests = function(options) {
       page.callbacks = [];
@@ -30,7 +30,7 @@ var called = false,
 
       if (!isNode) {
 
-        var htmlWrapper = document.createElement('div');
+        htmlWrapper = document.createElement('div');
         html += '<ul class="links">';
         html += '      <li><a href="./">/</a></li>';
         html += '      <li><a href="#whoop">#whoop</a></li>';
@@ -186,6 +186,10 @@ var called = false,
             page('/whathever');
           });
         });
+
+        if (!isNode) {
+
+        }
 
       });
     },

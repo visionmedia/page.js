@@ -153,7 +153,6 @@
 
   page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
-    if (false !== ctx.handled) ctx.pushState();
     if (false !== dispatch) page.dispatch(ctx);
     return ctx;
   };
@@ -278,9 +277,8 @@
   Context.prototype.pushState = function(){
     history.pushState(this.state
       , this.title
-      , hashbang && this.canonicalPath !== '/'
-        ? '#!' + this.canonicalPath
-        : this.canonicalPath);
+      , (hashbang && this.canonicalPath !== '/' ? '#!' : '') +
+        this.canonicalPath);
   };
 
   /**
@@ -292,9 +290,8 @@
   Context.prototype.save = function(){
     history.replaceState(this.state
       , this.title
-      , hashbang && this.canonicalPath !== '/'
-        ? '#!' + this.canonicalPath
-        : this.canonicalPath);
+      , (hashbang && this.canonicalPath !== '/' ? '#!' : '') +
+        this.canonicalPath);
   };
 
   /**

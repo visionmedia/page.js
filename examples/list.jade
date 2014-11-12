@@ -1,12 +1,7 @@
-!!! 5
+doctype html
 html
   head
     title page.js examples
-    style
-      body {
-        padding: 50px;
-        font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
-      }
   body
     h1 Examples
     ul
@@ -15,8 +10,8 @@ html
           a(href='/#{name}')= name
           if ('hash' == name)
             span
-              |  - 
+              |  -
               a(href="/hash/section?query=string") section
             span
-              |  - 
+              |  -
               a(href="/hash/section?query=string#subsection") subsection

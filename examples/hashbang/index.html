@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Basic</title>
+    <title>Hashbang</title>
     <script src="/page.js"></script>
-    <base href="hashbang" target="_blank, _self, _parent, _top">
-
+    <base href="/hashbang/">
   </head>
   <body>
-    <h1>Basic</h1>
+    <h1>Hashbang</h1>
     <p></p>
     <ul>
-      <li><a href="/">/</a></li>
+      <li><a href="./">/</a></li>
       <li><a href="#whoop">#whoop</a></li>
-      <li><a href="/about">/about</a></li>
-      <li><a href="/contact">/contact</a></li>
-      <li><a href="/contact/me">/contact/me</a></li>
-      <li><a href="/not-found?foo=bar">/not-found</a></li>
+      <li><a href="./about">/about</a></li>
+      <li><a href="./contact">/contact</a></li>
+      <li><a href="./contact/me">/contact/me</a></li>
+      <li><a href="./not-found?foo=bar">/not-found</a></li>
     </ul>
 
     <script>
-
+      page.base('/hashbang');
       page('/', index);
       page('/about', about);
       page('/contact', contact);
-
+      page('/contact/:contactName', contact);
       page({
         hashbang:true
       });
@@ -38,9 +37,9 @@
           .textContent = 'viewing about';
       }
 
-      function contact() {
+      function contact(ctx) {
         document.querySelector('p')
-          .textContent = 'viewing contact';
+          .textContent = 'viewing contact ' + (ctx.params.contactName || '');
       }
     </script>
   </body>

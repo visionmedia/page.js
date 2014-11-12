@@ -114,15 +114,15 @@
    */
 
   page.start = function(options){
-    if (running) return;
     options = options || {};
+    if (running) return;
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && location.hash.indexOf('#!') === 0)
+    var url = (hashbang && ~location.hash.indexOf('#!'))
       ? location.hash.substr(2) + location.search
       : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
@@ -154,6 +154,7 @@
   page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
     if (false !== dispatch) page.dispatch(ctx);
+    if (false !== ctx.handled) ctx.pushState();
     return ctx;
   };
 
@@ -219,7 +220,14 @@
 
   function unhandled(ctx) {
     if (ctx.handled) return;
-    var current = location.pathname + location.search;
+    var current;
+
+    if (hashbang) {
+      current = base + location.hash.replace('#!','');
+    } else {
+      current = location.pathname + location.search;
+    }
+
     if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.handled = false;
@@ -277,8 +285,9 @@
   Context.prototype.pushState = function(){
     history.pushState(this.state
       , this.title
-      , (hashbang && this.canonicalPath !== '/' ? '#!' : '') +
-        this.canonicalPath);
+      , hashbang && this.path !== '/'
+        ? '#!' + this.path
+        : this.canonicalPath);
   };
 
   /**
@@ -290,8 +299,9 @@
   Context.prototype.save = function(){
     history.replaceState(this.state
       , this.title
-      , (hashbang && this.canonicalPath !== '/' ? '#!' : '') +
-        this.canonicalPath);
+      , hashbang && this.path !== '/'
+        ? '#!' + this.path
+        : this.canonicalPath);
   };
 
   /**
@@ -422,9 +432,10 @@
     var path = el.pathname + el.search + (el.hash || '');
 
     // same page
-    var orig = path + el.hash;
+    var orig = path;
 
     path = path.replace(base, '');
+
     if (base && orig === path) return;
 
     e.preventDefault();

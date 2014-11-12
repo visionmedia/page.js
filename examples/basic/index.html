@@ -3,18 +3,18 @@
   <head>
     <title>Basic</title>
     <script src="/page.js"></script>
-    <base href="basic" target="_blank, _self, _parent, _top">
+    <base href="/basic/" >
   </head>
   <body>
     <h1>Basic</h1>
     <p></p>
     <ul>
-      <li><a href="/">/</a></li>
+      <li><a href="./">/</a></li>
       <li><a href="#whoop">#whoop</a></li>
-      <li><a href="/about">/about</a></li>
-      <li><a href="/contact">/contact</a></li>
-      <li><a href="/contact/me">/contact/me</a></li>
-      <li><a href="/not-found?foo=bar">/not-found</a></li>
+      <li><a href="./about">/about</a></li>
+      <li><a href="./contact">/contact</a></li>
+      <li><a href="./contact/me">/contact/me</a></li>
+      <li><a href="./not-found?foo=bar">/not-found</a></li>
     </ul>
 
     <script>
@@ -23,10 +23,13 @@
       // no catch-all, so page.js will redirect
       // to the location of paths which do not
       // match any of the following routes
+      //
+      page.base('/basic');
 
       page('/', index);
       page('/about', about);
       page('/contact', contact);
+      page('/contact/:contactName', contact);
       page();
 
       function index() {
@@ -39,9 +42,9 @@
           .textContent = 'viewing about';
       }
 
-      function contact() {
+      function contact(ctx) {
         document.querySelector('p')
-          .textContent = 'viewing contact';
+          .textContent = 'viewing contact ' + (ctx.params.contactName || '');
       }
     </script>
   </body>

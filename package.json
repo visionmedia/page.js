@@ -32,7 +32,8 @@
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
     "serve": "*",
-    "should": "*"
+    "should": "*",
+    "simulant": "^0.1.2"
   },
   "files": [
     "index.js"

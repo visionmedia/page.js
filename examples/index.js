@@ -9,8 +9,10 @@ var express = require('express')
 
 var app = express();
 
-app.use(express.favicon());
-app.use(express.logger('dev'));
+
+// deprecated express methods
+// app.use(express.favicon());
+// app.use(express.logger('dev'));
 
 app.set('views', __dirname);
 app.set('view engine', 'jade');
@@ -29,7 +31,7 @@ var examples = fs.readdirSync(__dirname).filter(function(file){
  */
 
 app.get('/page.js', function(req, res){
-  res.sendfile(join(__dirname, '..', 'page.js'));
+  res.sendFile(join(__dirname, '..', 'page.js'));
 });
 
 /**
@@ -37,7 +39,7 @@ app.get('/page.js', function(req, res){
  */
 
 app.get(/^\/(mocha|chai)\.(css|js)$/i, function(req, res){
-  res.sendfile(join(__dirname, '../test/', req.params.join('.')));
+  res.sendFile(join(__dirname, '../test/', req.params.join('.')));
 });
 
 /**
@@ -67,7 +69,7 @@ app.get('/:example/:file(*)', function(req, res, next){
   var path = join(__dirname, name, file);
   fs.stat(path, function(err, stat){
     if (err) return next();
-    res.sendfile(path);
+    res.sendFile(path);
   });
 });
 
@@ -77,7 +79,7 @@ app.get('/:example/:file(*)', function(req, res, next){
 
 app.get('/:example/*', function(req, res){
   var name = req.params.example;
-  res.sendfile(join(__dirname, name, 'index.html'));
+  res.sendFile(join(__dirname, name, 'index.html'));
 });
 
 app.listen(4000);

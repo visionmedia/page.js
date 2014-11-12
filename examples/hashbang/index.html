@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Basic</title>
+    <title>Hashbang</title>
     <script src="/page.js"></script>
-    <base href="/basic/" >
+    <base href="/hashbang/">
   </head>
   <body>
-    <h1>Basic</h1>
+    <h1>Hashbang</h1>
     <p></p>
     <ul>
       <li><a href="./">/</a></li>
@@ -18,19 +18,14 @@
     </ul>
 
     <script>
-      // the "notfound" implements a catch-all
-      // with page('*', notfound). Here we have
-      // no catch-all, so page.js will redirect
-      // to the location of paths which do not
-      // match any of the following routes
-      //
-      page.base('/basic');
-
+      page.base('/hashbang');
       page('/', index);
       page('/about', about);
       page('/contact', contact);
       page('/contact/:contactName', contact);
-      page();
+      page({
+        hashbang:true
+      });
 
       function index() {
         document.querySelector('p')

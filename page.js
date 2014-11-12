@@ -1,11 +1,11 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.page=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.page=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
   /* globals require, module */
 
 /**
    * Module dependencies.
    */
 
-  var pathtoRegexp = _dereq_('path-to-regexp');
+  var pathtoRegexp = require('path-to-regexp');
 
   /**
    * Module exports.
@@ -123,7 +123,7 @@
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && location.hash.indexOf('#!') === 0)
+    var url = (hashbang && ~location.hash.indexOf('#!'))
       ? location.hash.substr(2) + location.search
       : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
@@ -136,9 +136,10 @@
    */
 
   page.stop = function(){
+    if (!running) return;
     running = false;
-    removeEventListener('click', onclick, false);
-    removeEventListener('popstate', onpopstate, false);
+    window.removeEventListener('click', onclick, false);
+    window.removeEventListener('popstate', onpopstate, false);
   };
 
   /**
@@ -220,7 +221,14 @@
 
   function unhandled(ctx) {
     if (ctx.handled) return;
-    var current = location.pathname + location.search;
+    var current;
+
+    if (hashbang) {
+      current = base + location.hash.replace('#!','');
+    } else {
+      current = location.pathname + location.search;
+    }
+
     if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.handled = false;
@@ -278,8 +286,8 @@
   Context.prototype.pushState = function(){
     history.pushState(this.state
       , this.title
-      , hashbang && this.canonicalPath !== '/'
-        ? '#!' + this.canonicalPath
+      , hashbang && this.path !== '/'
+        ? '#!' + this.path
         : this.canonicalPath);
   };
 
@@ -292,8 +300,8 @@
   Context.prototype.save = function(){
     history.replaceState(this.state
       , this.title
-      , hashbang && this.canonicalPath !== '/'
-        ? '#!' + this.canonicalPath
+      , hashbang && this.path !== '/'
+        ? '#!' + this.path
         : this.canonicalPath);
   };
 
@@ -425,9 +433,10 @@
     var path = el.pathname + el.search + (el.hash || '');
 
     // same page
-    var orig = path + el.hash;
+    var orig = path;
 
     path = path.replace(base, '');
+
     if (base && orig === path) return;
 
     e.preventDefault();
@@ -457,7 +466,7 @@
 
   page.sameOrigin = sameOrigin;
 
-},{"path-to-regexp":2}],2:[function(_dereq_,module,exports){
+},{"path-to-regexp":2}],2:[function(require,module,exports){
 /**
  * Expose `pathtoRegexp`.
  */
@@ -626,6 +635,5 @@ function pathtoRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
-},{}]},{},[1])
-(1)
+},{}]},{},[1])(1)
 });

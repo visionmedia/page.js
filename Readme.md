@@ -111,7 +111,8 @@ $('.view').click(function(e){
 
   - `click` bind to click events [__true__]
   - `popstate` bind to popstate [__true__]
-  - `dispatch` perform initial dispatch [true]
+  - `dispatch` perform initial dispatch [__true__]
+  - `hashbang` add `#!` before urls [__false__]
 
   If you wish to load serve initial content
   from the server you likely will want to

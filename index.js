@@ -410,6 +410,9 @@
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
 
+    // link should redirect somewhere outside the app
+    if(el.getAttribute('data-external') === 'true') return;
+
     // ensure link
     var el = e.target;
     while (el && 'A' != el.nodeName) el = el.parentNode;

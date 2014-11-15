@@ -387,6 +387,9 @@
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
 
+    // Ignore if tag has a "download" attribute
+    if (el.getAttribute("download")) return;
+
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
     if (el.pathname == location.pathname && (el.hash || '#' == link)) return;

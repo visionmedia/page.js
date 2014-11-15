@@ -45,13 +45,15 @@
 
   /**
    * Register `path` with callback `fn()`,
-   * or route `path`, or `page.start()`.
+   * or route `path`, or redirection,
+   * or `page.start()`.
    *
    *   page(fn);
    *   page('*', fn);
    *   page('/user/:id', load, user);
    *   page('/user/' + user.id, { some: 'thing' });
    *   page('/user/' + user.id);
+   *   page('/from', '/to')
    *   page();
    *
    * @param {String|Function} path
@@ -159,7 +161,7 @@
   };
 
   /**
-   * Show `path` with optional `state` object.
+   * Register redirect from one path to other.
    *
    * @param {String} from
    * @param {String} to

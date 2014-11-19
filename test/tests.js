@@ -68,7 +68,7 @@ var called = false,
         });
         page('/one');
       });
-      it('should should load done within redirect', function(done) {
+      it('should load done within redirect', function(done) {
         page('/redirect', function(){
           page.redirect('/done');
         });

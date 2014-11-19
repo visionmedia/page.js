@@ -198,18 +198,30 @@
   };
 
   /**
-   * Register redirect from one path to other.
+   * Register route to redirect from one path to other
+   * or just redirect to another route
    *
-   * @param {String} from
-   * @param {String} to
+   * @param {String} from - if param 'to' is undefined redirects to 'from'
+   * @param {String} [to]
    * @api public
    */
   page.redirect = function(from, to) {
-    page(from, function (e) {
-      setTimeout(function() {
-        page.replace(to);
+    // Define route from a path to another
+    if ('string' === typeof from && 'string' === typeof to) {
+       page(from, function (e) {
+        setTimeout(function() {
+          page.replace(to);
+        });
       });
-    });
+    }
+
+    // Wait for the push state and replace it with another
+    if('string' === typeof from && 'undefined' === typeof to) {
+      setTimeout(function() {
+          page.replace(from);
+      });
+    }
+
   };
 
   /**

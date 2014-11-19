@@ -66,7 +66,16 @@ var called = false,
         page('/two', function() {
           done();
         });
-        page('/two');
+        page('/one');
+      });
+      it('should load done within redirect', function(done) {
+        page('/redirect', function(){
+          page.redirect('/done');
+        });
+        page('/done', function() {
+          done();
+        });
+        page('/redirect');
       });
     });
 

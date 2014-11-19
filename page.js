@@ -46,13 +46,15 @@
 
   /**
    * Register `path` with callback `fn()`,
-   * or route `path`, or `page.start()`.
+   * or route `path`, or redirection,
+   * or `page.start()`.
    *
    *   page(fn);
    *   page('*', fn);
    *   page('/user/:id', load, user);
    *   page('/user/' + user.id, { some: 'thing' });
    *   page('/user/' + user.id);
+   *   page('/from', '/to')
    *   page();
    *
    * @param {String|Function} path
@@ -160,18 +162,30 @@
   };
 
   /**
-   * Show `path` with optional `state` object.
+   * Register route to redirect from one path to other
+   * or just redirect to another route
    *
-   * @param {String} from
-   * @param {String} to
+   * @param {String} from - if param 'to' is undefined redirects to 'from'
+   * @param {String} [to]
    * @api public
    */
   page.redirect = function(from, to) {
-    page(from, function (e) {
-      setTimeout(function() {
-        page.replace(to);
+    // Define route from a path to another
+    if ('string' === typeof from && 'string' === typeof to) {
+       page(from, function (e) {
+        setTimeout(function() {
+          page.replace(to);
+        });
       });
-    });
+    }
+
+    // Wait for the push state and replace it with another
+    if('string' === typeof from && 'undefined' === typeof to) {
+      setTimeout(function() {
+          page.replace(from);
+      });
+    }
+
   };
 
   /**
@@ -415,6 +429,9 @@
     var el = e.target;
     while (el && 'A' != el.nodeName) el = el.parentNode;
     if (!el || 'A' != el.nodeName) return;
+
+    // Ignore if tag has a "download" attribute
+    if (el.getAttribute("download")) return;
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');

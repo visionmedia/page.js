@@ -99,6 +99,25 @@ $('.view').click(function(e){
 
   Identical to `page(fromPath, toPath)`
 
+### page.redirect(path)
+  Calling page.redirect with only a string as the first parameter
+  redirects to another route.
+  Waits for the current route to push state and after replaces it
+  with the new one leaving the browser history clean.
+
+```js
+page('/default', function(){
+  // some logic to decide which route to redirect to
+  if(admin) {
+    page.redirect('/admin');
+  } else {
+    page.redirect('/guest');
+  }
+});
+
+page('/default');
+```
+
 ### page.show(path)
 
   Identical to `page(path)` above.

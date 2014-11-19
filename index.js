@@ -211,7 +211,7 @@
       page(from, function (e) {
         setTimeout(function() {
           page.replace(to);
-        });
+        },0);
       });
     }
 
@@ -219,7 +219,7 @@
     if('string' === typeof from && 'undefined' === typeof to) {
       setTimeout(function() {
           page.replace(from);
-      });
+      },0);
     }
   };
 

@@ -171,7 +171,7 @@
   page.redirect = function(from, to) {
     // Define route from a path to another
     if ('string' === typeof from && 'string' === typeof to) {
-       page(from, function (e) {
+      page(from, function (e) {
         setTimeout(function() {
           page.replace(to);
         });
@@ -184,7 +184,6 @@
           page.replace(from);
       });
     }
-
   };
 
   /**

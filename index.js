@@ -284,6 +284,10 @@
     location.href = ctx.canonicalPath;
   }
 
+  function decodeURLEncodedURIComponent(str) {
+    return decodeURIComponent(str.replace(/\+/g, ' '));
+  }
+
   /**
    * Initialize a new "request" `Context`
    * with the given `path` and optional initial `state`.
@@ -294,6 +298,7 @@
    */
 
   function Context(path, state) {
+    path = decodeURLEncodedURIComponent(path);
     if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
 

@@ -20,6 +20,7 @@ var called = false,
   htmlWrapper,
   html = '',
   base = '',
+  hashbang = false,
   beforeTests = function(options) {
     page.callbacks = [];
     options = options || {};
@@ -102,7 +103,7 @@ var called = false,
     describe('ctx.pathname', function() {
       it('should default to ctx.path', function(done) {
         page('/pathname-default', function(ctx) {
-          expect(ctx.pathname).to.equal(base+ '/pathname-default');
+          expect(ctx.pathname).to.equal(base + (base && hashbang ? '#!' : '') + '/pathname-default');
           done();
         });
 
@@ -111,7 +112,7 @@ var called = false,
 
       it('should omit the query string', function(done) {
         page('/pathname', function(ctx) {
-          expect(ctx.pathname).to.equal(base+ '/pathname');
+          expect(ctx.pathname).to.equal(base + (base && hashbang ? '#!' : '') + '/pathname');
           done();
         });
 
@@ -225,8 +226,9 @@ describe('Html5 history navigation', function() {
 describe('Hashbang option enabled', function() {
 
   before(function() {
+    hashbang = true
     beforeTests({
-      hashbang: true
+      hashbang: hashbang
     });
   });
 

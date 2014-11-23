@@ -172,10 +172,10 @@
   page.redirect = function(from, to) {
     // Define route from a path to another
     if ('string' === typeof from && 'string' === typeof to) {
-       page(from, function (e) {
+      page(from, function (e) {
         setTimeout(function() {
           page.replace(to);
-        });
+        },0);
       });
     }
 
@@ -183,9 +183,8 @@
     if('string' === typeof from && 'undefined' === typeof to) {
       setTimeout(function() {
           page.replace(from);
-      });
+      },0);
     }
-
   };
 
   /**
@@ -250,6 +249,17 @@
   }
 
   /**
+  * Remove URL encoding from the given `str`.
+  * Accommodates whitespace in both x-www-form-urlencoded
+  * and regular percent-encoded form.
+  *
+  * @param {str} URL component to decode
+  */
+  function decodeURLEncodedURIComponent(str) {
+    return decodeURIComponent(str.replace(/\+/g, ' '));
+  }
+
+  /**
    * Initialize a new "request" `Context`
    * with the given `path` and optional initial `state`.
    *
@@ -259,11 +269,13 @@
    */
 
   function Context(path, state) {
-    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + path;
+    path = decodeURLEncodedURIComponent(path);
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
+    if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;
     this.state = state || {};
@@ -278,11 +290,13 @@
 
     // fragment
     this.hash = '';
-    if (!~this.path.indexOf('#')) return;
-    var parts = this.path.split('#');
-    this.path = parts[0];
-    this.hash = parts[1] || '';
-    this.querystring = this.querystring.split('#')[0];
+    if (!hashbang) {
+      if (!~this.path.indexOf('#')) return;
+      var parts = this.path.split('#');
+      this.path = parts[0];
+      this.hash = parts[1] || '';
+      this.querystring = this.querystring.split('#')[0];
+    }
   }
 
   /**
@@ -413,6 +427,8 @@
     if (e.state) {
       var path = e.state.path;
       page.replace(path, e.state);
+    } else {
+      page.show(location.pathname + location.hash)
     }
   }
 
@@ -435,7 +451,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (el.pathname === location.pathname && (el.hash || '#' === link)) return;
+    if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
     // Check for mailto: in the href
     if (link && link.indexOf("mailto:") > -1) return;
@@ -453,6 +469,7 @@
     var orig = path;
 
     path = path.replace(base, '');
+    if (hashbang) path = path.replace('#!', '');
 
     if (base && orig === path) return;
 

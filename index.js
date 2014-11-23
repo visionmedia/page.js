@@ -269,11 +269,12 @@
 
   function Context(path, state) {
     path = decodeURLEncodedURIComponent(path);
-    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + path;
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
+    if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;
     this.state = state || {};
@@ -288,11 +289,13 @@
 
     // fragment
     this.hash = '';
-    if (!~this.path.indexOf('#')) return;
-    var parts = this.path.split('#');
-    this.path = parts[0];
-    this.hash = parts[1] || '';
-    this.querystring = this.querystring.split('#')[0];
+    if (!hashbang) {
+      if (!~this.path.indexOf('#')) return;
+      var parts = this.path.split('#');
+      this.path = parts[0];
+      this.hash = parts[1] || '';
+      this.querystring = this.querystring.split('#')[0];
+    }
   }
 
   /**
@@ -423,6 +426,8 @@
     if (e.state) {
       var path = e.state.path;
       page.replace(path, e.state);
+    } else {
+      page.show(location.pathname + location.hash)
     }
   }
 
@@ -445,7 +450,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (el.pathname === location.pathname && (el.hash || '#' === link)) return;
+    if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
     // Check for mailto: in the href
     if (link && link.indexOf("mailto:") > -1) return;
@@ -463,6 +468,7 @@
     var orig = path;
 
     path = path.replace(base, '');
+    if (hashbang) path = path.replace('#!', '');
 
     if (base && orig === path) return;
 

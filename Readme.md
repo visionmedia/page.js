@@ -148,7 +148,30 @@ page('/default');
 ### page.base([path])
 
   Get or set the base `path`. For example if page.js
-  is operating within "/blog/*" set the base path to "/blog".
+  is operating within `/blog/*` set the base path to "/blog".
+
+### page.exit(path, callback[, callback ...])
+
+  Defines an exit route mapping `path` to the given `callback(s)`.
+
+  Exit routes are called when a page changes, using the context
+  from the previous change. For example:
+
+```js
+page('/sidebar', function(ctx, next) {
+  sidebar.open = true
+  next()
+})
+
+page.exit('/sidebar', function(next) {
+  sidebar.open = false
+  next()
+})
+```
+
+### page.exit(callback)
+
+Equivalent to `page.exit('*', callback)`.
 
 ### Context
 

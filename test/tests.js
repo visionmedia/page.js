@@ -22,6 +22,7 @@ var called = false,
   base = '',
   beforeTests = function(options) {
     page.callbacks = [];
+    page.exits = [];
     options = options || {};
     page('/', function() {
       called = true;
@@ -76,6 +77,55 @@ var called = false,
           done();
         });
         page('/redirect');
+      });
+    });
+
+    describe('on exit', function() {
+      it('should run when exiting the page', function(done) {
+        page('/exit', function() {
+          visited = true;
+        });
+
+        page.exit('/exit', function() {
+          expect(visited).to.equal(true);
+          done();
+        });
+
+        page('/exit');
+        page('/');
+      });
+
+      it('should only run on matched routes', function(done) {
+        page('/should-exit', function(){});
+        page('/', function(){});
+
+        page.exit('/should-not-exit', function() {
+          throw new Error('This exit route should not have been called');
+        });
+
+        page.exit('/should-exit', function() {
+          done();
+        });
+
+        page('/should-exit');
+        page('/');
+      });
+
+      it('should use the previous context', function(done) {
+        var unique;
+
+        page('/', function(){});
+        page('/bootstrap', function(ctx) {
+          unique = ctx.unique = {};
+        });
+
+        page.exit('/bootstrap', function(ctx) {
+          expect(ctx.unique).to.equal(unique);
+          done();
+        })
+
+        page('/bootstrap');
+        page('/');
       });
     });
 

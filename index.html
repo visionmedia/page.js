@@ -32,25 +32,42 @@
 
 <p>Tiny ~1200 byte Express-inspired client-side router.</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user'</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/edit'</span><span class="p">,</span> <span class="nx">edit</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/album'</span><span class="p">,</span> <span class="nx">album</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/album/sort'</span><span class="p">,</span> <span class="nx">sort</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="nx">notfound</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">()</span>
-</pre>
-</div>
+<p><a href="https://travis-ci.org/visionmedia/page.js"><img src="https://travis-ci.org/visionmedia/page.js.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/r/visionmedia/page.js?branch=master"><img src="https://coveralls.io/repos/visionmedia/page.js/badge.png?branch=master" alt="Coverage Status"></a>
+<a href="https://gitter.im/visionmedia/page.js?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a></p>
 
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, index)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user<span class="pl-pds">'</span></span>, show)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user/edit<span class="pl-pds">'</span></span>, edit)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user/album<span class="pl-pds">'</span></span>, album)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user/album/sort<span class="pl-pds">'</span></span>, sort)
+page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</span></span>, notfound)
+page()</pre></div>
 
-<h2>Running examples</h2>
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>To run examples do the following to install dev dependencies an run the example server:</p>
+<p>There are multiple ways to install <code>page.js</code>.
+  With package managers:</p>
 
-<pre><code>$ npm install
+<div class="highlight highlight-bash"><pre>  $ npm install page <span class="pl-c"># for browserify</span>
+  $ component install visionmedia/page.js
+  $ bower install visionmedia/page.js</pre></div>
+
+<p>Via CDN and script tag:</p>
+
+<div class="highlight highlight-html"><pre><span class="pl-s2">  &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s1"><span class="pl-pds">"</span>https://cdn.rawgit.com/visionmedia/page.js/master/page.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</span></pre></div>
+
+<h2>
+<a id="running-examples" class="anchor" href="#running-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running examples</h2>
+
+<p>To run examples do the following to install dev dependencies and run the example server:</p>
+
+<pre><code>$ git clone git://github.com/visionmedia/page.js
+$ cd page.js
+$ npm install
 $ node examples
-$ open http://localhost:3000
+$ open http://localhost:4000
 </code></pre>
 
 <p>Currently we have examples for:</p>
@@ -71,48 +88,85 @@ $ open http://localhost:3000
 <li>
 <code>server</code> illustrates how to use the dispatch option to server initial content</li>
 <li>
-<p><code>chrome</code> Google Chrome style administration interface</p>
+<code>chrome</code> Google Chrome style administration interface</li>
+<li>
+<code>transitions</code> Shows off a simple technique for adding transitions between "pages"</li>
+<li>
+<p><code>partials</code> using hogan.js to render mustache partials client side</p>
 
 <p><strong>NOTE</strong>: keep in mind these examples do not use jQuery or similar, so
 portions of the examples may be relatively verbose, though they're not
 directly related to page.js in any way.</p>
 </li>
-</ul><h2>API</h2>
+</ul>
 
-<h3>page(path, callback[, callback ...])</h3>
+<h2>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h2>
+
+<h3>
+<a id="pagepath-callback-callback-" class="anchor" href="#pagepath-callback-callback-" aria-hidden="true"><span class="octicon octicon-link"></span></a>page(path, callback[, callback ...])</h3>
 
 <p>Defines a route mapping <code>path</code> to the given <code>callback(s)</code>.</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">list</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:id'</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">load</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">show</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:id/edit'</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">load</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">edit</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="nx">notfound</span><span class="p">)</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, user.list)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:id<span class="pl-pds">'</span></span>, user.load, user.show)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:id/edit<span class="pl-pds">'</span></span>, user.load, user.edit)
+page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</span></span>, notfound)</pre></div>
 
 <p>Links that are not of the same origin are disregarded
   and will not be dispatched.</p>
 
-<h3>page(path)</h3>
+<h3>
+<a id="pagecallback" class="anchor" href="#pagecallback" aria-hidden="true"><span class="octicon octicon-link"></span></a>page(callback)</h3>
+
+<p>This is equivalent to <code>page('*', callback)</code> for generic "middleware".</p>
+
+<h3>
+<a id="pagepath" class="anchor" href="#pagepath" aria-hidden="true"><span class="octicon octicon-link"></span></a>page(path)</h3>
 
 <p>Navigate to the given <code>path</code>.</p>
 
-<div class="highlight">
-<pre><span class="nx">$</span><span class="p">(</span><span class="s1">'.view'</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-  <span class="nx">page</span><span class="p">(</span><span class="s1">'/user/12'</span><span class="p">)</span>
-  <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">()</span>
-<span class="p">})</span>
-</pre>
-</div>
+<div class="highlight highlight-js"><pre>$(<span class="pl-s1"><span class="pl-pds">'</span>.view<span class="pl-pds">'</span></span>).<span class="pl-s3">click</span>(<span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+  page(<span class="pl-s1"><span class="pl-pds">'</span>/user/12<span class="pl-pds">'</span></span>)
+  e.preventDefault()
+})</pre></div>
 
+<h3>
+<a id="pagefrompath-topath" class="anchor" href="#pagefrompath-topath" aria-hidden="true"><span class="octicon octicon-link"></span></a>page(fromPath, toPath)</h3>
 
-<h3>page.show(path)</h3>
+<p>Setup redirect form one path to other.</p>
+
+<h3>
+<a id="pageredirectfrompath-topath" class="anchor" href="#pageredirectfrompath-topath" aria-hidden="true"><span class="octicon octicon-link"></span></a>page.redirect(fromPath, toPath)</h3>
+
+<p>Identical to <code>page(fromPath, toPath)</code></p>
+
+<h3>
+<a id="pageredirectpath" class="anchor" href="#pageredirectpath" aria-hidden="true"><span class="octicon octicon-link"></span></a>page.redirect(path)</h3>
+
+<p>Calling page.redirect with only a string as the first parameter
+  redirects to another route.
+  Waits for the current route to push state and after replaces it
+  with the new one leaving the browser history clean.</p>
+
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/default<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(){
+  <span class="pl-c">// some logic to decide which route to redirect to</span>
+  <span class="pl-k">if</span>(admin) {
+    page.redirect(<span class="pl-s1"><span class="pl-pds">'</span>/admin<span class="pl-pds">'</span></span>);
+  } <span class="pl-k">else</span> {
+    page.redirect(<span class="pl-s1"><span class="pl-pds">'</span>/guest<span class="pl-pds">'</span></span>);
+  }
+});
+
+page(<span class="pl-s1"><span class="pl-pds">'</span>/default<span class="pl-pds">'</span></span>);</pre></div>
+
+<h3>
+<a id="pageshowpath" class="anchor" href="#pageshowpath" aria-hidden="true"><span class="octicon octicon-link"></span></a>page.show(path)</h3>
 
 <p>Identical to <code>page(path)</code> above.</p>
 
-<h3>page([options])</h3>
+<h3>
+<a id="pageoptions" class="anchor" href="#pageoptions" aria-hidden="true"><span class="octicon octicon-link"></span></a>page([options])</h3>
 
 <p>Register page's <code>popstate</code> / <code>click</code> bindings. If you're
   doing selective binding you'll like want to pass <code>{ click: false }</code>
@@ -124,61 +178,109 @@ directly related to page.js in any way.</p>
 <li>
 <code>popstate</code> bind to popstate [<strong>true</strong>]</li>
 <li>
-<p><code>dispatch</code> perform initial dispatch [true]</p>
+<code>dispatch</code> perform initial dispatch [<strong>true</strong>]</li>
+<li>
+<p><code>hashbang</code> add <code>#!</code> before urls [<strong>false</strong>]</p>
 
 <p>If you wish to load serve initial content
 from the server you likely will want to
 set <code>dispatch</code> to <strong>false</strong>.</p>
 </li>
-</ul><h3>page.start([options])</h3>
+</ul>
+
+<h3>
+<a id="pagestartoptions" class="anchor" href="#pagestartoptions" aria-hidden="true"><span class="octicon octicon-link"></span></a>page.start([options])</h3>
 
 <p>Identical to <code>page([options])</code> above.</p>
 
-<h3>page.stop()</h3>
+<h3>
+<a id="pagestop" class="anchor" href="#pagestop" aria-hidden="true"><span class="octicon octicon-link"></span></a>page.stop()</h3>
 
 <p>Unbind both the <code>popstate</code> and <code>click</code> handlers.</p>
 
-<h3>page.base([path])</h3>
+<h3>
+<a id="pagebasepath" class="anchor" href="#pagebasepath" aria-hidden="true"><span class="octicon octicon-link"></span></a>page.base([path])</h3>
 
 <p>Get or set the base <code>path</code>. For example if page.js
-  is operating within "/blog/*" set the base path to "/blog". </p>
+  is operating within <code>/blog/*</code> set the base path to "/blog".</p>
 
-<h3>Context#save()</h3>
+<h3>
+<a id="pageexitpath-callback-callback-" class="anchor" href="#pageexitpath-callback-callback-" aria-hidden="true"><span class="octicon octicon-link"></span></a>page.exit(path, callback[, callback ...])</h3>
 
-<p>Saves the context using <code>replaceState()</code>. For example
-  this is useful for caching HTML or other resources
-  that were loaded for when a user presses "back".</p>
+<p>Defines an exit route mapping <code>path</code> to the given <code>callback(s)</code>.</p>
+
+<p>Exit routes are called when a page changes, using the context
+  from the previous change. For example:</p>
+
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/sidebar<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">ctx</span>, <span class="pl-vpf">next</span>) {
+  sidebar.open <span class="pl-k">=</span> <span class="pl-c1">true</span>
+  next()
+})
+
+page.exit(<span class="pl-s1"><span class="pl-pds">'</span>/sidebar<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">next</span>) {
+  sidebar.open <span class="pl-k">=</span> <span class="pl-c1">false</span>
+  next()
+})</pre></div>
+
+<h3>
+<a id="pageexitcallback" class="anchor" href="#pageexitcallback" aria-hidden="true"><span class="octicon octicon-link"></span></a>page.exit(callback)</h3>
+
+<p>Equivalent to <code>page.exit('*', callback)</code>.</p>
+
+<h3>
+<a id="context" class="anchor" href="#context" aria-hidden="true"><span class="octicon octicon-link"></span></a>Context</h3>
 
 <p>Routes are passed <code>Context</code> objects, these may
   be used to share state, for example <code>ctx.user =</code>,
   as well as the history "state" <code>ctx.state</code> that
   the <code>pushState</code> API provides.</p>
 
-<h2>Context#canonicalPath</h2>
+<h4>
+<a id="contextsave" class="anchor" href="#contextsave" aria-hidden="true"><span class="octicon octicon-link"></span></a>Context#save()</h4>
+
+<p>Saves the context using <code>replaceState()</code>. For example
+  this is useful for caching HTML or other resources
+  that were loaded for when a user presses "back".</p>
+
+<h4>
+<a id="contexthandled" class="anchor" href="#contexthandled" aria-hidden="true"><span class="octicon octicon-link"></span></a>Context#handled</h4>
+
+<p>If <code>true</code>, marks the context as handled to prevent <a href="https://github.com/visionmedia/page.js#default-404-behaviour">default 404 behaviour</a>.
+  For example this is useful for the routes with interminate quantity of the
+  callbacks.</p>
+
+<h4>
+<a id="contextcanonicalpath" class="anchor" href="#contextcanonicalpath" aria-hidden="true"><span class="octicon octicon-link"></span></a>Context#canonicalPath</h4>
 
 <p>Pathname including the "base" (if any) and query string "/admin/login?foo=bar".</p>
 
-<h2>Context#path</h2>
+<h4>
+<a id="contextpath" class="anchor" href="#contextpath" aria-hidden="true"><span class="octicon octicon-link"></span></a>Context#path</h4>
 
 <p>Pathname and query string "/login?foo=bar".</p>
 
-<h2>Context#querystring</h2>
+<h4>
+<a id="contextquerystring" class="anchor" href="#contextquerystring" aria-hidden="true"><span class="octicon octicon-link"></span></a>Context#querystring</h4>
 
 <p>Query string void of leading <code>?</code> such as "foo=bar", defaults to "".</p>
 
-<h2>Context#pathname</h2>
+<h4>
+<a id="contextpathname" class="anchor" href="#contextpathname" aria-hidden="true"><span class="octicon octicon-link"></span></a>Context#pathname</h4>
 
 <p>The pathname void of query string "/login".</p>
 
-<h2>Context#state</h2>
+<h4>
+<a id="contextstate" class="anchor" href="#contextstate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Context#state</h4>
 
 <p>The <code>pushState</code> state object.</p>
 
-<h2>Context#title</h2>
+<h4>
+<a id="contexttitle" class="anchor" href="#contexttitle" aria-hidden="true"><span class="octicon octicon-link"></span></a>Context#title</h4>
 
 <p>The <code>pushState</code> title.</p>
 
-<h2>Routing</h2>
+<h2>
+<a id="routing" class="anchor" href="#routing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Routing</h2>
 
 <p>The router uses the same string-to-regexp conversion
   that Express does, so things like ":id", ":id?", and "*" work
@@ -188,44 +290,34 @@ set <code>dispatch</code> to <strong>false</strong>.</p>
   pass multiple callbacks. You can use this to your advantage
   to flatten nested callbacks, or simply to abstract components.</p>
 
-<h3>Separating concerns</h3>
+<h3>
+<a id="separating-concerns" class="anchor" href="#separating-concerns" aria-hidden="true"><span class="octicon octicon-link"></span></a>Separating concerns</h3>
 
 <p>For example suppose you had a route to <em>edit</em> users, and a
   route to <em>view</em> users. In both cases you need to load the user.
   One way to achieve this is with several callbacks as shown here:</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user'</span><span class="p">,</span> <span class="nx">load</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/edit'</span><span class="p">,</span> <span class="nx">load</span><span class="p">,</span> <span class="nx">edit</span><span class="p">)</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user<span class="pl-pds">'</span></span>, load, show)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user/edit<span class="pl-pds">'</span></span>, load, edit)</pre></div>
 
 <p>Using the <code>*</code> character we could alter this to match all
   routes prefixed with "/user" to achieve the same result:</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/*'</span><span class="p">,</span> <span class="nx">load</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user'</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user/edit'</span><span class="p">,</span> <span class="nx">edit</span><span class="p">)</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/*<span class="pl-pds">'</span></span>, load)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user<span class="pl-pds">'</span></span>, show)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user/edit<span class="pl-pds">'</span></span>, edit)</pre></div>
 
 <p>Likewise <code>*</code> may be used as catch-alls after all routes
   acting as a 404 handler, before all routes, in-between and
   so on. For example:</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:user'</span><span class="p">,</span> <span class="nx">load</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
-  <span class="nx">$</span><span class="p">(</span><span class="s1">'body'</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="s1">'Not found!'</span><span class="p">)</span>
-<span class="p">})</span>
-</pre>
-</div>
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user<span class="pl-pds">'</span></span>, load, show)
+page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(){
+  $(<span class="pl-s1"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span>).<span class="pl-sc">text</span>(<span class="pl-s1"><span class="pl-pds">'</span>Not found!<span class="pl-pds">'</span></span>)
+})</pre></div>
 
-
-<h3>Default 404 behaviour</h3>
+<h3>
+<a id="default-404-behaviour" class="anchor" href="#default-404-behaviour" aria-hidden="true"><span class="octicon octicon-link"></span></a>Default 404 behaviour</h3>
 
 <p>By default when a route is not matched,
   page.js will invoke <code>page.stop()</code> to unbind
@@ -234,7 +326,8 @@ set <code>dispatch</code> to <strong>false</strong>.</p>
   page.js with a multi-page application <em>without</em>
   explicitly binding to certain links.</p>
 
-<h3>Working with parameters and contexts</h3>
+<h3>
+<a id="working-with-parameters-and-contexts" class="anchor" href="#working-with-parameters-and-contexts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Working with parameters and contexts</h3>
 
 <p>Much like <code>request</code> and <code>response</code> objects are
   passed around in Express, page.js has a single
@@ -248,30 +341,22 @@ set <code>dispatch</code> to <strong>false</strong>.</p>
   access the ":id" passed. You can do this with
   <code>ctx.params.NAME</code> much like Express:</p>
 
-<div class="highlight">
-<pre><span class="kd">function</span> <span class="nx">load</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">next</span><span class="p">){</span>
-  <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span>
-<span class="p">}</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre><span class="pl-st">function</span> <span class="pl-en">load</span>(<span class="pl-vpf">ctx</span>, <span class="pl-vpf">next</span>){
+  <span class="pl-s">var</span> id <span class="pl-k">=</span> ctx.params.<span class="pl-sc">id</span>
+}</pre></div>
 
 <p>Then perform some kind of action against the server,
   assigning the user to <code>ctx.user</code> for other routes to
   utilize. <code>next()</code> is then invoked to pass control to
   the following matching route in sequence, if any.</p>
 
-<div class="highlight">
-<pre><span class="kd">function</span> <span class="nx">load</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">next</span><span class="p">){</span>
-  <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span>
-  <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">'/user/'</span> <span class="o">+</span> <span class="nx">id</span> <span class="o">+</span> <span class="s1">'.json'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">){</span>
-    <span class="nx">ctx</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="nx">user</span>
-    <span class="nx">next</span><span class="p">()</span>
-  <span class="p">})</span>
-<span class="p">}</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre><span class="pl-st">function</span> <span class="pl-en">load</span>(<span class="pl-vpf">ctx</span>, <span class="pl-vpf">next</span>){
+  <span class="pl-s">var</span> id <span class="pl-k">=</span> ctx.params.<span class="pl-sc">id</span>
+  $.getJSON(<span class="pl-s1"><span class="pl-pds">'</span>/user/<span class="pl-pds">'</span></span> <span class="pl-k">+</span> id <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">'</span>.json<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">user</span>){
+    ctx.user <span class="pl-k">=</span> user
+    next()
+  })
+}</pre></div>
 
 <p>The "show" function might look something like this,
   however you may render templates or do anything you
@@ -280,25 +365,18 @@ set <code>dispatch</code> to <strong>false</strong>.</p>
   will be matched until another link is clicked or
   <code>page(path)</code> is called.</p>
 
-<div class="highlight">
-<pre><span class="kd">function</span> <span class="nx">show</span><span class="p">(</span><span class="nx">ctx</span><span class="p">){</span>
-  <span class="nx">$</span><span class="p">(</span><span class="s1">'body'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">empty</span><span class="p">()</span>
-    <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s1">'&lt;h1&gt;'</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s1">'&lt;h1&gt;'</span><span class="p">);</span>
-<span class="p">}</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre><span class="pl-st">function</span> <span class="pl-en">show</span>(<span class="pl-vpf">ctx</span>){
+  $(<span class="pl-s1"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span>)
+    .empty()
+    .append(<span class="pl-s1"><span class="pl-pds">'</span>&lt;h1&gt;<span class="pl-pds">'</span></span> <span class="pl-k">+</span> ctx.user.<span class="pl-sc">name</span> <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">'</span>&lt;h1&gt;<span class="pl-pds">'</span></span>);
+}</pre></div>
 
 <p>Finally using them like so:</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:id'</span><span class="p">,</span> <span class="nx">load</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
-</pre>
-</div>
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:id<span class="pl-pds">'</span></span>, load, show)</pre></div>
 
-
-<h3>Working with state</h3>
+<h3>
+<a id="working-with-state" class="anchor" href="#working-with-state" aria-hidden="true"><span class="octicon octicon-link"></span></a>Working with state</h3>
 
 <p>When working with the <code>pushState</code> API,
   and thus page.js you may optionally provide
@@ -314,15 +392,11 @@ set <code>dispatch</code> to <strong>false</strong>.</p>
 
 <p>Perhaps the route callback looks like this:</p>
 
-<div class="highlight">
-<pre><span class="kd">function</span> <span class="nx">show</span><span class="p">(</span><span class="nx">ctx</span><span class="p">){</span>
-  <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">'/photos'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">images</span><span class="p">){</span>
-    <span class="nx">displayImages</span><span class="p">(</span><span class="nx">images</span><span class="p">)</span>
-  <span class="p">})</span>
-<span class="p">}</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre><span class="pl-st">function</span> <span class="pl-en">show</span>(<span class="pl-vpf">ctx</span>){
+  $.getJSON(<span class="pl-s1"><span class="pl-pds">'</span>/photos<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">images</span>){
+    displayImages(images)
+  })
+}</pre></div>
 
 <p>You may utilize the history's state
    object to cache this result, or any
@@ -331,21 +405,17 @@ set <code>dispatch</code> to <strong>false</strong>.</p>
    when a user presses back, providing
    a much nicer experience.</p>
 
-<div class="highlight">
-<pre><span class="kd">function</span> <span class="nx">show</span><span class="p">(</span><span class="nx">ctx</span><span class="p">){</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">images</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">displayImages</span><span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">images</span><span class="p">)</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">'/photos'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">images</span><span class="p">){</span>
-      <span class="nx">ctx</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">images</span> <span class="o">=</span> <span class="nx">images</span>
-      <span class="nx">ctx</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
-      <span class="nx">displayImages</span><span class="p">(</span><span class="nx">images</span><span class="p">)</span>
-    <span class="p">})</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre><span class="pl-st">function</span> <span class="pl-en">show</span>(<span class="pl-vpf">ctx</span>){
+  <span class="pl-k">if</span> (ctx.state.<span class="pl-sc">images</span>) {
+    displayImages(ctx.state.<span class="pl-sc">images</span>)
+  } <span class="pl-k">else</span> {
+    $.getJSON(<span class="pl-s1"><span class="pl-pds">'</span>/photos<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">images</span>){
+      ctx.state.<span class="pl-sc">images</span> <span class="pl-k">=</span> images
+      ctx.save()
+      displayImages(images)
+    })
+  }
+}</pre></div>
 
 <p><strong>NOTE</strong>: <code>ctx.save()</code> must be used
   if the state changes <em>after</em> the first
@@ -353,114 +423,138 @@ set <code>dispatch</code> to <strong>false</strong>.</p>
   it is optional and the state will be
   saved after dispatching.</p>
 
-<h3>Matching paths</h3>
+<h3>
+<a id="matching-paths" class="anchor" href="#matching-paths" aria-hidden="true"><span class="octicon octicon-link"></span></a>Matching paths</h3>
 
 <p>Here are some examples of what's possible
   with the string to <code>RegExp</code> conversion.</p>
 
 <p>Match an explicit path:</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/about'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/about<span class="pl-pds">'</span></span>, callback)</pre></div>
 
 <p>Match with required parameter accessed via <code>ctx.params.name</code>:</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:name'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:name<span class="pl-pds">'</span></span>, callback)</pre></div>
 
 <p>Match with several params, for example <code>/user/tj/edit</code> or
   <code>/user/tj/view</code>.</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:name/:operation'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:name/:operation<span class="pl-pds">'</span></span>, callback)</pre></div>
 
 <p>Match with one optional and one required, now <code>/user/tj</code>
   will match the same route as <code>/user/tj/show</code> etc:</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/:name/:operation?'</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
-</pre>
-</div>
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:name/:operation?<span class="pl-pds">'</span></span>, callback)</pre></div>
 
-
-<p>Use the wildcard char "<em>" to match across segments,
+<p>Use the wildcard char <code>*</code> to match across segments,
   available via <code>ctx.params[N]</code> where <strong>N</strong> is the
-  index of "</em>" since you may use several. For example
+  index of <code>*</code> since you may use several. For example
   the following will match <code>/user/12/edit</code>, <code>/user/12/albums/2/admin</code>
   and so on.</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/user/*'</span><span class="p">,</span> <span class="nx">loadUser</span><span class="p">)</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/*<span class="pl-pds">'</span></span>, loadUser)</pre></div>
 
 <p>Named wildcard accessed, for example <code>/file/javascripts/jquery.js</code>
   would provide "/javascripts/jquery.js" as <code>ctx.params.file</code>:</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'/file/:file(*)'</span><span class="p">,</span> <span class="nx">loadUser</span><span class="p">)</span>
-</pre>
-</div>
-
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/file/:file(*)<span class="pl-pds">'</span></span>, loadUser)</pre></div>
 
 <p>And of course <code>RegExp</code> literals, where the capture
   groups are available via <code>ctx.params[N]</code> where <strong>N</strong>
   is the index of the capture group.</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="sr">/^\/commits\/(\d+)\.\.(\d+)/</span><span class="p">,</span> <span class="nx">loadUser</span><span class="p">)</span>
-</pre>
-</div>
+<div class="highlight highlight-js"><pre>page(<span class="pl-sr"><span class="pl-pds">/</span><span class="pl-k">^</span><span class="pl-cce">\/</span>commits<span class="pl-cce">\/</span>(<span class="pl-c1">\d</span><span class="pl-k">+</span>)<span class="pl-cce">\.\.</span>(<span class="pl-c1">\d</span><span class="pl-k">+</span>)<span class="pl-pds">/</span></span>, loadUser)</pre></div>
 
+<h2>
+<a id="plugins" class="anchor" href="#plugins" aria-hidden="true"><span class="octicon octicon-link"></span></a>Plugins</h2>
 
-<h2>Plugins</h2>
-
-<p>Currently there are no official plugins,
-  however <em>examples/query-string/query.js</em>
-  will provide a parsed <code>ctx.query</code> object
-  derived from <a href="https://github.com/visionmedia/node-querystring">https://github.com/visionmedia/node-querystring</a>.</p>
+<p>An example plugin <em>examples/query-string/query.js</em>
+  demonstrates how to make plugins. It will provide a parsed <code>ctx.query</code> object
+  derived from <a href="https://github.com/visionmedia/node-querystring">node-querystring</a>.</p>
 
 <p>Usage by using "*" to match any path
   in order to parse the query-string:</p>
 
-<div class="highlight">
-<pre><span class="nx">page</span><span class="p">(</span><span class="s1">'*'</span><span class="p">,</span> <span class="nx">parse</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span> <span class="nx">show</span><span class="p">)</span>
-<span class="nx">page</span><span class="p">()</span>
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</span></span>, parse)
+page(<span class="pl-s1"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, show)
+page()
 
-<span class="kd">function</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">ctx</span><span class="p">.</span><span class="nx">query</span> <span class="o">=</span> <span class="nx">qs</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
-  <span class="nx">next</span><span class="p">();</span>
-<span class="p">}</span>
+<span class="pl-st">function</span> <span class="pl-en">parse</span>(<span class="pl-vpf">ctx</span>, <span class="pl-vpf">next</span>) {
+  ctx.query <span class="pl-k">=</span> qs.<span class="pl-s3">parse</span>(location.search.<span class="pl-s3">slice</span>(<span class="pl-c1">1</span>));
+  next();
+}
 
-<span class="kd">function</span> <span class="nx">show</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">query</span><span class="p">).</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nb">document</span>
-      <span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'pre'</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">query</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre>
-</div>
+<span class="pl-st">function</span> <span class="pl-en">show</span>(<span class="pl-vpf">ctx</span>) {
+  <span class="pl-k">if</span> (<span class="pl-s3">Object</span>.keys(ctx.query).<span class="pl-sc">length</span>) {
+    <span class="pl-s3">document</span>
+      .querySelector(<span class="pl-s1"><span class="pl-pds">'</span>pre<span class="pl-pds">'</span></span>)
+      .textContent <span class="pl-k">=</span> JSON.stringify(ctx.query, <span class="pl-c1">null</span>, <span class="pl-c1">2</span>);
+  }
+}</pre></div>
 
+<h3>
+<a id="available-plugins" class="anchor" href="#available-plugins" aria-hidden="true"><span class="octicon octicon-link"></span></a>Available plugins</h3>
 
-<h3>Running tests</h3>
+<ul>
+<li>
+<a href="https://github.com/visionmedia/page.js/blob/master/examples/query-string/query.js">querystring</a>: provides a parsed <code>ctx.query</code> object derived from <a href="https://github.com/visionmedia/node-querystring">node-querystring</a>.</li>
+<li>
+<a href="https://github.com/kethinov/page.js-body-parser.js">body-parser</a>: provides a <code>req.body</code> object for routes derived from <a href="https://github.com/expressjs/body-parser">body-parser</a>.</li>
+<li>
+<a href="https://github.com/kethinov/page.js-express-mapper.js">express-mapper</a>: provides a direct imitation of the <a href="http://expressjs.com/">Express</a> API so you can share controller code on the client and the server with your Express application without modification.</li>
+</ul>
 
-<pre><code>$ make test
-$ open http://localhost:3000
+<p>Please submit pull requests to add more to this list.</p>
+
+<h3>
+<a id="running-tests" class="anchor" href="#running-tests" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running tests</h3>
+
+<p>In the console:</p>
+
+<pre><code>$ npm install
+$ npm test
 </code></pre>
 
-<h2>License</h2>
+<p>In the browser:</p>
+
+<pre><code>$ npm install
+$ npm run serve
+$ open http://localhost:3000/
+</code></pre>
+
+<h3>
+<a id="support-in-ie8" class="anchor" href="#support-in-ie8" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support in IE8+</h3>
+
+<p>If you want the router to work in older version of Internet Explorer that don't support pushState, you can use the <a href="https://github.com/devote/HTML5-History-API">HTML5-History-API</a> polyfill:</p>
+
+<div class="highlight highlight-bash"><pre>  npm install html5-history-api</pre></div>
+
+<h5>
+<a id="how-to-use-a-polyfill-together-with-router-optional" class="anchor" href="#how-to-use-a-polyfill-together-with-router-optional" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use a Polyfill together with router (OPTIONAL):</h5>
+
+<p>If your site is operating within not root path, you will need to specify the <code>basepath</code> for the HTML5-History-API polyfill.
+Before calling <code>page.base()</code> use: <code>history.redirect([prefixType], [basepath])</code> - Translation link if required.</p>
+
+<ul>
+<li>
+<code>prefixType</code>: <code>[string|null]</code> - Substitute the string after the anchor (#) by default "/".</li>
+<li>
+<code>basepath</code>: <code>[string|null]</code> - Set the base path. See <code>page.base()</code> by default "/". (Note: Slash after <code>pathname</code> required)</li>
+</ul>
+
+<h3>
+<a id="pull-requests" class="anchor" href="#pull-requests" aria-hidden="true"><span class="octicon octicon-link"></span></a>Pull Requests</h3>
+
+<ul>
+<li>Break commits into a single objective.</li>
+<li>An objective should be a chunk of code that is related but requires explaination.</li>
+<li>Commits should be in the form of what-it-is: how-it-does-it and or why-it's-needed or what-it-is for trivial changes</li>
+<li>Pull requests and commits should be a guide to the code.</li>
+</ul>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
 <p>(The MIT License)</p>
 

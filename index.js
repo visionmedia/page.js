@@ -44,6 +44,13 @@
   var hashbang = false;
 
   /**
+   * Previous context, for capturing
+   * page exit events.
+   */
+
+  var prevContext;
+
+  /**
    * Register `path` with callback `fn()`,
    * or route `path`, or redirection,
    * or `page.start()`.
@@ -89,6 +96,7 @@
    */
 
   page.callbacks = [];
+  page.exits = [];
 
   /**
    * len : page.len
@@ -248,15 +256,29 @@
    */
 
   page.dispatch = function(ctx){
+    var prev = prevContext;
     var i = 0;
+    var j = 0;
 
-    function next() {
-      var fn = page.callbacks[i++];
-      if (!fn) return unhandled(ctx);
-      fn(ctx, next);
+    prevContext = ctx;
+
+    function nextExit() {
+      var fn = page.exits[j++];
+      if (!fn) return nextEnter();
+      fn(prev, nextExit);
     }
 
-    next();
+    function nextEnter() {
+      var fn = page.callbacks[i++];
+      if (!fn) return unhandled(ctx);
+      fn(ctx, nextEnter);
+    }
+
+    if (prev) {
+      nextExit();
+    } else {
+      nextEnter();
+    }
   };
 
   /**
@@ -283,6 +305,23 @@
     ctx.handled = false;
     location.href = ctx.canonicalPath;
   }
+
+  /**
+   * Register an exit route on `path` with
+   * callback `fn()`, which will be called
+   * on the previous context when a new
+   * page is visited.
+   */
+  page.exit = function(path, fn) {
+    if (typeof path == 'function') {
+      return page.exit('*', path);
+    };
+
+    var route = new Route(path);
+    for (var i = 1; i < arguments.length; ++i) {
+      page.exits.push(route.middleware(arguments[i]));
+    }
+  };
 
   /**
   * Remove URL encoding from the given `str`.

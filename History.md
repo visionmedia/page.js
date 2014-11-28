@@ -1,3 +1,11 @@
+1.5.0 / 2014-11-29
+==================
+
+* added page.exit(path, callback[, callback...])
+* added page.redirect(url)
+* fix: ignore links with `download` attribute
+* fix: remove URL encoding before parsing paths
+
 1.4.1 / 2014-11-14
 ==================
 

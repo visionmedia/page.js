@@ -165,7 +165,7 @@ page('/default');
 
 #### Context#handled
 
-  If `true`, marks the context as handled to prevent [defauld 404 behaviour][404].
+  If `true`, marks the context as handled to prevent [default 404 behaviour][404].
   For example this is useful for the routes with interminate quantity of the
   callbacks.
 

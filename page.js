@@ -45,6 +45,13 @@
   var hashbang = false;
 
   /**
+   * Previous context, for capturing
+   * page exit events.
+   */
+
+  var prevContext;
+
+  /**
    * Register `path` with callback `fn()`,
    * or route `path`, or redirection,
    * or `page.start()`.
@@ -90,6 +97,7 @@
    */
 
   page.callbacks = [];
+  page.exits = [];
 
   /**
    * Get or set basepath to `path`.
@@ -172,10 +180,10 @@
   page.redirect = function(from, to) {
     // Define route from a path to another
     if ('string' === typeof from && 'string' === typeof to) {
-       page(from, function (e) {
+      page(from, function (e) {
         setTimeout(function() {
           page.replace(to);
-        });
+        },0);
       });
     }
 
@@ -183,9 +191,8 @@
     if('string' === typeof from && 'undefined' === typeof to) {
       setTimeout(function() {
           page.replace(from);
-      });
+      },0);
     }
-
   };
 
   /**
@@ -213,15 +220,29 @@
    */
 
   page.dispatch = function(ctx){
+    var prev = prevContext;
     var i = 0;
+    var j = 0;
 
-    function next() {
-      var fn = page.callbacks[i++];
-      if (!fn) return unhandled(ctx);
-      fn(ctx, next);
+    prevContext = ctx;
+
+    function nextExit() {
+      var fn = page.exits[j++];
+      if (!fn) return nextEnter();
+      fn(prev, nextExit);
     }
 
-    next();
+    function nextEnter() {
+      var fn = page.callbacks[i++];
+      if (!fn) return unhandled(ctx);
+      fn(ctx, nextEnter);
+    }
+
+    if (prev) {
+      nextExit();
+    } else {
+      nextEnter();
+    }
   };
 
   /**
@@ -250,6 +271,34 @@
   }
 
   /**
+   * Register an exit route on `path` with
+   * callback `fn()`, which will be called
+   * on the previous context when a new
+   * page is visited.
+   */
+  page.exit = function(path, fn) {
+    if (typeof path == 'function') {
+      return page.exit('*', path);
+    };
+
+    var route = new Route(path);
+    for (var i = 1; i < arguments.length; ++i) {
+      page.exits.push(route.middleware(arguments[i]));
+    }
+  };
+
+  /**
+  * Remove URL encoding from the given `str`.
+  * Accommodates whitespace in both x-www-form-urlencoded
+  * and regular percent-encoded form.
+  *
+  * @param {str} URL component to decode
+  */
+  function decodeURLEncodedURIComponent(str) {
+    return decodeURIComponent(str.replace(/\+/g, ' '));
+  }
+
+  /**
    * Initialize a new "request" `Context`
    * with the given `path` and optional initial `state`.
    *
@@ -259,6 +308,7 @@
    */
 
   function Context(path, state) {
+    path = decodeURLEncodedURIComponent(path);
     if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
 

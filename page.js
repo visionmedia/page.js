@@ -100,6 +100,12 @@
   page.exits = [];
 
   /**
+   * Current path being processed
+   * @type {String}
+   */
+  page.current = '';
+
+  /**
    * Get or set basepath to `path`.
    *
    * @param {String} path
@@ -146,6 +152,7 @@
    */
 
   page.stop = function(){
+    page.current = '';
     if (!running) return;
     running = false;
     window.removeEventListener('click', onclick, false);
@@ -163,6 +170,7 @@
    */
 
   page.show = function(path, state, dispatch){
+    page.current = path;
     var ctx = new Context(path, state);
     if (false !== dispatch) page.dispatch(ctx);
     if (false !== ctx.handled) ctx.pushState();
@@ -205,6 +213,7 @@
    */
 
   page.replace = function(path, state, init, dispatch){
+    page.current = path;
     var ctx = new Context(path, state);
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
@@ -234,6 +243,10 @@
 
     function nextEnter() {
       var fn = page.callbacks[i++];
+      if(ctx.path !== page.current){
+        ctx.handled = false;
+        return;
+      }
       if (!fn) return unhandled(ctx);
       fn(ctx, nextEnter);
     }

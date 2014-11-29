@@ -45,13 +45,6 @@
   var hashbang = false;
 
   /**
-   * Previous context, for capturing
-   * page exit events.
-   */
-
-  var prevContext;
-
-  /**
    * Register `path` with callback `fn()`,
    * or route `path`, or redirection,
    * or `page.start()`.
@@ -97,13 +90,6 @@
    */
 
   page.callbacks = [];
-  page.exits = [];
-
-  /**
-   * Current path being processed
-   * @type {String}
-   */
-  page.current = '';
 
   /**
    * Get or set basepath to `path`.
@@ -152,7 +138,6 @@
    */
 
   page.stop = function(){
-    page.current = '';
     if (!running) return;
     running = false;
     window.removeEventListener('click', onclick, false);
@@ -170,7 +155,6 @@
    */
 
   page.show = function(path, state, dispatch){
-    page.current = path;
     var ctx = new Context(path, state);
     if (false !== dispatch) page.dispatch(ctx);
     if (false !== ctx.handled) ctx.pushState();
@@ -213,7 +197,6 @@
    */
 
   page.replace = function(path, state, init, dispatch){
-    page.current = path;
     var ctx = new Context(path, state);
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
@@ -229,33 +212,15 @@
    */
 
   page.dispatch = function(ctx){
-    var prev = prevContext;
     var i = 0;
-    var j = 0;
 
-    prevContext = ctx;
-
-    function nextExit() {
-      var fn = page.exits[j++];
-      if (!fn) return nextEnter();
-      fn(prev, nextExit);
-    }
-
-    function nextEnter() {
+    function next() {
       var fn = page.callbacks[i++];
-      if(ctx.path !== page.current){
-        ctx.handled = false;
-        return;
-      }
       if (!fn) return unhandled(ctx);
-      fn(ctx, nextEnter);
+      fn(ctx, next);
     }
 
-    if (prev) {
-      nextExit();
-    } else {
-      nextEnter();
-    }
+    next();
   };
 
   /**
@@ -284,23 +249,6 @@
   }
 
   /**
-   * Register an exit route on `path` with
-   * callback `fn()`, which will be called
-   * on the previous context when a new
-   * page is visited.
-   */
-  page.exit = function(path, fn) {
-    if (typeof path == 'function') {
-      return page.exit('*', path);
-    };
-
-    var route = new Route(path);
-    for (var i = 1; i < arguments.length; ++i) {
-      page.exits.push(route.middleware(arguments[i]));
-    }
-  };
-
-  /**
   * Remove URL encoding from the given `str`.
   * Accommodates whitespace in both x-www-form-urlencoded
   * and regular percent-encoded form.
@@ -322,11 +270,12 @@
 
   function Context(path, state) {
     path = decodeURLEncodedURIComponent(path);
-    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + path;
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
+    if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;
     this.state = state || {};
@@ -341,11 +290,13 @@
 
     // fragment
     this.hash = '';
-    if (!~this.path.indexOf('#')) return;
-    var parts = this.path.split('#');
-    this.path = parts[0];
-    this.hash = parts[1] || '';
-    this.querystring = this.querystring.split('#')[0];
+    if (!hashbang) {
+      if (!~this.path.indexOf('#')) return;
+      var parts = this.path.split('#');
+      this.path = parts[0];
+      this.hash = parts[1] || '';
+      this.querystring = this.querystring.split('#')[0];
+    }
   }
 
   /**
@@ -476,6 +427,8 @@
     if (e.state) {
       var path = e.state.path;
       page.replace(path, e.state);
+    } else {
+      page.show(location.pathname + location.hash)
     }
   }
 
@@ -498,7 +451,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (el.pathname === location.pathname && (el.hash || '#' === link)) return;
+    if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
     // Check for mailto: in the href
     if (link && link.indexOf("mailto:") > -1) return;
@@ -516,6 +469,7 @@
     var orig = path;
 
     path = path.replace(base, '');
+    if (hashbang) path = path.replace('#!', '');
 
     if (base && orig === path) return;
 

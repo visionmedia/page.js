@@ -1,4 +1,6 @@
-var isNode = false;
+var isNode = false,
+  $head,
+  $;
 
 if (isNode = typeof window !== 'object') {
   require('./support/jsdom');
@@ -8,45 +10,71 @@ if (isNode = typeof window !== 'object') {
     global.chai = require('chai');
     global.expect = chai.expect;
     global.page = process.env.PAGE_COV ? require('../index-cov') : require('../index');
-    global.simulant = require('simulant');
+    $ = document.querySelector.bind(document);
+    $head = $('head');
+
   });
 
 } else {
   expect = chai.expect;
-
+  $ = document.querySelector.bind(document);
+  $head = $('head');
 }
 
 var called = false,
   htmlWrapper,
   html = '',
   base = '',
+  baseTag,
   hashbang = false,
+  /**
+   * Fire an event handler to the specified node. Event handlers can detect that the event was fired programatically
+   * by testing for a 'synthetic=true' property on the event object
+   * @param {HTMLNode} node The node to fire the event handler on.
+   * @param {String} eventName The name of the event without the "on" (e.g., "focus")
+   */
+  fireEvent = function(node, eventName) {
+
+    var event = document.createEvent('MouseEvents');
+    event.initEvent(eventName, true, true); // All events created as bubbling and cancelable.
+    // The second parameter says go ahead with the default action
+    node.dispatchEvent(event, true);
+
+  },
   beforeTests = function(options) {
     page.callbacks = [];
     page.exits = [];
     options = options || {};
+
     page('/', function() {
       called = true;
     });
 
-    if (!isNode) {
-
-      htmlWrapper = document.createElement('div');
-      html += '<ul class="links">';
-      html += '      <li><a href="./">/</a></li>';
-      html += '      <li><a href="#whoop">#whoop</a></li>';
-      html += '      <li><a href="./about">/about</a></li>';
-      html += '      <li><a href="./contact">/contact</a></li>';
-      html += '      <li><a href="./contact/me">/contact/me</a></li>';
-      html += '      <li><a href="./not-found?foo=bar">/not-found</a></li>';
-      html += '</ul>';
-
-      htmlWrapper.innerHTML = html;
-      document.body.appendChild(htmlWrapper);
+    if (!baseTag) {
+      baseTag = document.createElement('base');
+      $head.appendChild(baseTag);
     }
+
+    baseTag.setAttribute('href', (base ? base + '/' : '/'));
+
+    htmlWrapper = document.createElement('div');
+
+    html += '<ul class="links">';
+    html += '      <li><a class="index" href="./">/</a></li>';
+    html += '      <li><a class="whoop" href="#whoop">#whoop</a></li>';
+    html += '      <li><a class="about" href="./about">/about</a></li>';
+    html += '      <li><a class="contact" href="./contact">/contact</a></li>';
+    html += '      <li><a class="contact-me" href="./contact/me">/contact/me</a></li>';
+    html += '      <li><a class="not-found" href="./not-found?foo=bar">/not-found</a></li>';
+    html += '</ul>';
+
+    htmlWrapper.innerHTML = html;
+    document.body.appendChild(htmlWrapper);
+
 
 
     page(options);
+
   },
   tests = function() {
     describe('on page load', function() {
@@ -71,7 +99,7 @@ var called = false,
         page('/one');
       });
       it('should load done within redirect', function(done) {
-        page('/redirect', function(){
+        page('/redirect', function() {
           page.redirect('/done');
         });
         page('/done', function() {
@@ -97,8 +125,8 @@ var called = false,
       });
 
       it('should only run on matched routes', function(done) {
-        page('/should-exit', function(){});
-        page('/', function(){});
+        page('/should-exit', function() {});
+        page('/', function() {});
 
         page.exit('/should-not-exit', function() {
           throw new Error('This exit route should not have been called');
@@ -115,7 +143,7 @@ var called = false,
       it('should use the previous context', function(done) {
         var unique;
 
-        page('/', function(){});
+        page('/', function() {});
         page('/bootstrap', function(ctx) {
           unique = ctx.unique = {};
         });
@@ -181,6 +209,17 @@ var called = false,
       });
     });
 
+  /*  describe('links dispatcher', function() {
+
+      it('should invoke the callback', function(done) {
+        page('/about', function() {
+          done();
+        });
+        fireEvent($('.about'), 'click');
+      });
+    });*/
+
+
     describe('dispatcher', function() {
       it('should ignore query strings', function(done) {
         page('/qs', function(ctx) {
@@ -228,7 +267,6 @@ var called = false,
           });
 
           page('/forum/:fid/thread/:tid', function(ctx) {
-            // expect(ctx.fullPath).to.equal('1/thread/2');
             expect(ctx.params.tid).to.equal('2');
             done();
           });
@@ -236,6 +274,8 @@ var called = false,
           page('/forum/1/thread/2');
         });
       });
+
+
 
       describe('not found', function() {
         it('should invoke the not found callback', function(done) {
@@ -276,7 +316,7 @@ describe('Html5 history navigation', function() {
 describe('Hashbang option enabled', function() {
 
   before(function() {
-    hashbang = true
+    hashbang = true;
     beforeTests({
       hashbang: hashbang
     });

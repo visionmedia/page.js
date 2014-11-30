@@ -73,8 +73,13 @@ page('/user/:id/edit', user.load, user.edit)
 page('*', notfound)
 ```
 
-  Links that are not of the same origin are disregarded
-  and will not be dispatched.
+  Under certain conditions, links will be disregarded
+  and will not be dispatched, such as:
+  
+  - Links that are not of the same origin
+  - Links with the `download` attribute
+  - Links with the `rel="external"` attribute
+  - Links with the `target="_blank"` attribute
 
 ### page(callback)
 

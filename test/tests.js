@@ -228,7 +228,7 @@ var called = false,
         fireEvent($('.about'), 'click');
       });
 
-      it('should invoke the callback', function(done) {
+      it('should invoke the callback with the right params', function(done) {
         page('/contact/:name', function(ctx) {
           expect(ctx.params.name).to.equal('me');
           done();
@@ -236,7 +236,7 @@ var called = false,
         fireEvent($('.contact-me'), 'click');
       });
 
-      it('should invoke the callback', function() {
+      it('should not invoke the callback', function() {
         page('/whoop', function(ctx) {
           expect(true).to.equal(false);
         });

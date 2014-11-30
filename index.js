@@ -489,9 +489,9 @@
     // 1. "download" attribute
     // 2. rel="external" attribute
     // 3. target="_blank" attribute
-    if (el.getAttribute("download") ||
-        el.getAttribute("rel") === "external" ||
-        el.getAttribute("target") === "_blank"
+    if (el.getAttribute('download') ||
+        el.getAttribute('rel') === 'external' ||
+        el.getAttribute('target') === '_blank'
        ) return;
     
     // ensure non-hash for the same path

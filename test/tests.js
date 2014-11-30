@@ -25,7 +25,8 @@ var called = false,
     page.callbacks = [];
     page.exits = [];
     options = options || {};
-    page('/', function() {
+    page.base(base);
+    page(base + '/', function() {
       called = true;
     });
 
@@ -57,183 +58,183 @@ var called = false,
 
     describe('on redirect', function() {
       it('should load destination page', function(done) {
-        page.redirect('/from', '/to');
-        page('/to', function() {
+        page.redirect(base + '/from', base + '/to');
+        page(base + '/to', function() {
           done();
         });
-        page('/from');
+        page(base + '/from');
       });
       it('should work with short alias', function(done) {
-        page('/one', '/two');
-        page('/two', function() {
+        page(base + '/one', base + '/two');
+        page(base + '/two', function() {
           done();
         });
-        page('/one');
+        page(base + '/one');
       });
       it('should load done within redirect', function(done) {
-        page('/redirect', function(){
-          page.redirect('/done');
+        page(base + '/redirect', function(){
+          page.redirect(base + '/done');
         });
-        page('/done', function() {
+        page(base + '/done', function() {
           done();
         });
-        page('/redirect');
+        page(base + '/redirect');
       });
     });
 
     describe('on exit', function() {
       it('should run when exiting the page', function(done) {
-        page('/exit', function() {
+        page(base + '/exit', function() {
           visited = true;
         });
 
-        page.exit('/exit', function() {
+        page.exit(base + '/exit', function() {
           expect(visited).to.equal(true);
           done();
         });
 
-        page('/exit');
+        page(base + '/exit');
         page('/');
       });
 
       it('should only run on matched routes', function(done) {
-        page('/should-exit', function(){});
-        page('/', function(){});
+        page(base + '/should-exit', function(){});
+        page(base + '/', function(){});
 
-        page.exit('/should-not-exit', function() {
+        page.exit(base + '/should-not-exit', function() {
           throw new Error('This exit route should not have been called');
         });
 
-        page.exit('/should-exit', function() {
+        page.exit(base + '/should-exit', function() {
           done();
         });
 
-        page('/should-exit');
-        page('/');
+        page(base + '/should-exit');
+        page(base + '/');
       });
 
       it('should use the previous context', function(done) {
         var unique;
 
-        page('/', function(){});
-        page('/bootstrap', function(ctx) {
+        page(base + '/', function(){});
+        page(base + '/bootstrap', function(ctx) {
           unique = ctx.unique = {};
         });
 
-        page.exit('/bootstrap', function(ctx) {
+        page.exit(base + '/bootstrap', function(ctx) {
           expect(ctx.unique).to.equal(unique);
           done();
         })
 
-        page('/bootstrap');
-        page('/');
+        page(base + '/bootstrap');
+        page(base + '/');
       });
     });
 
     describe('ctx.querystring', function() {
       it('should default to ""', function(done) {
-        page('/querystring-default', function(ctx) {
+        page(base + '/querystring-default', function(ctx) {
           expect(ctx.querystring).to.equal('');
           done();
         });
 
-        page('/querystring-default');
+        page(base + '/querystring-default');
       });
 
       it('should expose the query string', function(done) {
-        page('/querystring', function(ctx) {
+        page(base + '/querystring', function(ctx) {
           expect(ctx.querystring).to.equal('hello=there');
           done();
         });
 
-        page('/querystring?hello=there');
+        page(base + '/querystring?hello=there');
       });
     });
 
     describe('ctx.pathname', function() {
       it('should default to ctx.path', function(done) {
-        page('/pathname-default', function(ctx) {
+        page(base + '/pathname-default', function(ctx) {
           expect(ctx.pathname).to.equal(base + (base && hashbang ? '#!' : '') + '/pathname-default');
           done();
         });
 
-        page('/pathname-default');
+        page(base + '/pathname-default');
       });
 
       it('should omit the query string', function(done) {
-        page('/pathname', function(ctx) {
+        page(base + '/pathname', function(ctx) {
           expect(ctx.pathname).to.equal(base + (base && hashbang ? '#!' : '') + '/pathname');
           done();
         });
 
-        page('/pathname?hello=there');
+        page(base + '/pathname?hello=there');
       });
     });
 
     describe('ctx.handled', function() {
       it('should skip unhandled redirect if exists', function() {
-        page('/page/:page', function(ctx, next) {
+        page(base +'/page/:page', function(ctx, next) {
           ctx.handled = true;
           next();
         });
-        var ctx = page.show('/page/1');
+        var ctx = page.show(base + '/page/1');
         expect(ctx.handled).to.be.ok;
       });
     });
 
     describe('dispatcher', function() {
       it('should ignore query strings', function(done) {
-        page('/qs', function(ctx) {
+        page(base + '/qs', function(ctx) {
           done();
         });
 
-        page('/qs?test=true');
+        page(base + '/qs?test=true');
       });
 
       it('should ignore query strings with params', function(done) {
-        page('/qs/:name', function(ctx) {
+        page(base + '/qs/:name', function(ctx) {
           expect(ctx.params.name).to.equal('tobi');
           done();
         });
 
-        page('/qs/tobi?test=true');
+        page(base + '/qs/tobi?test=true');
       });
 
       it('should invoke the matching callback', function(done) {
-        page('/user/:name', function(ctx) {
+        page(base + '/user/:name', function(ctx) {
           done();
         });
 
-        page('/user/tj');
+        page(base + '/user/tj');
       });
 
       it('should populate ctx.params', function(done) {
-        page('/blog/post/:name', function(ctx) {
+        page(base + '/blog/post/:name', function(ctx) {
           expect(ctx.params.name).to.equal('something');
           done();
         });
 
-        page('/blog/post/something');
+        page(base + '/blog/post/something');
       });
 
       describe('when next() is invoked', function() {
         it('should invoke subsequent matching middleware', function(done) {
-          page('/forum/*', function(ctx, next) {
+          page(base + '/forum/*', function(ctx, next) {
             ctx.fullPath = ctx.params[0];
             next();
           });
 
-          page('/user', function() {
+          page(base + '/user', function() {
 
           });
 
-          page('/forum/:fid/thread/:tid', function(ctx) {
+          page(base + '/forum/:fid/thread/:tid', function(ctx) {
             // expect(ctx.fullPath).to.equal('1/thread/2');
             expect(ctx.params.tid).to.equal('2');
             done();
           });
 
-          page('/forum/1/thread/2');
+          page(base + '/forum/1/thread/2');
         });
       });
 
@@ -242,7 +243,7 @@ var called = false,
           page(function() {
             done();
           });
-          page('/whathever');
+          page(base + '/whathever');
         });
       });
 
@@ -254,8 +255,6 @@ var called = false,
     }
     called = false;
     page.stop();
-    page.base('');
-    page('/');
     base = '';
   };
 
@@ -294,7 +293,6 @@ describe('Different Base', function() {
 
   before(function() {
     base = '/newBase';
-    page.base(base);
     beforeTests();
   });
 

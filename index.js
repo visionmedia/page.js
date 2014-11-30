@@ -84,8 +84,7 @@
       }
       // show <path> with [state]
     } else if ('string' === typeof path) {
-      'string' === typeof fn
-        ? page.redirect(path, fn) : page.show(path, fn);
+      page['string' === typeof fn ? 'redirect' : 'show'](path, fn);
       // start [options]
     } else {
       page.start(path);

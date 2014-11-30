@@ -36,9 +36,19 @@ var called = false,
   fireEvent = function(node, eventName) {
 
     var event = document.createEvent('MouseEvents');
-    event.initEvent(eventName, true, true); // All events created as bubbling and cancelable.
-    // The second parameter says go ahead with the default action
-    node.dispatchEvent(event, true);
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
+
+    event.initEvent(
+      eventName, true, true, window, 0,
+      event.screenX, event.screenY, event.clientX, event.clientY,
+      false, false, false, false,
+      0, null);
+
+    event.button = 1;
+    event.which = null;
+
+    node.dispatchEvent(event);
 
   },
   beforeTests = function(options) {
@@ -209,7 +219,7 @@ var called = false,
       });
     });
 
-  /*  describe('links dispatcher', function() {
+    describe('links dispatcher', function() {
 
       it('should invoke the callback', function(done) {
         page('/about', function() {
@@ -217,7 +227,16 @@ var called = false,
         });
         fireEvent($('.about'), 'click');
       });
-    });*/
+
+      it('should invoke the callback', function(done) {
+        page('/contact/:name', function(ctx) {
+          expect(ctx.params.name).to.equal('me');
+          done();
+        });
+        fireEvent($('.contact-me'), 'click');
+      });
+
+    });
 
 
     describe('dispatcher', function() {
@@ -289,9 +308,9 @@ var called = false,
     });
   },
   afterTests = function() {
-    if (!isNode) {
-      document.body.removeChild(htmlWrapper);
-    }
+
+    document.body.removeChild(htmlWrapper);
+
     called = false;
     page.stop();
     page.base('');

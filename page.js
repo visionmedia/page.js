@@ -156,6 +156,7 @@
 
   page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
+    page.current = ctx.path;
     if (false !== dispatch) page.dispatch(ctx);
     if (false !== ctx.handled) ctx.pushState();
     return ctx;
@@ -198,6 +199,7 @@
 
   page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
+    page.current = ctx.path;
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
     if (false !== dispatch) page.dispatch(ctx);

@@ -236,6 +236,13 @@ var called = false,
         fireEvent($('.contact-me'), 'click');
       });
 
+      it('should invoke the callback', function() {
+        page('/whoop', function(ctx) {
+          expect(true).to.equal(false);
+        });
+        fireEvent($('.whoop'), 'click');
+      });
+
     });
 
 

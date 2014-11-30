@@ -1,6 +1,8 @@
   /* globals require, module */
 
-/**
+  'use strict';
+
+  /**
    * Module dependencies.
    */
 
@@ -38,8 +40,8 @@
   var running;
 
   /**
-  * HashBang option
-  */
+   * HashBang option
+   */
 
   var hashbang = false;
 
@@ -80,12 +82,11 @@
       for (var i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
-    // show <path> with [state]
-    } else if ('string' == typeof path) {
+      // show <path> with [state]
+    } else if ('string' === typeof path) {
       'string' === typeof fn
-        ? page.redirect(path, fn)
-        : page.show(path, fn);
-    // start [options]
+        ? page.redirect(path, fn) : page.show(path, fn);
+      // start [options]
     } else {
       page.start(path);
     }
@@ -123,7 +124,7 @@
    * @api public
    */
 
-  page.base = function(path){
+  page.base = function(path) {
     if (0 === arguments.length) return base;
     base = path;
   };
@@ -141,7 +142,7 @@
    * @api public
    */
 
-  page.start = function(options){
+  page.start = function(options) {
     options = options || {};
     if (running) return;
     running = true;
@@ -150,9 +151,7 @@
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!'))
-      ? location.hash.substr(2) + location.search
-      : location.pathname + location.search + location.hash;
+    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -162,7 +161,7 @@
    * @api public
    */
 
-  page.stop = function(){
+  page.stop = function() {
     page.current = '';
     if (!running) return;
     running = false;
@@ -180,9 +179,11 @@
    * @api public
    */
 
-  page.show = function(path, state, dispatch){
+  page.show = function(path, state, dispatch) {
     page.current = path;
+
     var ctx = new Context(path, state);
+
     if (false !== dispatch) page.dispatch(ctx);
     if (false !== ctx.handled) ctx.pushState();
     return ctx;
@@ -224,18 +225,18 @@
   page.redirect = function(from, to) {
     // Define route from a path to another
     if ('string' === typeof from && 'string' === typeof to) {
-      page(from, function (e) {
+      page(from, function(e) {
         setTimeout(function() {
           page.replace(to);
-        },0);
+        }, 0);
       });
     }
 
     // Wait for the push state and replace it with another
-    if('string' === typeof from && 'undefined' === typeof to) {
+    if ('string' === typeof from && 'undefined' === typeof to) {
       setTimeout(function() {
-          page.replace(from);
-      },0);
+        page.replace(from);
+      }, 0);
     }
   };
 
@@ -248,7 +249,7 @@
    * @api public
    */
 
-  page.replace = function(path, state, init, dispatch){
+  page.replace = function(path, state, init, dispatch) {
     page.current = path;
     var ctx = new Context(path, state);
     ctx.init = init;
@@ -264,10 +265,10 @@
    * @api private
    */
 
-  page.dispatch = function(ctx){
-    var prev = prevContext;
-    var i = 0;
-    var j = 0;
+  page.dispatch = function(ctx) {
+    var prev = prevContext,
+      i = 0,
+      j = 0;
 
     prevContext = ctx;
 
@@ -279,7 +280,8 @@
 
     function nextEnter() {
       var fn = page.callbacks[i++];
-      if(ctx.path !== page.current){
+
+      if (ctx.path !== page.current.replace(base, '')) {
         ctx.handled = false;
         return;
       }
@@ -308,7 +310,7 @@
     var current;
 
     if (hashbang) {
-      current = base + location.hash.replace('#!','');
+      current = base + location.hash.replace('#!', '');
     } else {
       current = location.pathname + location.search;
     }
@@ -326,9 +328,9 @@
    * page is visited.
    */
   page.exit = function(path, fn) {
-    if (typeof path == 'function') {
+    if (typeof path === 'function') {
       return page.exit('*', path);
-    };
+    }
 
     var route = new Route(path);
     for (var i = 1; i < arguments.length; ++i) {
@@ -337,12 +339,12 @@
   };
 
   /**
-  * Remove URL encoding from the given `str`.
-  * Accommodates whitespace in both x-www-form-urlencoded
-  * and regular percent-encoded form.
-  *
-  * @param {str} URL component to decode
-  */
+   * Remove URL encoding from the given `str`.
+   * Accommodates whitespace in both x-www-form-urlencoded
+   * and regular percent-encoded form.
+   *
+   * @param {str} URL component to decode
+   */
   function decodeURLEncodedURIComponent(str) {
     return decodeURIComponent(str.replace(/\+/g, ' '));
   }
@@ -368,12 +370,8 @@
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;
-    this.querystring = ~i
-      ? path.slice(i + 1)
-      : '';
-    this.pathname = ~i
-      ? path.slice(0, i)
-      : path;
+    this.querystring = ~i ? path.slice(i + 1) : '';
+    this.pathname = ~i ? path.slice(0, i) : path;
     this.params = [];
 
     // fragment
@@ -399,13 +397,9 @@
    * @api private
    */
 
-  Context.prototype.pushState = function(){
+  Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state
-      , this.title
-      , hashbang && this.path !== '/'
-        ? '#!' + this.path
-        : this.canonicalPath);
+    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -414,12 +408,8 @@
    * @api public
    */
 
-  Context.prototype.save = function(){
-    history.replaceState(this.state
-      , this.title
-      , hashbang && this.path !== '/'
-        ? '#!' + this.path
-        : this.canonicalPath);
+  Context.prototype.save = function() {
+    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -461,9 +451,9 @@
    * @api public
    */
 
-  Route.prototype.middleware = function(fn){
+  Route.prototype.middleware = function(fn) {
     var self = this;
-    return function(ctx, next){
+    return function(ctx, next) {
       if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
       next();
     };
@@ -479,27 +469,21 @@
    * @api private
    */
 
-  Route.prototype.match = function(path, params){
+  Route.prototype.match = function(path, params) {
     var keys = this.keys,
-        qsIndex = path.indexOf('?'),
-        pathname = ~qsIndex
-          ? path.slice(0, qsIndex)
-          : path,
-        m = this.regexp.exec(decodeURIComponent(pathname));
+      qsIndex = path.indexOf('?'),
+      pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
+      m = this.regexp.exec(decodeURIComponent(pathname));
 
     if (!m) return false;
 
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' === typeof m[i]
-        ? decodeURIComponent(m[i])
-        : m[i];
+      var val = 'string' === typeof m[i] ? decodeURIComponent(m[i]) : m[i];
 
       if (key) {
-        params[key.name] = undefined !== params[key.name]
-          ? params[key.name]
-          : val;
+        params[key.name] = undefined !== params[key.name] ? params[key.name] : val;
       } else {
         params.push(val);
       }
@@ -517,7 +501,7 @@
       var path = e.state.path;
       page.replace(path, e.state);
     } else {
-      page.show(location.pathname + location.hash)
+      page.show(location.pathname + location.hash);
     }
   }
 
@@ -526,30 +510,40 @@
    */
 
   function onclick(e) {
-    if (1 != which(e)) return;
+
+    if (1 !== which(e)) return;
+
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
 
+
+
     // ensure link
     var el = e.target;
-    while (el && 'A' != el.nodeName) el = el.parentNode;
-    if (!el || 'A' != el.nodeName) return;
+    while (el && 'A' !== el.nodeName) el = el.parentNode;
+    if (!el || 'A' !== el.nodeName) return;
+
+
 
     // Ignore if tag has a "download" attribute
-    if (el.getAttribute("download")) return;
+    if (el.getAttribute('download')) return;
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
     if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
+
+
     // Check for mailto: in the href
-    if (link && link.indexOf("mailto:") > -1) return;
+    if (link && link.indexOf('mailto:') > -1) return;
 
     // check target
     if (el.target) return;
 
     // x-origin
     if (!sameOrigin(el.href)) return;
+
+
 
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');
@@ -559,6 +553,8 @@
 
     path = path.replace(base, '');
     if (hashbang) path = path.replace('#!', '');
+
+
 
     if (base && orig === path) return;
 
@@ -572,9 +568,7 @@
 
   function which(e) {
     e = e || window.event;
-    return null === e.which
-      ? e.button
-      : e.which;
+    return null === e.which ? e.button : e.which;
   }
 
   /**

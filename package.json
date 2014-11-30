@@ -12,11 +12,12 @@
     }
   },
   "scripts": {
-    "test": "node_modules/jshint/bin/jshint index.js && mocha test/tests.js",
+    "test": "jshint index.js test/tests.js && npm run beautify && mocha test/tests.js",
+    "beautify": "js-beautify index.js -r && js-beautify test/tests.js -r",
     "serve": "serve test",
     "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
     "prepublish": "npm run make",
-    "make": "browserify index.js --standalone page -o page.js"
+    "make": "npm run beautify && browserify index.js --standalone page -o page.js"
   },
   "dependencies": {
     "path-to-regexp": "~1.0.1"
@@ -27,6 +28,7 @@
     "coveralls": "^2.11.2",
     "express": "^4.10.2",
     "jade": "^1.7.0",
+    "js-beautify": "^1.5.4",
     "jscoverage": "^0.5.9",
     "jsdom": "^1.3.1",
     "jshint": "^2.5.10",

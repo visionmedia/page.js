@@ -169,10 +169,8 @@
    */
 
   page.show = function(path, state, dispatch) {
-    page.current = path;
-
     var ctx = new Context(path, state);
-
+    page.current = ctx.path;
     if (false !== dispatch) page.dispatch(ctx);
     if (false !== ctx.handled) ctx.pushState();
     return ctx;
@@ -213,9 +211,10 @@
    * @api public
    */
 
+
   page.replace = function(path, state, init, dispatch) {
-    page.current = path;
     var ctx = new Context(path, state);
+    page.current = ctx.path;
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
     if (false !== dispatch) page.dispatch(ctx);
@@ -245,7 +244,7 @@
     function nextEnter() {
       var fn = page.callbacks[i++];
 
-      if (ctx.path !== page.current.replace(base, '')) {
+      if (ctx.path !== page.current) {
         ctx.handled = false;
         return;
       }

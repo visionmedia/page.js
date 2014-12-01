@@ -13,7 +13,6 @@
     ".npmignore",
     ".travis.yml",
     "component.json",
-    "bower.json",
     "examples",
     "History.md",
     "Makefile",

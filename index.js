@@ -326,7 +326,7 @@
       }
     }
 
-    return prop;
+    return target;
   }
 
   /**

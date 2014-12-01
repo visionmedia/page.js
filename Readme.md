@@ -78,6 +78,7 @@ page('*', notfound)
   
   - Links that are not of the same origin
   - Links with the `download` attribute
+  - Links with the `target` attribute
   - Links with the `rel="external"` attribute
 
 ### page(callback)

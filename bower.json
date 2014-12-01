@@ -1,6 +1,6 @@
 {
   "name": "page",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Tiny client-side router (~1200 bytes)",
   "keywords": ["page", "route", "router", "routes", "pushState"],
   "main": "page.js",
@@ -13,7 +13,6 @@
     ".npmignore",
     ".travis.yml",
     "component.json",
-    "bower.json",
     "examples",
     "History.md",
     "Makefile",

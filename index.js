@@ -1,6 +1,8 @@
   /* globals require, module */
 
-/**
+  'use strict';
+
+  /**
    * Module dependencies.
    */
 
@@ -38,10 +40,17 @@
   var running;
 
   /**
-  * HashBang option
-  */
+   * HashBang option
+   */
 
   var hashbang = false;
+
+  /**
+   * Previous context, for capturing
+   * page exit events.
+   */
+
+  var prevContext;
 
   /**
    * Register `path` with callback `fn()`,
@@ -73,12 +82,10 @@
       for (var i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
-    // show <path> with [state]
-    } else if ('string' == typeof path) {
-      'string' === typeof fn
-        ? page.redirect(path, fn)
-        : page.show(path, fn);
-    // start [options]
+      // show <path> with [state]
+    } else if ('string' === typeof path) {
+      page['string' === typeof fn ? 'redirect' : 'show'](path, fn);
+      // start [options]
     } else {
       page.start(path);
     }
@@ -89,6 +96,13 @@
    */
 
   page.callbacks = [];
+  page.exits = [];
+
+  /**
+   * Current path being processed
+   * @type {String}
+   */
+  page.current = '';
 
   /**
    * Get or set basepath to `path`.
@@ -97,7 +111,7 @@
    * @api public
    */
 
-  page.base = function(path){
+  page.base = function(path) {
     if (0 === arguments.length) return base;
     base = path;
   };
@@ -115,7 +129,7 @@
    * @api public
    */
 
-  page.start = function(options){
+  page.start = function(options) {
     options = options || {};
     if (running) return;
     running = true;
@@ -124,9 +138,7 @@
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!'))
-      ? location.hash.substr(2) + location.search
-      : location.pathname + location.search + location.hash;
+    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -136,7 +148,8 @@
    * @api public
    */
 
-  page.stop = function(){
+  page.stop = function() {
+    page.current = '';
     if (!running) return;
     running = false;
     window.removeEventListener('click', onclick, false);
@@ -153,8 +166,9 @@
    * @api public
    */
 
-  page.show = function(path, state, dispatch){
+  page.show = function(path, state, dispatch) {
     var ctx = new Context(path, state);
+    page.current = ctx.path;
     if (false !== dispatch) page.dispatch(ctx);
     if (false !== ctx.handled) ctx.pushState();
     return ctx;
@@ -171,18 +185,18 @@
   page.redirect = function(from, to) {
     // Define route from a path to another
     if ('string' === typeof from && 'string' === typeof to) {
-      page(from, function (e) {
+      page(from, function(e) {
         setTimeout(function() {
           page.replace(to);
-        },0);
+        }, 0);
       });
     }
 
     // Wait for the push state and replace it with another
-    if('string' === typeof from && 'undefined' === typeof to) {
+    if ('string' === typeof from && 'undefined' === typeof to) {
       setTimeout(function() {
-          page.replace(from);
-      },0);
+        page.replace(from);
+      }, 0);
     }
   };
 
@@ -195,8 +209,10 @@
    * @api public
    */
 
-  page.replace = function(path, state, init, dispatch){
+
+  page.replace = function(path, state, init, dispatch) {
     var ctx = new Context(path, state);
+    page.current = ctx.path;
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
     if (false !== dispatch) page.dispatch(ctx);
@@ -210,16 +226,35 @@
    * @api private
    */
 
-  page.dispatch = function(ctx){
-    var i = 0;
+  page.dispatch = function(ctx) {
+    var prev = prevContext,
+      i = 0,
+      j = 0;
 
-    function next() {
-      var fn = page.callbacks[i++];
-      if (!fn) return unhandled(ctx);
-      fn(ctx, next);
+    prevContext = ctx;
+
+    function nextExit() {
+      var fn = page.exits[j++];
+      if (!fn) return nextEnter();
+      fn(prev, nextExit);
     }
 
-    next();
+    function nextEnter() {
+      var fn = page.callbacks[i++];
+
+      if (ctx.path !== page.current) {
+        ctx.handled = false;
+        return;
+      }
+      if (!fn) return unhandled(ctx);
+      fn(ctx, nextEnter);
+    }
+
+    if (prev) {
+      nextExit();
+    } else {
+      nextEnter();
+    }
   };
 
   /**
@@ -236,7 +271,7 @@
     var current;
 
     if (hashbang) {
-      current = base + location.hash.replace('#!','');
+      current = base + location.hash.replace('#!', '');
     } else {
       current = location.pathname + location.search;
     }
@@ -267,6 +302,34 @@
   }
 
   /**
+   * Register an exit route on `path` with
+   * callback `fn()`, which will be called
+   * on the previous context when a new
+   * page is visited.
+   */
+  page.exit = function(path, fn) {
+    if (typeof path === 'function') {
+      return page.exit('*', path);
+    }
+
+    var route = new Route(path);
+    for (var i = 1; i < arguments.length; ++i) {
+      page.exits.push(route.middleware(arguments[i]));
+    }
+  };
+
+  /**
+   * Remove URL encoding from the given `str`.
+   * Accommodates whitespace in both x-www-form-urlencoded
+   * and regular percent-encoded form.
+   *
+   * @param {str} URL component to decode
+   */
+  function decodeURLEncodedURIComponent(str) {
+    return decodeURIComponent(str.replace(/\+/g, ' '));
+  }
+
+  /**
    * Initialize a new "request" `Context`
    * with the given `path` and optional initial `state`.
    *
@@ -276,30 +339,30 @@
    */
 
   function Context(path, state) {
-    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + path;
+    path = decodeURLEncodedURIComponent(path);
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
+    if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;
     this.state = extend(state) || {};
     this.state.path = path;
-    this.querystring = ~i
-      ? path.slice(i + 1)
-      : '';
-    this.pathname = ~i
-      ? path.slice(0, i)
-      : path;
+    this.querystring = ~i ? path.slice(i + 1) : '';
+    this.pathname = ~i ? path.slice(0, i) : path;
     this.params = [];
 
     // fragment
     this.hash = '';
-    if (!~this.path.indexOf('#')) return;
-    var parts = this.path.split('#');
-    this.path = parts[0];
-    this.hash = parts[1] || '';
-    this.querystring = this.querystring.split('#')[0];
+    if (!hashbang) {
+      if (!~this.path.indexOf('#')) return;
+      var parts = this.path.split('#');
+      this.path = parts[0];
+      this.hash = parts[1] || '';
+      this.querystring = this.querystring.split('#')[0];
+    }
   }
 
   /**
@@ -314,12 +377,8 @@
    * @api private
    */
 
-  Context.prototype.pushState = function(){
-    history.pushState(this.state
-      , this.title
-      , hashbang && this.path !== '/'
-        ? '#!' + this.path
-        : this.canonicalPath);
+  Context.prototype.pushState = function() {
+    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -328,12 +387,8 @@
    * @api public
    */
 
-  Context.prototype.save = function(){
-    history.replaceState(this.state
-      , this.title
-      , hashbang && this.path !== '/'
-        ? '#!' + this.path
-        : this.canonicalPath);
+  Context.prototype.save = function() {
+    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -375,9 +430,9 @@
    * @api public
    */
 
-  Route.prototype.middleware = function(fn){
+  Route.prototype.middleware = function(fn) {
     var self = this;
-    return function(ctx, next){
+    return function(ctx, next) {
       if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
       next();
     };
@@ -393,27 +448,21 @@
    * @api private
    */
 
-  Route.prototype.match = function(path, params){
+  Route.prototype.match = function(path, params) {
     var keys = this.keys,
-        qsIndex = path.indexOf('?'),
-        pathname = ~qsIndex
-          ? path.slice(0, qsIndex)
-          : path,
-        m = this.regexp.exec(decodeURIComponent(pathname));
+      qsIndex = path.indexOf('?'),
+      pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
+      m = this.regexp.exec(decodeURIComponent(pathname));
 
     if (!m) return false;
 
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' === typeof m[i]
-        ? decodeURIComponent(m[i])
-        : m[i];
+      var val = 'string' === typeof m[i] ? decodeURIComponent(m[i]) : m[i];
 
       if (key) {
-        params[key.name] = undefined !== params[key.name]
-          ? params[key.name]
-          : val;
+        params[key.name] = undefined !== params[key.name] ? params[key.name] : val;
       } else {
         params.push(val);
       }
@@ -430,6 +479,8 @@
     if (e.state) {
       var path = e.state.path;
       page.replace(path, e.state);
+    } else {
+      page.show(location.pathname + location.hash);
     }
   }
 
@@ -438,30 +489,44 @@
    */
 
   function onclick(e) {
-    if (1 != which(e)) return;
+
+    if (1 !== which(e)) return;
+
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
 
+
+
     // ensure link
     var el = e.target;
-    while (el && 'A' != el.nodeName) el = el.parentNode;
-    if (!el || 'A' != el.nodeName) return;
+    while (el && 'A' !== el.nodeName) el = el.parentNode;
+    if (!el || 'A' !== el.nodeName) return;
 
-    // Ignore if tag has a "download" attribute
-    if (el.getAttribute("download")) return;
 
+
+    // Ignore if tag has
+    // 1. "download" attribute
+    // 2. rel="external" attribute
+    if (el.getAttribute('download') ||
+        el.getAttribute('rel') === 'external'
+       ) return;
+    
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (el.pathname === location.pathname && (el.hash || '#' === link)) return;
+    if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
+
+
 
     // Check for mailto: in the href
-    if (link && link.indexOf("mailto:") > -1) return;
+    if (link && link.indexOf('mailto:') > -1) return;
 
     // check target
     if (el.target) return;
 
     // x-origin
     if (!sameOrigin(el.href)) return;
+
+
 
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');
@@ -470,6 +535,9 @@
     var orig = path;
 
     path = path.replace(base, '');
+    if (hashbang) path = path.replace('#!', '');
+
+
 
     if (base && orig === path) return;
 
@@ -483,9 +551,7 @@
 
   function which(e) {
     e = e || window.event;
-    return null === e.which
-      ? e.button
-      : e.which;
+    return null === e.which ? e.button : e.which;
   }
 
   /**

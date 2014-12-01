@@ -4,7 +4,7 @@ Tiny ~1200 byte Express-inspired client-side router.
 
  [![Build Status](https://travis-ci.org/visionmedia/page.js.svg?branch=master)](https://travis-ci.org/visionmedia/page.js)
 [![Coverage Status](https://coveralls.io/repos/visionmedia/page.js/badge.png?branch=master)](https://coveralls.io/r/visionmedia/page.js?branch=master)
-[![Code Climate](https://codeclimate.com/github/visionmedia/page.js/badges/gpa.svg)](https://codeclimate.com/github/visionmedia/page.js)
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/visionmedia/page.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ```js
 page('/', index)
@@ -73,8 +73,13 @@ page('/user/:id/edit', user.load, user.edit)
 page('*', notfound)
 ```
 
-  Links that are not of the same origin are disregarded
-  and will not be dispatched.
+  Under certain conditions, links will be disregarded
+  and will not be dispatched, such as:
+  
+  - Links that are not of the same origin
+  - Links with the `download` attribute
+  - Links with the `target` attribute
+  - Links with the `rel="external"` attribute
 
 ### page(callback)
 
@@ -148,7 +153,30 @@ page('/default');
 ### page.base([path])
 
   Get or set the base `path`. For example if page.js
-  is operating within "/blog/*" set the base path to "/blog".
+  is operating within `/blog/*` set the base path to "/blog".
+
+### page.exit(path, callback[, callback ...])
+
+  Defines an exit route mapping `path` to the given `callback(s)`.
+
+  Exit routes are called when a page changes, using the context
+  from the previous change. For example:
+
+```js
+page('/sidebar', function(ctx, next) {
+  sidebar.open = true
+  next()
+})
+
+page.exit('/sidebar', function(next) {
+  sidebar.open = false
+  next()
+})
+```
+
+### page.exit(callback)
+
+Equivalent to `page.exit('*', callback)`.
 
 ### Context
 
@@ -165,7 +193,7 @@ page('/default');
 
 #### Context#handled
 
-  If `true`, marks the context as handled to prevent [defauld 404 behaviour][404].
+  If `true`, marks the context as handled to prevent [default 404 behaviour][404].
   For example this is useful for the routes with interminate quantity of the
   callbacks.
 

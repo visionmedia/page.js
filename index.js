@@ -525,10 +525,8 @@
     // Ignore if tag has
     // 1. "download" attribute
     // 2. rel="external" attribute
-    // 3. target="_blank" attribute
     if (el.getAttribute('download') ||
-        el.getAttribute('rel') === 'external' ||
-        el.getAttribute('target') === '_blank'
+        el.getAttribute('rel') === 'external'
        ) return;
     
     // ensure non-hash for the same path

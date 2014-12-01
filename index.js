@@ -248,6 +248,25 @@
   }
 
   /**
+   * Create a shallow copy of `source`
+   *
+   * @param {Object} source
+   * @api private
+   */
+
+  function extend(source) {
+    var target = {};
+
+    for(var prop in source) {
+      if(Object.hasOwnProperty.call(source, prop)) {
+        target[prop] = source[prop];
+      }
+    }
+
+    return prop;
+  }
+
+  /**
    * Initialize a new "request" `Context`
    * with the given `path` and optional initial `state`.
    *
@@ -264,7 +283,7 @@
     this.path = path.replace(base, '') || '/';
 
     this.title = document.title;
-    this.state = state || {};
+    this.state = extend(state) || {};
     this.state.path = path;
     this.querystring = ~i
       ? path.slice(i + 1)

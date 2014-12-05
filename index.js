@@ -28,6 +28,11 @@
   var dispatch = true;
 
   /**
+  * Perform URL decoding.
+  */
+  var decode = true;
+
+  /**
    * Base path.
    */
 
@@ -146,6 +151,7 @@
     if (running) return;
     running = true;
     if (false === options.dispatch) dispatch = false;
+    if (false === options.decode) decode = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
@@ -343,7 +349,7 @@
    * @param {str} URL component to decode
    */
   function decodeURLEncodedURIComponent(str) {
-    return decodeURIComponent(str.replace(/\+/g, ' '));
+    return decode ? decodeURIComponent(str.replace(/\+/g, ' ')) : str;
   }
 
   /**

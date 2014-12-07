@@ -39,7 +39,7 @@
       var event = document.createEvent('MouseEvents');
 
       // https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
-      event.initEvent(
+      event.initMouseEvent(
         eventName, true, true, this, 0,
         event.screenX, event.screenY, event.clientX, event.clientY,
         false, false, false, false,

@@ -326,7 +326,6 @@
    */
 
   function Context(path, state) {
-    path = decodeURLEncodedURIComponent(path);
     if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
@@ -337,8 +336,8 @@
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;
-    this.querystring = ~i ? path.slice(i + 1) : '';
-    this.pathname = ~i ? path.slice(0, i) : path;
+    this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
+    this.pathname = decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
     this.params = [];
 
     // fragment
@@ -347,7 +346,7 @@
       if (!~this.path.indexOf('#')) return;
       var parts = this.path.split('#');
       this.path = parts[0];
-      this.hash = parts[1] || '';
+      this.hash = decodeURLEncodedURIComponent(parts[1]) || '';
       this.querystring = this.querystring.split('#')[0];
     }
   }
@@ -446,7 +445,7 @@
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' === typeof m[i] ? decodeURIComponent(m[i]) : m[i];
+      var val = 'string' === typeof m[i] ? decodeURLEncodedURIComponent(m[i]) : m[i];
 
       if (key) {
         params[key.name] = undefined !== params[key.name] ? params[key.name] : val;

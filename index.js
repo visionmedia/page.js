@@ -28,9 +28,10 @@
   var dispatch = true;
 
   /**
-  * Perform URL decoding.
+  * Decode URL components (query string, pathname, hash) and route param matches.
+  * Accommodates both regular percent encoding and x-www-form-urlencoded format.
   */
-  var decode = true;
+  var decodeURLComponents = true;
 
   /**
    * Base path.
@@ -139,7 +140,7 @@
     if (running) return;
     running = true;
     if (false === options.dispatch) dispatch = false;
-    if (false === options.decode) decode = false;
+    if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
@@ -313,7 +314,7 @@
    * @param {str} URL component to decode
    */
   function decodeURLEncodedURIComponent(str) {
-    return decode ? decodeURIComponent(str.replace(/\+/g, ' ')) : str;
+    return decodeURLComponents ? decodeURIComponent(str.replace(/\+/g, ' ')) : str;
   }
 
   /**

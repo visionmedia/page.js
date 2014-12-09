@@ -126,7 +126,9 @@ page.base = function (path) {
  */
 
 page.start = function (options) {
-  options = options || {};
+  if (options === undefined) options = {};
+
+
   if (running) return;
   running = true;
   if (false === options.dispatch) dispatch = false;
@@ -182,8 +184,8 @@ page.redirect = function (from, to) {
   // Define route from a path to another
   if ("string" === typeof from && "string" === typeof to) {
     page(from, function (e) {
-      setTimeout(function () {
-        page.replace(to);
+      return setTimeout(function () {
+        return page.replace(to);
       }, 0);
     });
   }
@@ -191,7 +193,7 @@ page.redirect = function (from, to) {
   // Wait for the push state and replace it with another
   if ("string" === typeof from && "undefined" === typeof to) {
     setTimeout(function () {
-      page.replace(from);
+      return page.replace(from);
     }, 0);
   }
 };
@@ -378,16 +380,16 @@ page.Context = Context;
 
 var Route = (function () {
   var Route = function Route(path, options) {
-    options = options || {};
+    if (options === undefined) options = {};
     this.path = (path === "*") ? "(.*)" : path;
     this.method = "GET";
     this.regexp = pathtoRegexp(this.path, this.keys = [], options.sensitive, options.strict);
   };
 
   Route.prototype.middleware = function (fn) {
-    var self = this;
+    var _this = this;
     return function (ctx, next) {
-      if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
+      if (_this.match(ctx.path, ctx.params)) return fn(ctx, next);
       next();
     };
   };
@@ -506,7 +508,7 @@ function which(e) {
  */
 
 function sameOrigin(href) {
-  var origin = location.protocol + "//" + location.hostname;
+  var origin = "" + location.protocol + "//" + location.hostname;
   if (location.port) origin += ":" + location.port;
   return (href && (0 === href.indexOf(origin)));
 }

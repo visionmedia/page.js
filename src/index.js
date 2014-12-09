@@ -8,7 +8,7 @@
    * Module dependencies.
    */
 
-  let
+  var
   /**
    * To work properly with the URL
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
@@ -73,7 +73,7 @@
 
     // route <path> to <callback ...>
     if ('function' === typeof fn) {
-      let route = new Route(path);
+      var route = new Route(path);
       for (let i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
@@ -124,8 +124,8 @@
    * @api public
    */
 
-  page.start = function(options) {
-    options = options || {};
+  page.start = function(options = {}) {
+
     if (running) return;
     running = true;
     if (false === options.dispatch) dispatch = false;
@@ -133,7 +133,7 @@
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    let url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -162,7 +162,7 @@
    */
 
   page.show = function(path, state, dispatch) {
-    let ctx = new Context(path, state);
+    var ctx = new Context(path, state);
     page.current = ctx.path;
     if (false !== dispatch) page.dispatch(ctx);
     if (false !== ctx.handled) ctx.pushState();
@@ -180,18 +180,12 @@
   page.redirect = function(from, to) {
     // Define route from a path to another
     if ('string' === typeof from && 'string' === typeof to) {
-      page(from, function(e) {
-        setTimeout(function() {
-          page.replace(to);
-        }, 0);
-      });
+      page(from, (e) => setTimeout(() => page.replace(to), 0));
     }
 
     // Wait for the push state and replace it with another
     if ('string' === typeof from && 'undefined' === typeof to) {
-      setTimeout(function() {
-        page.replace(from);
-      }, 0);
+      setTimeout(() => page.replace(from), 0);
     }
   };
 
@@ -206,7 +200,7 @@
 
 
   page.replace = function(path, state, init, dispatch) {
-    let ctx = new Context(path, state);
+    var ctx = new Context(path, state);
     page.current = ctx.path;
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
@@ -222,20 +216,20 @@
    */
 
   page.dispatch = function(ctx) {
-    let prev = prevContext,
+    var prev = prevContext,
       i = 0,
       j = 0;
 
     prevContext = ctx;
 
     function nextExit() {
-      let fn = page.exits[j++];
+      var fn = page.exits[j++];
       if (!fn) return nextEnter();
       fn(prev, nextExit);
     }
 
     function nextEnter() {
-      let fn = page.callbacks[i++];
+      var fn = page.callbacks[i++];
 
       if (ctx.path !== page.current) {
         ctx.handled = false;
@@ -263,7 +257,7 @@
 
   function unhandled(ctx) {
     if (ctx.handled) return;
-    let current;
+    var current;
 
     if (hashbang) {
       current = base + location.hash.replace('#!', '');
@@ -288,7 +282,7 @@
       return page.exit('*', path);
     }
 
-    let route = new Route(path);
+    var route = new Route(path);
     for (let i = 1; i < arguments.length; ++i) {
       page.exits.push(route.middleware(arguments[i]));
     }
@@ -318,7 +312,7 @@
     constructor(path, state) {
       path = decodeURLEncodedURIComponent(path);
       if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
-      let i = path.indexOf('?');
+      var i = path.indexOf('?');
 
       this.canonicalPath = path;
       this.path = path.replace(base, '') || '/';
@@ -349,7 +343,7 @@
      */
 
     pushState() {
-      history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+      history.pushState(this.state, this.title, hashbang && this.path !== '/' ? `#!${this.path}` : this.canonicalPath);
     }
 
     /**
@@ -359,7 +353,7 @@
      */
 
     save() {
-      history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+      history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? `#!${this.path}` : this.canonicalPath);
     }
 
   }
@@ -387,8 +381,7 @@
    */
 
   class Route {
-    constructor(path, options) {
-        options = options || {};
+    constructor(path, options = {}) {
         this.path = (path === '*') ? '(.*)' : path;
         this.method = 'GET';
         this.regexp = pathtoRegexp(this.path,
@@ -406,9 +399,8 @@
        */
 
     middleware(fn) {
-      let self = this;
-      return function(ctx, next) {
-        if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
+      return (ctx, next) => {
+        if (this.match(ctx.path, ctx.params)) return fn(ctx, next);
         next();
       };
     }
@@ -424,7 +416,7 @@
      */
 
     match(path, params) {
-      let keys = this.keys,
+      var keys = this.keys,
         qsIndex = path.indexOf('?'),
         pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
         m = this.regexp.exec(decodeURIComponent(pathname));
@@ -461,7 +453,7 @@
 
   function onpopstate(e) {
     if (e.state) {
-      let path = e.state.path;
+      var path = e.state.path;
       page.replace(path, e.state);
     } else {
       page.show(location.pathname + location.hash);
@@ -482,7 +474,7 @@
 
 
     // ensure link
-    let el = e.target;
+    var el = e.target;
     while (el && 'A' !== el.nodeName) el = el.parentNode;
     if (!el || 'A' !== el.nodeName) return;
 
@@ -492,7 +484,7 @@
     if (el.getAttribute('download')) return;
 
     // ensure non-hash for the same path
-    let link = el.getAttribute('href');
+    var link = el.getAttribute('href');
     if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
 
@@ -509,10 +501,10 @@
 
 
     // rebuild path
-    let path = el.pathname + el.search + (el.hash || '');
+    var path = el.pathname + el.search + (el.hash || '');
 
     // same page
-    let orig = path;
+    var orig = path;
 
     path = path.replace(base, '');
     if (hashbang) path = path.replace('#!', '');
@@ -539,8 +531,8 @@
    */
 
   function sameOrigin(href) {
-    let origin = location.protocol + '//' + location.hostname;
-    if (location.port) origin += ':' + location.port;
+    var origin = `${location.protocol}//${location.hostname}`;
+    if (location.port) origin += `:${location.port}`;
     return (href && (0 === href.indexOf(origin)));
   }
 

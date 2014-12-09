@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "jshint src/index.js test/tests.js && npm run beautify && mocha test/tests.js",
-    "beautify": "js-beautify index.js -r && js-beautify test/tests.js -r",
+    "beautify": "js-beautify src/index.js -r && js-beautify test/tests.js -r",
     "serve": "serve test",
     "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html"
   },

@@ -3,19 +3,12 @@
 var gulp = require('gulp'),
   Mocha = require('mocha'),
   fs = require('fs'),
-  minimist = require('minimist'),
-  jsc = require('gulp-jscoverage'),
-  path = require('path'),
-  options = minimist(process.argv.slice(2));
+  path = require('path');
 
 
-gulp.task('test', ['coverage'], function(cb) {
+gulp.task('test', function(cb) {
 
-  process.env.PAGE_COV = 1;
-
-  var mocha = new Mocha({
-    reporter: options.cov ? 'html-cov' : null
-  });
+  var mocha = new Mocha();
 
   fs.readdirSync('test').filter(function(file) {
     // Only keep the .js files
@@ -35,10 +28,4 @@ gulp.task('test', ['coverage'], function(cb) {
     });
   });
 
-});
-
-gulp.task('coverage', function() {
-  return gulp.src('./index.js')
-    .pipe(jsc())
-    .pipe(gulp.dest('./'));
 });

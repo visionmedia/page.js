@@ -14,38 +14,38 @@ var
  * history.location generated polyfill in https://github.com/devote/HTML5-History-API
  */
 
-  location = window.history.location || window.location,
+location = window.history.location || window.location,
 
-  /**
-   * Perform initial dispatch.
-   */
+/**
+ * Perform initial dispatch.
+ */
 
-  dispatch = true,
+dispatch = true,
 
-  /**
-   * Base path.
-   */
+/**
+ * Base path.
+ */
 
-  base = "",
+base = "",
 
-  /**
-   * Running flag.
-   */
+/**
+ * Running flag.
+ */
 
-  running,
+running,
 
-  /**
-   * HashBang option
-   */
+/**
+ * HashBang option
+ */
 
-  hashbang = false,
+hashbang = false,
 
-  /**
-   * Previous context, for capturing
-   * page exit events.
-   */
+/**
+ * Previous context, for capturing
+ * page exit events.
+ */
 
-  prevContext;
+prevContext;
 
 /**
  * Register `path` with callback `fn()`,
@@ -106,7 +106,7 @@ page.current = "";
  * @api public
  */
 
-page.base = function(path) {
+page.base = function (path) {
   if (0 === arguments.length) return base;
   base = path;
 };
@@ -124,8 +124,10 @@ page.base = function(path) {
  * @api public
  */
 
-page.start = function(options) {
-  options = options || {};
+page.start = function (options) {
+  if (options === undefined) options = {};
+
+
   if (running) return;
   running = true;
   if (false === options.dispatch) dispatch = false;
@@ -143,7 +145,7 @@ page.start = function(options) {
  * @api public
  */
 
-page.stop = function() {
+page.stop = function () {
   page.current = "";
   if (!running) return;
   running = false;
@@ -161,7 +163,7 @@ page.stop = function() {
  * @api public
  */
 
-page.show = function(path, state, dispatch) {
+page.show = function (path, state, dispatch) {
   var ctx = new Context(path, state);
   page.current = ctx.path;
   if (false !== dispatch) page.dispatch(ctx);
@@ -177,20 +179,20 @@ page.show = function(path, state, dispatch) {
  * @param {String} [to]
  * @api public
  */
-page.redirect = function(from, to) {
+page.redirect = function (from, to) {
   // Define route from a path to another
   if ("string" === typeof from && "string" === typeof to) {
-    page(from, function(e) {
-      setTimeout(function() {
-        page.replace(to);
+    page(from, function (e) {
+      return setTimeout(function () {
+        return page.replace(to);
       }, 0);
     });
   }
 
   // Wait for the push state and replace it with another
   if ("string" === typeof from && "undefined" === typeof to) {
-    setTimeout(function() {
-      page.replace(from);
+    setTimeout(function () {
+      return page.replace(from);
     }, 0);
   }
 };
@@ -205,7 +207,7 @@ page.redirect = function(from, to) {
  */
 
 
-page.replace = function(path, state, init, dispatch) {
+page.replace = function (path, state, init, dispatch) {
   var ctx = new Context(path, state);
   page.current = ctx.path;
   ctx.init = init;
@@ -221,10 +223,8 @@ page.replace = function(path, state, init, dispatch) {
  * @api private
  */
 
-page.dispatch = function(ctx) {
-  var prev = prevContext,
-    i = 0,
-    j = 0;
+page.dispatch = function (ctx) {
+  var prev = prevContext, i = 0, j = 0;
 
   prevContext = ctx;
 
@@ -283,7 +283,7 @@ function unhandled(ctx) {
  * on the previous context when a new
  * page is visited.
  */
-page.exit = function(path, fn) {
+page.exit = function (path, fn) {
   if (typeof path === "function") {
     return page.exit("*", path);
   }
@@ -314,7 +314,7 @@ function decodeURLEncodedURIComponent(str) {
  * @api public
  */
 
-var Context = (function() {
+var Context = (function () {
   var Context = function Context(path, state) {
     path = decodeURLEncodedURIComponent(path);
     if ("/" === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? "#!" : "") + path;
@@ -334,7 +334,7 @@ var Context = (function() {
     // fragment
     this.hash = "";
     if (!hashbang) {
-      if (!~this.path.indexOf("#")) return;
+      if (! ~this.path.indexOf("#")) return;
       var parts = this.path.split("#");
       this.path = parts[0];
       this.hash = parts[1] || "";
@@ -342,11 +342,11 @@ var Context = (function() {
     }
   };
 
-  Context.prototype.pushState = function() {
+  Context.prototype.pushState = function () {
     history.pushState(this.state, this.title, hashbang && this.path !== "/" ? "#!" + this.path : this.canonicalPath);
   };
 
-  Context.prototype.save = function() {
+  Context.prototype.save = function () {
     history.replaceState(this.state, this.title, hashbang && this.path !== "/" ? "#!" + this.path : this.canonicalPath);
   };
 
@@ -377,27 +377,24 @@ page.Context = Context;
  * @api private
  */
 
-var Route = (function() {
+var Route = (function () {
   var Route = function Route(path, options) {
-    options = options || {};
+    if (options === undefined) options = {};
     this.path = (path === "*") ? "(.*)" : path;
     this.method = "GET";
     this.regexp = pathtoRegexp(this.path, this.keys = [], options.sensitive, options.strict);
   };
 
-  Route.prototype.middleware = function(fn) {
-    var self = this;
-    return function(ctx, next) {
-      if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
+  Route.prototype.middleware = function (fn) {
+    var _this = this;
+    return function (ctx, next) {
+      if (_this.match(ctx.path, ctx.params)) return fn(ctx, next);
       next();
     };
   };
 
-  Route.prototype.match = function(path, params) {
-    var keys = this.keys,
-      qsIndex = path.indexOf("?"),
-      pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
-      m = this.regexp.exec(decodeURIComponent(pathname));
+  Route.prototype.match = function (path, params) {
+    var keys = this.keys, qsIndex = path.indexOf("?"), pathname = ~qsIndex ? path.slice(0, qsIndex) : path, m = this.regexp.exec(decodeURIComponent(pathname));
 
     if (!m) return false;
 
@@ -510,7 +507,7 @@ function which(e) {
  */
 
 function sameOrigin(href) {
-  var origin = location.protocol + "//" + location.hostname;
+  var origin = "" + location.protocol + "//" + location.hostname;
   if (location.port) origin += ":" + location.port;
   return (href && (0 === href.indexOf(origin)));
 }

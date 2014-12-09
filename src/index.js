@@ -384,10 +384,12 @@
     constructor(path, options = {}) {
         this.path = (path === '*') ? '(.*)' : path;
         this.method = 'GET';
-        this.regexp = pathtoRegexp(this.path,
+        this.regexp = pathtoRegexp(
+          this.path,
           this.keys = [],
           options.sensitive,
-          options.strict);
+          options.strict
+        );
       }
       /**
        * Return route middleware with
@@ -480,8 +482,12 @@
 
 
 
-    // Ignore if tag has a "download" attribute
-    if (el.getAttribute('download')) return;
+    // Ignore if tag has
+    // 1. "download" attribute
+    // 2. rel="external" attribute
+    if (el.getAttribute('download') ||
+        el.getAttribute('rel') === 'external'
+       ) return;
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');

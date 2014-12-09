@@ -457,8 +457,10 @@ function onclick(e) {
 
 
 
-  // Ignore if tag has a "download" attribute
-  if (el.getAttribute("download")) return;
+  // Ignore if tag has
+  // 1. "download" attribute
+  // 2. rel="external" attribute
+  if (el.getAttribute("download") || el.getAttribute("rel") === "external") return;
 
   // ensure non-hash for the same path
   var link = el.getAttribute("href");

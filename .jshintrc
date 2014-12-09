@@ -19,5 +19,6 @@
   "trailing": false,
   "smarttabs": true,
   "latedef": false,
-  "indent": 2
+  "indent": 2,
+  "esnext":true
 }

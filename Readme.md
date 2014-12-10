@@ -137,6 +137,7 @@ page('/default');
   - `popstate` bind to popstate [__true__]
   - `dispatch` perform initial dispatch [__true__]
   - `hashbang` add `#!` before urls [__false__]
+  - `decodeURLComponents` remove URL encoding from path components and route params [__true__]
 
   If you wish to load serve initial content
   from the server you likely will want to

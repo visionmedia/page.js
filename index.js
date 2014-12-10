@@ -28,6 +28,12 @@
   var dispatch = true;
 
   /**
+  * Decode URL components (query string, pathname, hash) and route param matches.
+  * Accommodates both regular percent encoding and x-www-form-urlencoded format.
+  */
+  var decodeURLComponents = true;
+
+  /**
    * Base path.
    */
 
@@ -134,6 +140,7 @@
     if (running) return;
     running = true;
     if (false === options.dispatch) dispatch = false;
+    if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
@@ -307,7 +314,7 @@
    * @param {str} URL component to decode
    */
   function decodeURLEncodedURIComponent(str) {
-    return decodeURIComponent(str.replace(/\+/g, ' '));
+    return decodeURLComponents ? decodeURIComponent(str.replace(/\+/g, ' ')) : str;
   }
 
   /**
@@ -320,7 +327,6 @@
    */
 
   function Context(path, state) {
-    path = decodeURLEncodedURIComponent(path);
     if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
@@ -331,8 +337,8 @@
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;
-    this.querystring = ~i ? path.slice(i + 1) : '';
-    this.pathname = ~i ? path.slice(0, i) : path;
+    this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
+    this.pathname = decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
     this.params = [];
 
     // fragment
@@ -341,7 +347,7 @@
       if (!~this.path.indexOf('#')) return;
       var parts = this.path.split('#');
       this.path = parts[0];
-      this.hash = parts[1] || '';
+      this.hash = decodeURLEncodedURIComponent(parts[1]) || '';
       this.querystring = this.querystring.split('#')[0];
     }
   }
@@ -440,7 +446,7 @@
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' === typeof m[i] ? decodeURIComponent(m[i]) : m[i];
+      var val = 'string' === typeof m[i] ? decodeURLEncodedURIComponent(m[i]) : m[i];
 
       if (key) {
         params[key.name] = undefined !== params[key.name] ? params[key.name] : val;

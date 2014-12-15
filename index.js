@@ -28,9 +28,9 @@
   var dispatch = true;
 
   /**
-  * Decode URL components (query string, pathname, hash) and route param matches.
-  * Accommodates both regular percent encoding and x-www-form-urlencoded format.
-  */
+   * Decode URL components (query string, pathname, hash).
+   * Accommodates both regular percent encoding and x-www-form-urlencoded format.
+   */
   var decodeURLComponents = true;
 
   /**
@@ -495,9 +495,9 @@
     // 1. "download" attribute
     // 2. rel="external" attribute
     if (el.getAttribute('download') ||
-        el.getAttribute('rel') === 'external'
-       ) return;
-    
+      el.getAttribute('rel') === 'external'
+    ) return;
+
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
     if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;

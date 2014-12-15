@@ -9,6 +9,7 @@
     html = '',
     base = '',
     hashbang = false,
+    decodeURLComponents = true,
     chai = this.chai,
     expect = this.expect,
     page = this.page,
@@ -187,6 +188,15 @@
 
           page('/querystring?hello=there');
         });
+
+        it('should accommodate URL encoding', function(done) {
+          page('/whatever', function(ctx) {
+            expect(ctx.querystring).to.equal(decodeURLComponents ? 'queryParam=string with whitespace' : 'queryParam=string%20with%20whitespace');
+            done();
+          });
+
+          page('/whatever?queryParam=string%20with%20whitespace');
+        });
       });
 
       describe('ctx.pathname', function() {
@@ -206,6 +216,27 @@
           });
 
           page('/pathname?hello=there');
+        });
+
+        it('should accommodate URL encoding', function(done) {
+          page('/long path with whitespace', function(ctx) {
+            expect(ctx.pathname).to.equal(base + (base && hashbang ? '#!' : '') +
+              (decodeURLComponents ? '/long path with whitespace' : '/long%20path%20with%20whitespace'));
+            done();
+          });
+
+          page('/long%20path%20with%20whitespace');
+        });
+      });
+
+      describe('ctx.params', function() {
+        it('should always be URL-decoded', function(done) {
+          page('/whatever/:param', function(ctx) {
+            expect(ctx.params.param).to.equal('param with whitespace');
+            done();
+          });
+
+          page('/whatever/param%20with%20whitespace');
         });
       });
 
@@ -311,8 +342,6 @@
           });
         });
 
-
-
       });
     },
     afterTests = function() {
@@ -372,6 +401,21 @@
       afterTests();
     });
 
+  });
+
+  describe('URL path component decoding disabled', function() {
+    before(function() {
+      decodeURLComponents = false;
+      beforeTests({
+        decodeURLComponents: decodeURLComponents
+      });
+    });
+
+    tests();
+
+    after(function() {
+      afterTests();
+    });
   });
 
 }).call(this);

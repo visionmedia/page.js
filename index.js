@@ -19,7 +19,7 @@
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
 
-  var location = window && window.history.location || window.location;
+  var location = window && (window.history.location || window.location);
 
   /**
    * Perform initial dispatch.
@@ -497,7 +497,7 @@
     if (el.getAttribute('download') ||
         el.getAttribute('rel') === 'external'
        ) return;
-    
+
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
     if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;

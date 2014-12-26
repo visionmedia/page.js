@@ -167,8 +167,9 @@
    */
 
   page.stop = function() {
-    page.current = '';
     if (!running) return;
+    page.current = '';
+    page.len = 0;
     running = false;
     window.removeEventListener('click', onclick, false);
     window.removeEventListener('popstate', onpopstate, false);

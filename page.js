@@ -112,6 +112,18 @@
   page.current = '';
 
   /**
+   * len : page.len
+   * Number of pages navigated to.
+   *
+   *     page.len == 0;
+   *     page('/login');
+   *     page.len == 1;
+   */
+
+  page.len = 0;
+
+
+  /**
    * Get or set basepath to `path`.
    *
    * @param {String} path
@@ -174,12 +186,37 @@
    * @api public
    */
 
-  page.show = function(path, state, dispatch) {
+  page.show = function(path, state, dispatch){
     var ctx = new Context(path, state);
     page.current = ctx.path;
     if (false !== dispatch) page.dispatch(ctx);
     if (false !== ctx.handled) ctx.pushState();
     return ctx;
+  };
+
+  /**
+   * Goes back in the history
+   * Back should always let the current route push state and then go back.
+   *
+   * @param {String} path - fallback path to go back if no more history exists, if undefined defaults to page.base
+   * @param {Object} [state]
+   * @api public
+   */
+
+  page.back = function(path, state) {
+    if (page.len > 0) {
+      // this may need more testing to see if all browsers
+      // wait for the next tick to go back in history
+      history.back();
+    } else if (path) {
+      setTimeout(function() {
+        page.show(path, state);
+      });
+    }else{
+      setTimeout(function() {
+        page.show(base, state);
+      });
+    }
   };
 
   /**
@@ -217,8 +254,7 @@
    * @api public
    */
 
-
-  page.replace = function(path, state, init, dispatch) {
+  page.replace = function(path, state, init, dispatch){
     var ctx = new Context(path, state);
     page.current = ctx.path;
     ctx.init = init;
@@ -250,7 +286,7 @@
     function nextEnter() {
       var fn = page.callbacks[i++];
 
-      if (ctx.path !== page.current) {
+      if (ctx.path !== page.current.replace(base, '')) {
         ctx.handled = false;
         return;
       }
@@ -366,6 +402,7 @@
    */
 
   Context.prototype.pushState = function() {
+    page.len++;
     history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
@@ -555,8 +592,6 @@
   page.sameOrigin = sameOrigin;
 
 },{"path-to-regexp":2}],2:[function(require,module,exports){
-var isArray = require('isarray');
-
 /**
  * Expose `pathtoRegexp`.
  */
@@ -599,7 +634,7 @@ function escapeGroup (group) {
  * @param  {Array}  keys
  * @return {RegExp}
  */
-function attachKeys (re, keys) {
+var attachKeys = function (re, keys) {
   re.keys = keys;
 
   return re;
@@ -617,7 +652,7 @@ function attachKeys (re, keys) {
  * @return {RegExp}
  */
 function pathtoRegexp (path, keys, options) {
-  if (!isArray(keys)) {
+  if (keys && !Array.isArray(keys)) {
     options = keys;
     keys = null;
   }
@@ -632,35 +667,32 @@ function pathtoRegexp (path, keys, options) {
 
   if (path instanceof RegExp) {
     // Match all capturing groups of a regexp.
-    var groups = path.source.match(/\((?!\?)/g);
+    var groups = path.source.match(/\((?!\?)/g) || [];
 
-    // Map all the matches to their numeric indexes and push into the keys.
-    if (groups) {
-      for (var i = 0; i < groups.length; i++) {
-        keys.push({
-          name:      i,
-          delimiter: null,
-          optional:  false,
-          repeat:    false
-        });
-      }
-    }
+    // Map all the matches to their numeric keys and push into the keys.
+    keys.push.apply(keys, groups.map(function (match, index) {
+      return {
+        name:      index,
+        delimiter: null,
+        optional:  false,
+        repeat:    false
+      };
+    }));
 
     // Return the source back to the user.
     return attachKeys(path, keys);
   }
 
-  // Map array parts into regexps and return their source. We also pass
-  // the same keys and options instance into every generation to get
-  // consistent matching groups before we join the sources together.
-  if (isArray(path)) {
-    var parts = [];
+  if (Array.isArray(path)) {
+    // Map array parts into regexps and return their source. We also pass
+    // the same keys and options instance into every generation to get
+    // consistent matching groups before we join the sources together.
+    path = path.map(function (value) {
+      return pathtoRegexp(value, keys, options).source;
+    });
 
-    for (var i = 0; i < path.length; i++) {
-      parts.push(pathtoRegexp(path[i], keys, options).source);
-    }
     // Generate a new regexp instance by joining all the parts together.
-    return attachKeys(new RegExp('(?:' + parts.join('|') + ')', flags), keys);
+    return attachKeys(new RegExp('(?:' + path.join('|') + ')', flags), keys);
   }
 
   // Alter the path string into a usable regexp.
@@ -726,11 +758,6 @@ function pathtoRegexp (path, keys, options) {
   }
 
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
-};
-
-},{"isarray":3}],3:[function(require,module,exports){
-module.exports = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
 },{}]},{},[1])(1)

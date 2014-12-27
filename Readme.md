@@ -236,7 +236,7 @@ Equivalent to `page.exit('*', callback)`.
 
 ### Separating concerns
 
-  For example suppose you had a route to _edit_ users, and a
+  For example suppose you have a route to _edit_ users, and a
   route to _view_ users. In both cases you need to load the user.
   One way to achieve this is with several callbacks as shown here:
 
@@ -245,7 +245,7 @@ page('/user/:user', load, show)
 page('/user/:user/edit', load, edit)
 ```
 
-  Using the `*` character we could alter this to match all
+  Using the `*` character we can alter this to match all
   routes prefixed with "/user" to achieve the same result:
 
 ```js
@@ -254,7 +254,7 @@ page('/user/:user', show)
 page('/user/:user/edit', edit)
 ```
 
-  Likewise `*` may be used as catch-alls after all routes
+  Likewise `*` can be used as catch-alls after all routes
   acting as a 404 handler, before all routes, in-between and
   so on. For example:
 
@@ -268,7 +268,7 @@ page('*', function(){
 ### Default 404 behaviour
 
   By default when a route is not matched,
-  page.js will invoke `page.stop()` to unbind
+  page.js invokes `page.stop()` to unbind
   itself, and proceed with redirecting to the
   location requested. This means you may use
   page.js with a multi-page application _without_
@@ -283,7 +283,7 @@ page('*', function(){
   arbitrary properties to `ctx` to maintain state
   between callbacks.
 
-  First to build a `load` function that will load
+  To build a `load` function that will load
   the user for subsequent routes you'll need to
   access the ":id" passed. You can do this with
   `ctx.params.NAME` much like Express:
@@ -333,7 +333,7 @@ page('/user/:id', load, show)
 ### Working with state
 
   When working with the `pushState` API,
-  and thus page.js you may optionally provide
+  and page.js you may optionally provide
   state objects available when the user navigates
   the history.
 
@@ -344,7 +344,7 @@ page('/user/:id', load, show)
   the browser the route would be invoked
   and the query would be made yet-again.
 
-  Perhaps the route callback looks like this:
+  An example implemenation might look as follows:
 
 ```js
 function show(ctx){
@@ -498,7 +498,7 @@ If you want the router to work in older version of Internet Explorer that don't 
 ```
 
 ##### How to use a Polyfill together with router (OPTIONAL):
-If your site is operating within not root path, you will need to specify the `basepath` for the HTML5-History-API polyfill.
+If your web app is located within a nested basepath, you will need to specify the `basepath` for the HTML5-History-API polyfill.
 Before calling `page.base()` use: `history.redirect([prefixType], [basepath])` - Translation link if required.
   * `prefixType`: `[string|null]` - Substitute the string after the anchor (#) by default "/".
   * `basepath`: `[string|null]` - Set the base path. See `page.base()` by default "/". (Note: Slash after `pathname` required)

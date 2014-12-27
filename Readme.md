@@ -65,6 +65,7 @@ page()
 ### page(path, callback[, callback ...])
 
   Defines a route mapping `path` to the given `callback(s)`.
+  Each callback is invoked with two arguments, [context](#context) and `next`. Much like Express invoking next will call the next registered callback with the given path.
 
 ```js
 page('/', user.list)
@@ -75,7 +76,7 @@ page('*', notfound)
 
   Under certain conditions, links will be disregarded
   and will not be dispatched, such as:
-  
+
   - Links that are not of the same origin
   - Links with the `download` attribute
   - Links with the `target` attribute

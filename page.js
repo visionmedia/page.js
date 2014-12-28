@@ -29,6 +29,12 @@
   var dispatch = true;
 
   /**
+   * Decode URL components (query string, pathname, hash).
+   * Accommodates both regular percent encoding and x-www-form-urlencoded format.
+   */
+  var decodeURLComponents = true;
+
+  /**
    * Base path.
    */
 
@@ -135,6 +141,7 @@
     if (running) return;
     running = true;
     if (false === options.dispatch) dispatch = false;
+    if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) window.addEventListener('click', onclick, false);
     if (true === options.hashbang) hashbang = true;
@@ -308,7 +315,7 @@
    * @param {str} URL component to decode
    */
   function decodeURLEncodedURIComponent(str) {
-    return decodeURIComponent(str.replace(/\+/g, ' '));
+    return decodeURLComponents ? decodeURIComponent(str.replace(/\+/g, ' ')) : str;
   }
 
   /**
@@ -321,7 +328,6 @@
    */
 
   function Context(path, state) {
-    path = decodeURLEncodedURIComponent(path);
     if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
@@ -332,8 +338,8 @@
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;
-    this.querystring = ~i ? path.slice(i + 1) : '';
-    this.pathname = ~i ? path.slice(0, i) : path;
+    this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
+    this.pathname = decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
     this.params = [];
 
     // fragment
@@ -342,7 +348,7 @@
       if (!~this.path.indexOf('#')) return;
       var parts = this.path.split('#');
       this.path = parts[0];
-      this.hash = parts[1] || '';
+      this.hash = decodeURLEncodedURIComponent(parts[1]) || '';
       this.querystring = this.querystring.split('#')[0];
     }
   }
@@ -441,7 +447,7 @@
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
 
-      var val = 'string' === typeof m[i] ? decodeURIComponent(m[i]) : m[i];
+      var val = 'string' === typeof m[i] ? decodeURLEncodedURIComponent(m[i]) : m[i];
 
       if (key) {
         params[key.name] = undefined !== params[key.name] ? params[key.name] : val;
@@ -486,8 +492,12 @@
 
 
 
-    // Ignore if tag has a "download" attribute
-    if (el.getAttribute('download')) return;
+    // Ignore if tag has
+    // 1. "download" attribute
+    // 2. rel="external" attribute
+    if (el.getAttribute('download') ||
+      el.getAttribute('rel') === 'external'
+    ) return;
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
@@ -544,6 +554,8 @@
 
   page.sameOrigin = sameOrigin;
 },{"path-to-regexp":2}],2:[function(require,module,exports){
+var isArray = require('isarray');
+
 /**
  * Expose `pathtoRegexp`.
  */
@@ -586,7 +598,7 @@ function escapeGroup (group) {
  * @param  {Array}  keys
  * @return {RegExp}
  */
-var attachKeys = function (re, keys) {
+function attachKeys (re, keys) {
   re.keys = keys;
 
   return re;
@@ -604,7 +616,7 @@ var attachKeys = function (re, keys) {
  * @return {RegExp}
  */
 function pathtoRegexp (path, keys, options) {
-  if (keys && !Array.isArray(keys)) {
+  if (!isArray(keys)) {
     options = keys;
     keys = null;
   }
@@ -619,32 +631,35 @@ function pathtoRegexp (path, keys, options) {
 
   if (path instanceof RegExp) {
     // Match all capturing groups of a regexp.
-    var groups = path.source.match(/\((?!\?)/g) || [];
+    var groups = path.source.match(/\((?!\?)/g);
 
-    // Map all the matches to their numeric keys and push into the keys.
-    keys.push.apply(keys, groups.map(function (match, index) {
-      return {
-        name:      index,
-        delimiter: null,
-        optional:  false,
-        repeat:    false
-      };
-    }));
+    // Map all the matches to their numeric indexes and push into the keys.
+    if (groups) {
+      for (var i = 0; i < groups.length; i++) {
+        keys.push({
+          name:      i,
+          delimiter: null,
+          optional:  false,
+          repeat:    false
+        });
+      }
+    }
 
     // Return the source back to the user.
     return attachKeys(path, keys);
   }
 
-  if (Array.isArray(path)) {
-    // Map array parts into regexps and return their source. We also pass
-    // the same keys and options instance into every generation to get
-    // consistent matching groups before we join the sources together.
-    path = path.map(function (value) {
-      return pathtoRegexp(value, keys, options).source;
-    });
+  // Map array parts into regexps and return their source. We also pass
+  // the same keys and options instance into every generation to get
+  // consistent matching groups before we join the sources together.
+  if (isArray(path)) {
+    var parts = [];
 
+    for (var i = 0; i < path.length; i++) {
+      parts.push(pathtoRegexp(path[i], keys, options).source);
+    }
     // Generate a new regexp instance by joining all the parts together.
-    return attachKeys(new RegExp('(?:' + path.join('|') + ')', flags), keys);
+    return attachKeys(new RegExp('(?:' + parts.join('|') + ')', flags), keys);
   }
 
   // Alter the path string into a usable regexp.
@@ -710,6 +725,11 @@ function pathtoRegexp (path, keys, options) {
   }
 
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
+};
+
+},{"isarray":3}],3:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
 },{}]},{},[1])(1)

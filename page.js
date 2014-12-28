@@ -20,7 +20,7 @@
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
 
-  var location = window.history.location || window.location;
+  var location = window && (window.history.location || window.location);
 
   /**
    * Perform initial dispatch.
@@ -495,9 +495,7 @@
     // Ignore if tag has
     // 1. "download" attribute
     // 2. rel="external" attribute
-    if (el.getAttribute('download') ||
-      el.getAttribute('rel') === 'external'
-    ) return;
+    if (el.getAttribute('download') || el.getAttribute('rel') === 'external') return;
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
@@ -553,6 +551,7 @@
   }
 
   page.sameOrigin = sameOrigin;
+
 },{"path-to-regexp":2}],2:[function(require,module,exports){
 var isArray = require('isarray');
 

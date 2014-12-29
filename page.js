@@ -112,6 +112,17 @@
   page.current = '';
 
   /**
+   * Number of pages navigated to.
+   * @type {number}
+   *
+   *     page.len == 0;
+   *     page('/login');
+   *     page.len == 1;
+   */
+
+  page.len = 0;
+
+  /**
    * Get or set basepath to `path`.
    *
    * @param {String} path
@@ -157,8 +168,9 @@
    */
 
   page.stop = function() {
-    page.current = '';
     if (!running) return;
+    page.current = '';
+    page.len = 0;
     running = false;
     window.removeEventListener('click', onclick, false);
     window.removeEventListener('popstate', onpopstate, false);
@@ -181,6 +193,33 @@
     if (false !== ctx.handled) ctx.pushState();
     return ctx;
   };
+
+  /**
+   * Goes back in the history
+   * Back should always let the current route push state and then go back.
+   *
+   * @param {String} path - fallback path to go back if no more history exists, if undefined defaults to page.base
+   * @param {Object} [state]
+   * @api public
+   */
+
+  page.back = function(path, state) {
+    if (page.len > 0) {
+      // this may need more testing to see if all browsers
+      // wait for the next tick to go back in history
+      history.back();
+      page.len--;
+    } else if (path) {
+      setTimeout(function() {
+        page.show(path, state);
+      });
+    }else{
+      setTimeout(function() {
+        page.show(base, state);
+      });
+    }
+  };
+
 
   /**
    * Register route to redirect from one path to other
@@ -367,6 +406,7 @@
    */
 
   Context.prototype.pushState = function() {
+    page.len++;
     history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 

@@ -313,8 +313,9 @@
    *
    * @param {str} URL component to decode
    */
-  function decodeURLEncodedURIComponent(str) {
-    return decodeURLComponents ? decodeURIComponent(str.replace(/\+/g, ' ')) : str;
+  function decodeURLEncodedURIComponent(val) {
+    if (typeof val !== 'string') { return val; }
+    return decodeURLComponents ? decodeURIComponent(val.replace(/\+/g, ' ')) : val;
   }
 
   /**

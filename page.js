@@ -314,8 +314,9 @@
    *
    * @param {str} URL component to decode
    */
-  function decodeURLEncodedURIComponent(str) {
-    return decodeURLComponents ? decodeURIComponent(str.replace(/\+/g, ' ')) : str;
+  function decodeURLEncodedURIComponent(val) {
+    if (typeof val !== 'string') { return val; }
+    return decodeURLComponents ? decodeURIComponent(val.replace(/\+/g, ' ')) : val;
   }
 
   /**
@@ -340,7 +341,7 @@
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
     this.pathname = decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
-    this.params = [];
+    this.params = {};
 
     // fragment
     this.hash = '';
@@ -431,7 +432,7 @@
    * populate `params`.
    *
    * @param {String} path
-   * @param {Array} params
+   * @param {Object} params
    * @return {Boolean}
    * @api private
    */
@@ -446,13 +447,9 @@
 
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
-
-      var val = 'string' === typeof m[i] ? decodeURLEncodedURIComponent(m[i]) : m[i];
-
-      if (key) {
-        params[key.name] = undefined !== params[key.name] ? params[key.name] : val;
-      } else {
-        params.push(val);
+      var val = decodeURLEncodedURIComponent(m[i]);
+      if (val !== undefined || !(hasOwnProperty.call(params, key.name))) {
+        params[key.name] = val;
       }
     }
 

@@ -238,6 +238,15 @@
 
           page('/whatever/param%20with%20whitespace');
         });
+
+        it('should be an object', function(done) {
+          page('/ctxparams/:param/', function(ctx) {
+            expect(ctx.params).to.not.be.an('array');
+            expect(ctx.params).to.be.an('object');
+            done();
+          });
+          page('/ctxparams/test');
+        });
       });
 
       describe('ctx.handled', function() {

@@ -20,7 +20,7 @@
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
 
-  var location = window && (window.history.location || window.location);
+  var location = ('undefined' !== typeof window) && (window.history.location || window.location);
 
   /**
    * Perform initial dispatch.

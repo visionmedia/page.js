@@ -170,6 +170,28 @@
         });
       });
 
+      describe('page.back', function() {
+        before(function() {
+          page('/first', function() {});
+          page('/second', function() {});
+          page('/first');
+          page('/second');
+        });
+        it('should move back to history', function() {
+          page.back('/first');
+          var path = hashbang
+            ? location.hash.replace('#!', '')
+            : location.pathname;
+          expect(path).to.be.equal('/first');
+        });
+        it('should decrement page.len on back()', function() {
+          var lenAtFirst = page.len;
+          page('/second');
+          page.back('/first');
+          expect(page.len).to.be.equal(lenAtFirst);
+        });
+      });
+
       describe('ctx.querystring', function() {
         it('should default to ""', function(done) {
           page('/querystring-default', function(ctx) {

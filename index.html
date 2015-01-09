@@ -106,15 +106,23 @@ directly related to page.js in any way.</p>
 <h3>
 <a id="pagepath-callback-callback-" class="anchor" href="#pagepath-callback-callback-" aria-hidden="true"><span class="octicon octicon-link"></span></a>page(path, callback[, callback ...])</h3>
 
-<p>Defines a route mapping <code>path</code> to the given <code>callback(s)</code>.</p>
+<p>Defines a route mapping <code>path</code> to the given <code>callback(s)</code>.
+  Each callback is invoked with two arguments, <a href="#context">context</a> and <code>next</code>. Much like Express invoking next will call the next registered callback with the given path.</p>
 
 <div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, user.list)
 page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:id<span class="pl-pds">'</span></span>, user.load, user.show)
 page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:id/edit<span class="pl-pds">'</span></span>, user.load, user.edit)
 page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</span></span>, notfound)</pre></div>
 
-<p>Links that are not of the same origin are disregarded
-  and will not be dispatched.</p>
+<p>Under certain conditions, links will be disregarded
+  and will not be dispatched, such as:</p>
+
+<ul>
+<li>Links that are not of the same origin</li>
+<li>Links with the <code>download</code> attribute</li>
+<li>Links with the <code>target</code> attribute</li>
+<li>Links with the <code>rel="external"</code> attribute</li>
+</ul>
 
 <h3>
 <a id="pagecallback" class="anchor" href="#pagecallback" aria-hidden="true"><span class="octicon octicon-link"></span></a>page(callback)</h3>
@@ -180,7 +188,9 @@ page(<span class="pl-s1"><span class="pl-pds">'</span>/default<span class="pl-pd
 <li>
 <code>dispatch</code> perform initial dispatch [<strong>true</strong>]</li>
 <li>
-<p><code>hashbang</code> add <code>#!</code> before urls [<strong>false</strong>]</p>
+<code>hashbang</code> add <code>#!</code> before urls [<strong>false</strong>]</li>
+<li>
+<p><code>decodeURLComponents</code> remove URL encoding from path components (query string, pathname, hash) [<strong>true</strong>]</p>
 
 <p>If you wish to load serve initial content
 from the server you likely will want to
@@ -293,21 +303,21 @@ page.exit(<span class="pl-s1"><span class="pl-pds">'</span>/sidebar<span class="
 <h3>
 <a id="separating-concerns" class="anchor" href="#separating-concerns" aria-hidden="true"><span class="octicon octicon-link"></span></a>Separating concerns</h3>
 
-<p>For example suppose you had a route to <em>edit</em> users, and a
+<p>For example suppose you have a route to <em>edit</em> users, and a
   route to <em>view</em> users. In both cases you need to load the user.
   One way to achieve this is with several callbacks as shown here:</p>
 
 <div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user<span class="pl-pds">'</span></span>, load, show)
 page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user/edit<span class="pl-pds">'</span></span>, load, edit)</pre></div>
 
-<p>Using the <code>*</code> character we could alter this to match all
+<p>Using the <code>*</code> character we can alter this to match all
   routes prefixed with "/user" to achieve the same result:</p>
 
 <div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/user/*<span class="pl-pds">'</span></span>, load)
 page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user<span class="pl-pds">'</span></span>, show)
 page(<span class="pl-s1"><span class="pl-pds">'</span>/user/:user/edit<span class="pl-pds">'</span></span>, edit)</pre></div>
 
-<p>Likewise <code>*</code> may be used as catch-alls after all routes
+<p>Likewise <code>*</code> can be used as catch-alls after all routes
   acting as a 404 handler, before all routes, in-between and
   so on. For example:</p>
 
@@ -320,7 +330,7 @@ page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</s
 <a id="default-404-behaviour" class="anchor" href="#default-404-behaviour" aria-hidden="true"><span class="octicon octicon-link"></span></a>Default 404 behaviour</h3>
 
 <p>By default when a route is not matched,
-  page.js will invoke <code>page.stop()</code> to unbind
+  page.js invokes <code>page.stop()</code> to unbind
   itself, and proceed with redirecting to the
   location requested. This means you may use
   page.js with a multi-page application <em>without</em>
@@ -336,7 +346,7 @@ page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</s
   arbitrary properties to <code>ctx</code> to maintain state
   between callbacks.</p>
 
-<p>First to build a <code>load</code> function that will load
+<p>To build a <code>load</code> function that will load
   the user for subsequent routes you'll need to
   access the ":id" passed. You can do this with
   <code>ctx.params.NAME</code> much like Express:</p>
@@ -379,7 +389,7 @@ page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</s
 <a id="working-with-state" class="anchor" href="#working-with-state" aria-hidden="true"><span class="octicon octicon-link"></span></a>Working with state</h3>
 
 <p>When working with the <code>pushState</code> API,
-  and thus page.js you may optionally provide
+  and page.js you may optionally provide
   state objects available when the user navigates
   the history.</p>
 
@@ -390,7 +400,7 @@ page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</s
   the browser the route would be invoked
   and the query would be made yet-again.</p>
 
-<p>Perhaps the route callback looks like this:</p>
+<p>An example implemenation might look as follows:</p>
 
 <div class="highlight highlight-js"><pre><span class="pl-st">function</span> <span class="pl-en">show</span>(<span class="pl-vpf">ctx</span>){
   $.getJSON(<span class="pl-s1"><span class="pl-pds">'</span>/photos<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">images</span>){
@@ -533,7 +543,7 @@ $ open http://localhost:3000/
 <h5>
 <a id="how-to-use-a-polyfill-together-with-router-optional" class="anchor" href="#how-to-use-a-polyfill-together-with-router-optional" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use a Polyfill together with router (OPTIONAL):</h5>
 
-<p>If your site is operating within not root path, you will need to specify the <code>basepath</code> for the HTML5-History-API polyfill.
+<p>If your web app is located within a nested basepath, you will need to specify the <code>basepath</code> for the HTML5-History-API polyfill.
 Before calling <code>page.base()</code> use: <code>history.redirect([prefixType], [basepath])</code> - Translation link if required.</p>
 
 <ul>

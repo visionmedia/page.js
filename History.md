@@ -1,3 +1,14 @@
+1.6.0./ 2015-01-27
+==================
+
+* added `page.back` feature #157
+* added `decodeURLComponents` option #187
+* now `ctx.params` is object like in express #203
+* skip route processing if another one is called #172
+* docs improved
+* tests improved
+
+
 1.5.0 / 2014-11-29
 ==================
 

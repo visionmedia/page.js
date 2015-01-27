@@ -1,6 +1,6 @@
 {
   "name": "page",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Tiny client-side router (~1200 bytes)",
   "keywords": ["page", "route", "router", "routes", "pushState"],
   "main": "page.js",

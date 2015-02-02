@@ -1,6 +1,6 @@
 {
   "name": "page",
-  "description": "Tiny client-side router (~1200 bytes)",
+  "description": "Tiny client-side router",
   "version": "1.6.0",
   "repository": {
     "type": "git",

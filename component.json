@@ -2,7 +2,7 @@
   "name": "page",
   "repo": "visionmedia/page.js",
   "version": "1.6.0",
-  "description": "Tiny client-side router (~1200 bytes)",
+  "description": "Tiny client-side router",
   "keywords": ["page", "route", "router", "routes", "pushState"],
   "scripts": ["index.js"],
   "license": "MIT",

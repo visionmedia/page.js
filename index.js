@@ -185,11 +185,11 @@
    * @api public
    */
 
-  page.show = function(path, state, dispatch) {
+  page.show = function(path, state, dispatch, push) {
     var ctx = new Context(path, state);
     page.current = ctx.path;
     if (false !== dispatch) page.dispatch(ctx);
-    if (false !== ctx.handled) ctx.pushState();
+    if (false !== ctx.handled && false !== push) ctx.pushState();
     return ctx;
   };
 
@@ -504,7 +504,7 @@
       var path = e.state.path;
       page.replace(path, e.state);
     } else {
-      page.show(location.pathname + location.hash);
+      page.show(location.pathname + location.hash, undefined, undefined, false);
     }
   }
 

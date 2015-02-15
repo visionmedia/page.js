@@ -36,6 +36,7 @@
     "should": "*"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "page.js"
   ]
 }

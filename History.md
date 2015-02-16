@@ -1,3 +1,9 @@
+1.6.1 / 2015-02-16
+==================
+
+* added `page.js` to npm files
+* back button works correct with hash links in Firefox  #218
+
 1.6.0./ 2015-01-27
 ==================
 

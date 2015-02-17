@@ -5,3 +5,4 @@ coverage.html
 npm-debug.log
 index-cov.js
 .DS_Store
+.idea

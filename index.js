@@ -8,11 +8,18 @@
 
   var pathtoRegexp = require('path-to-regexp');
 
+
+  /**
+   * Page.js Singleton.
+   */
+  var _page;
+
   /**
    * Module exports.
    */
 
-  module.exports = page;
+  module.exports = _page || page;
+
 
   /**
    * To work properly with the URL
@@ -77,6 +84,7 @@
    */
 
   function page(path, fn) {
+    _page = _page || page;
     // <callback>
     if ('function' === typeof path) {
       return page('*', path);

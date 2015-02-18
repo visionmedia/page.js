@@ -516,7 +516,6 @@
 
     if (1 !== which(e)) return;
 
-    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
 
 
@@ -558,6 +557,22 @@
 
     path = path.replace(base, '');
     if (hashbang) path = path.replace('#!', '');
+
+
+
+    if (e.metaKey || e.ctrlKey || e.shiftKey) {
+
+      if (hashbang) {
+        e.preventDefault();
+
+        var hashbangURL = base + '#!' + path;
+        var target = e.metaKey || e.ctrlKey ? null : '_blank';
+
+        window.open(hashbangURL, target);
+      }
+
+      return;
+    }
 
 
 

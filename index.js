@@ -154,7 +154,7 @@
     if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) window.addEventListener('click', onclick, false);
-    if (true === options.hashbang) hashbang = true;
+    if (true === options.hashbang) hashbang = true; window.addEventListener('contextmenu', oncontextmenu, false);
     if (!dispatch) return;
     var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
@@ -172,6 +172,7 @@
     page.len = 0;
     running = false;
     window.removeEventListener('click', onclick, false);
+    window.removeEventListener('contextmenu', oncontextmenu, false);
     window.removeEventListener('popstate', onpopstate, false);
   };
 
@@ -516,17 +517,12 @@
 
     if (1 !== which(e)) return;
 
-    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
 
-
+    var el = e.target;
 
     // ensure link
-    var el = e.target;
-    while (el && 'A' !== el.nodeName) el = el.parentNode;
-    if (!el || 'A' !== el.nodeName) return;
-
-
+    if (!isLink(el)) return;
 
     // Ignore if tag has
     // 1. "download" attribute
@@ -537,8 +533,6 @@
     var link = el.getAttribute('href');
     if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
-
-
     // Check for mailto: in the href
     if (link && link.indexOf('mailto:') > -1) return;
 
@@ -548,23 +542,99 @@
     // x-origin
     if (!sameOrigin(el.href)) return;
 
-
-
-    // rebuild path
-    var path = el.pathname + el.search + (el.hash || '');
-
-    // same page
-    var orig = path;
+    var path = getPath(el),
+        orig = path;
 
     path = path.replace(base, '');
     if (hashbang) path = path.replace('#!', '');
 
-
-
+    // check same page
     if (base && orig === path) return;
+
+    // open in new tab / window
+    if (e.metaKey || e.ctrlKey || e.shiftKey) {
+
+      // patch for hashbang routing
+      if (hashbang) {
+        e.preventDefault();
+
+        var hashbangURL = base + '#!' + path;
+        var target = e.metaKey || e.ctrlKey ? null : '_blank';
+
+        window.open(hashbangURL, target);
+      }
+
+      return;
+    }
 
     e.preventDefault();
     page.show(orig);
+  }
+
+  /**
+   * Handle "contextmenu" events.
+   */
+
+  function oncontextmenu(e) {
+    if (e.defaultPrevented) return;
+
+    // ensure link
+    var el = e.target;
+    if (!isLink(el)) return;
+
+    if (el.hasAttribute('data-page-href')) return;
+
+    revertContextMenuPatch = revertContextMenuPatch.bind(null, el);
+
+    patchContextMenu(el);
+    window.addEventListener('click', revertContextMenuPatch);
+  }
+
+  /**
+   * Patch context menu to work with hashbang option.
+   */
+
+  function patchContextMenu(el) {
+    var path = getPath(el),
+        orig = el.getAttribute('href');
+
+    path = path.replace(base, '').replace('#!', '');
+
+    var hashbangUrl = base + '#!' + path;
+
+    el.setAttribute('data-page-href', orig);
+    el.setAttribute('href', hashbangUrl);
+  }
+
+  /**
+   * Revert patch
+   */
+
+  function revertContextMenuPatch(el) {
+    var orig = el.getAttribute('data-page-href');
+
+    el.setAttribute('href', orig);
+    el.removeAttribute('data-page-href');
+
+    window.removeEventListener('click', revertContextMenuPatch);
+  }
+
+  /**
+   * Get full path of a link.
+   */
+
+  function getPath(el) {
+    return el.pathname + el.search + (el.hash || '');
+  }
+
+  /**
+   * Check if element is link.
+   */
+
+  function isLink(el) {
+    while (el && 'A' !== el.nodeName) el = el.parentNode;
+    if (!el || 'A' !== el.nodeName) return false;
+    return true;
   }
 
   /**

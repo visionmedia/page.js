@@ -553,6 +553,11 @@
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');
 
+    // strip leading "/C:" on nwjs on windows
+    if (typeof process !== 'undefined' && typeof require !== 'undefined' && typeof require('nw.gui') !== 'undefined' && path.substring(0, 4) === '/C:/') {
+      path = path.replace('/C:/', '/');
+    }
+    
     // same page
     var orig = path;
 

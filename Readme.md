@@ -99,7 +99,7 @@ $('.view').click(function(e){
 
 ### page(fromPath, toPath)
 
-  Setup redirect form one path to other.
+  Setup redirect from one path to another.
 
 ### page.redirect(fromPath, toPath)
 

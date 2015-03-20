@@ -159,7 +159,7 @@
         setTimeout(function() {
           window.addEventListener('popstate', onpopstate, false);
         }, 0);
-      });
+      }, false);
     }
     if (false !== options.click) {
       window.addEventListener('click', onclick, false);

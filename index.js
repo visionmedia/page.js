@@ -152,7 +152,15 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
+    if (false !== options.popstate) {
+      
+      // this hack resolves https://github.com/visionmedia/page.js/issues/213
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          window.addEventListener('popstate', onpopstate, false);
+        }, 0);
+      }, false);
+    }
     if (false !== options.click) {
       window.addEventListener('click', onclick, false);
       window.addEventListener('touchstart', onclick, false);

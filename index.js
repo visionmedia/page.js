@@ -155,11 +155,18 @@
     if (false !== options.popstate) {
       
       // this hack resolves https://github.com/visionmedia/page.js/issues/213
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          window.addEventListener('popstate', onpopstate, false);
-        }, 0);
-      }, false);
+      if (document.readyState !== 'complete') {
+        // load event has not fired
+        window.addEventListener('load', function() {
+          setTimeout(function() {
+            window.addEventListener('popstate', onpopstate, false);
+          }, 0);
+        }, false);
+      }
+      else {
+        // load event has fired
+        window.addEventListener('popstate', onpopstate, false);
+      }
     }
     if (false !== options.click) {
       window.addEventListener('click', onclick, false);

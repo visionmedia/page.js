@@ -153,7 +153,7 @@
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) {
-      
+
       // this hack resolves https://github.com/visionmedia/page.js/issues/213
       if (document.readyState !== 'complete') {
         // load event has not fired
@@ -189,8 +189,10 @@
     page.current = '';
     page.len = 0;
     running = false;
-    window.removeEventListener('click', onclick, false);
-    window.removeEventListener('popstate', onpopstate, false);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('click', onclick, false);
+      window.removeEventListener('popstate', onpopstate, false);
+    }
   };
 
   /**
@@ -392,7 +394,7 @@
     this.path = path.replace(base, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
-    this.title = document.title;
+    this.title = typeof document !== 'undefined' ? document.title : '';
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
@@ -423,8 +425,10 @@
    */
 
   Context.prototype.pushState = function() {
-    page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (typeof history !== 'undefined') {
+      page.len++;
+      history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -434,7 +438,9 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (typeof history !== 'undefined') {
+      history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -575,7 +581,7 @@
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
       path = path.replace(/^\/[a-zA-Z]:\//, '/');
     }
-    
+
     // same page
     var orig = path;
 

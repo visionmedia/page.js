@@ -1,4 +1,5 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.page=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (process){
   /* globals require, module */
 
   'use strict';
@@ -16,6 +17,11 @@
   module.exports = page;
 
   /**
+   * Detect click event
+   */
+  var clickEvent = document.ontouchstart ? 'touchstart' : 'click';
+
+  /**
    * To work properly with the URL
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
@@ -27,6 +33,7 @@
    */
 
   var dispatch = true;
+
 
   /**
    * Decode URL components (query string, pathname, hash).
@@ -154,7 +161,9 @@
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
-    if (false !== options.click) window.addEventListener('click', onclick, false);
+    if (false !== options.click) {
+      window.addEventListener(clickEvent, onclick, false);
+    }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
     var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
@@ -172,7 +181,7 @@
     page.current = '';
     page.len = 0;
     running = false;
-    window.removeEventListener('click', onclick, false);
+    window.removeEventListener(clickEvent, onclick, false);
     window.removeEventListener('popstate', onpopstate, false);
   };
 
@@ -496,19 +505,29 @@
     return true;
   };
 
+
   /**
    * Handle "populate" events.
    */
 
-  function onpopstate(e) {
-    if (e.state) {
-      var path = e.state.path;
-      page.replace(path, e.state);
-    } else {
-      page.show(location.pathname + location.hash, undefined, undefined, false);
-    }
-  }
-
+  var onpopstate = (function () {
+    // this hack resolves https://github.com/visionmedia/page.js/issues/213
+    var loaded = false;
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        loaded = true;
+      }, 0);
+    });
+    return function onpopstate(e) {
+      if (!loaded) return;
+      if (e.state) {
+        var path = e.state.path;
+        page.replace(path, e.state);
+      } else {
+        page.show(location.pathname + location.hash, undefined, undefined, false);
+      }
+    };
+  })();
   /**
    * Handle "click" events.
    */
@@ -532,7 +551,7 @@
     // Ignore if tag has
     // 1. "download" attribute
     // 2. rel="external" attribute
-    if (el.getAttribute('download') || el.getAttribute('rel') === 'external') return;
+    if (el.hasAttribute('download') || el.getAttribute('rel') === 'external') return;
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
@@ -554,13 +573,19 @@
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');
 
+    // strip leading "/[drive letter]:" on NW.js on Windows
+    if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
+      path = path.replace(/^\/[a-zA-Z]:\//, '/');
+    }
+
     // same page
     var orig = path;
 
-    path = path.replace(base, '');
+    if (path.indexOf(base) === 0) {
+      path = path.substr(base.length);
+    }
+
     if (hashbang) path = path.replace('#!', '');
-
-
 
     if (base && orig === path) return;
 
@@ -589,7 +614,96 @@
 
   page.sameOrigin = sameOrigin;
 
-},{"path-to-regexp":2}],2:[function(require,module,exports){
+}).call(this,require('_process'))
+},{"_process":2,"path-to-regexp":3}],2:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+process.nextTick = (function () {
+    var canSetImmediate = typeof window !== 'undefined'
+    && window.setImmediate;
+    var canMutationObserver = typeof window !== 'undefined'
+    && window.MutationObserver;
+    var canPost = typeof window !== 'undefined'
+    && window.postMessage && window.addEventListener
+    ;
+
+    if (canSetImmediate) {
+        return function (f) { return window.setImmediate(f) };
+    }
+
+    var queue = [];
+
+    if (canMutationObserver) {
+        var hiddenDiv = document.createElement("div");
+        var observer = new MutationObserver(function () {
+            var queueList = queue.slice();
+            queue.length = 0;
+            queueList.forEach(function (fn) {
+                fn();
+            });
+        });
+
+        observer.observe(hiddenDiv, { attributes: true });
+
+        return function nextTick(fn) {
+            if (!queue.length) {
+                hiddenDiv.setAttribute('yes', 'no');
+            }
+            queue.push(fn);
+        };
+    }
+
+    if (canPost) {
+        window.addEventListener('message', function (ev) {
+            var source = ev.source;
+            if ((source === window || source === null) && ev.data === 'process-tick') {
+                ev.stopPropagation();
+                if (queue.length > 0) {
+                    var fn = queue.shift();
+                    fn();
+                }
+            }
+        }, true);
+
+        return function nextTick(fn) {
+            queue.push(fn);
+            window.postMessage('process-tick', '*');
+        };
+    }
+
+    return function nextTick(fn) {
+        setTimeout(fn, 0);
+    };
+})();
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+
+},{}],3:[function(require,module,exports){
 var isArray = require('isarray');
 
 /**
@@ -763,7 +877,7 @@ function pathtoRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
-},{"isarray":3}],3:[function(require,module,exports){
+},{"isarray":4}],4:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };

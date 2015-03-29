@@ -15,6 +15,15 @@
   module.exports = page;
 
   /**
+   * Detect click event
+   */
+  var clickEvent = document.ontouchstart ? 'touchstart' : 'click';
+
+  /**
+   *
+   */
+
+  /**
    * To work properly with the URL
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
@@ -27,10 +36,6 @@
 
   var dispatch = true;
 
-  /**
-   * Detect click event
-   */
-  var clickEvent = null !== document.ontouchstart ? 'click' : 'touchstart';
 
   /**
    * Decode URL components (query string, pathname, hash).

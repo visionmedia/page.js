@@ -20,10 +20,6 @@
   var clickEvent = document.ontouchstart ? 'touchstart' : 'click';
 
   /**
-   *
-   */
-
-  /**
    * To work properly with the URL
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
@@ -162,22 +158,7 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate) {
-
-      // this hack resolves https://github.com/visionmedia/page.js/issues/213
-      if (document.readyState !== 'complete') {
-        // load event has not fired
-        window.addEventListener('load', function() {
-          setTimeout(function() {
-            window.addEventListener('popstate', onpopstate, false);
-          }, 0);
-        }, false);
-      }
-      else {
-        // load event has fired
-        window.addEventListener('popstate', onpopstate, false);
-      }
-    }
+    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) {
       window.addEventListener(clickEvent, onclick, false);
     }
@@ -522,19 +503,29 @@
     return true;
   };
 
+
   /**
    * Handle "populate" events.
    */
 
-  function onpopstate(e) {
-    if (e.state) {
-      var path = e.state.path;
-      page.replace(path, e.state);
-    } else {
-      page.show(location.pathname + location.hash, undefined, undefined, false);
-    }
-  }
-
+  var onpopstate = (function () {
+    // this hack resolves https://github.com/visionmedia/page.js/issues/213
+    var loaded = false;
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        loaded = true;
+      }, 0);
+    });
+    return function onpopstate(e) {
+      if (!loaded) return;
+      if (e.state) {
+        var path = e.state.path;
+        page.replace(path, e.state);
+      } else {
+        page.show(location.pathname + location.hash, undefined, undefined, false);
+      }
+    };
+  })();
   /**
    * Handle "click" events.
    */

@@ -28,6 +28,11 @@
   var dispatch = true;
 
   /**
+   * Detect click event
+   */
+  var clickEvent = null !== document.ontouchstart ? 'click' : 'touchstart';
+
+  /**
    * Decode URL components (query string, pathname, hash).
    * Accommodates both regular percent encoding and x-www-form-urlencoded format.
    */
@@ -153,7 +158,7 @@
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) {
-      
+
       // this hack resolves https://github.com/visionmedia/page.js/issues/213
       if (document.readyState !== 'complete') {
         // load event has not fired
@@ -169,8 +174,7 @@
       }
     }
     if (false !== options.click) {
-      window.addEventListener('click', onclick, false);
-      window.addEventListener('touchstart', onclick, false);
+      window.addEventListener(clickEvent, onclick, false);
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
@@ -189,7 +193,7 @@
     page.current = '';
     page.len = 0;
     running = false;
-    window.removeEventListener('click', onclick, false);
+    window.removeEventListener(clickEvent, onclick, false);
     window.removeEventListener('popstate', onpopstate, false);
   };
 
@@ -575,7 +579,7 @@
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
       path = path.replace(/^\/[a-zA-Z]:\//, '/');
     }
-    
+
     // same page
     var orig = path;
 

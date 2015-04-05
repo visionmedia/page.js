@@ -1,3 +1,11 @@
+1.6.2 / 2015-03-06
+==================
+
+* fix touch support #236
+* fix nw.js support #238
+* fix bug with click-event in Firefox #244
+* fix popstate issue in Safari #213
+
 1.6.1 / 2015-02-16
 ==================
 

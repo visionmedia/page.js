@@ -160,7 +160,7 @@
     if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) {
-      window.addEventListener(clickEvent, onclick, false);
+      document.addEventListener(clickEvent, onclick, false);
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
@@ -179,7 +179,7 @@
     page.current = '';
     page.len = 0;
     running = false;
-    window.removeEventListener(clickEvent, onclick, false);
+    document.removeEventListener(clickEvent, onclick, false);
     window.removeEventListener('popstate', onpopstate, false);
   };
 

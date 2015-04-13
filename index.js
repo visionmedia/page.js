@@ -509,13 +509,16 @@
    */
 
   var onpopstate = (function () {
-    // this hack resolves https://github.com/visionmedia/page.js/issues/213
     var loaded = false;
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        loaded = true;
-      }, 0);
-    });
+    if (document.readyState === 'complete') {
+      loaded = true;
+    } else {
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          loaded = true;
+        }, 0);
+      });
+    }
     return function onpopstate(e) {
       if (!loaded) return;
       if (e.state) {

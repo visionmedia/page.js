@@ -196,8 +196,15 @@
   page.show = function(path, state, dispatch, push) {
     var ctx = new Context(path, state);
     page.current = ctx.path;
-    if (false !== dispatch) page.dispatch(ctx);
-    if (false !== ctx.handled && false !== push) ctx.pushState();
+    function dispatchNext() {
+      if (false !== dispatch) page.dispatchEnter(ctx);
+      if (false !== ctx.handled && false !== push) ctx.pushState();
+    }
+    if (false !== dispatch) {
+      page.dispatchExit(ctx, dispatchNext);
+    } else {
+      dispatchNext();
+    }
     return ctx;
   };
 
@@ -273,25 +280,42 @@
     return ctx;
   };
 
+
   /**
-   * Dispatch the given `ctx`.
+   * Dispatch the exit routes for current `ctx`.
+   *
+   * @param {Object} ctx
+   * @param {Function} cb
+   * @api private
+   */
+
+  page.dispatchExit = function (ctx, cb) {
+    var prev = prevContext,
+      i = 0;
+    prevContext = ctx;
+
+    function nextExit() {
+      var fn = page.exits[i++];
+      if (!fn) return cb();
+      fn(prev, nextExit);
+    }
+
+    if (prev) {
+      nextExit();
+    } else {
+      cb();
+    }
+  };
+
+  /**
+   * Dispatch the entry routes for `ctx`.
    *
    * @param {Object} ctx
    * @api private
    */
 
-  page.dispatch = function(ctx) {
-    var prev = prevContext,
-      i = 0,
-      j = 0;
-
-    prevContext = ctx;
-
-    function nextExit() {
-      var fn = page.exits[j++];
-      if (!fn) return nextEnter();
-      fn(prev, nextExit);
-    }
+  page.dispatchEnter = function(ctx) {
+    var i = 0;
 
     function nextEnter() {
       var fn = page.callbacks[i++];
@@ -304,11 +328,20 @@
       fn(ctx, nextEnter);
     }
 
-    if (prev) {
-      nextExit();
-    } else {
-      nextEnter();
-    }
+    nextEnter();
+  };
+
+  /**
+   * Dispatch all routes for 'ctx'
+   *
+   * @param {Object} ctx
+   * @api private
+   */
+
+  page.dispatch = function(ctx) {
+    page.dispatchExit(ctx, function () {
+      page.dispatchEnter(ctx);
+    });
   };
 
   /**

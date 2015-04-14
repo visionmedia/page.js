@@ -168,6 +168,45 @@
           page('/bootstrap');
           page('/');
         });
+
+        it('should not call further route handlers if an exit route interrupts', function () {
+          var routes = [];
+          page('/before', function () {});
+          page('/after', function () {
+            routes.push('arrived');
+          });
+          page.exit('/before', function (ctx, next) {
+            routes.push('one');
+            next();
+          });
+          page.exit('/before', function (ctx, next) {
+            routes.push('two');
+            // Note absence of next() call.
+          });
+          page.exit('/before', function (ctx, next) {
+            routes.push('three');
+            next();
+          });
+          page('/before');
+          routes = [];
+          page('/after');
+          expect(routes.join(' ')).to.equal('one two');
+        });
+
+        it('should not update the current history location if exit route interrupts', function () {
+          page('/before', function (ctx, next) {});
+          page('/after', function (ctx, next) {});
+          page.exit('/before', function (ctx, next) {
+            expect(ctx.path).to.equal('/before');
+            // Note absence of next() call.
+          });
+          page('/before');
+          page('/after');
+          var path = hashbang
+            ? location.hash.replace('#!', '')
+            : location.pathname;
+          expect(path).to.equal('/before');
+        });
       });
 
       describe('page.back', function() {

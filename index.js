@@ -17,7 +17,7 @@
   /**
    * Detect click event
    */
-  var clickEvent = document.ontouchstart ? 'touchstart' : 'click';
+  var clickEvent = ('undefined' !== typeof document) && document.ontouchstart ? 'touchstart' : 'click';
 
   /**
    * To work properly with the URL
@@ -510,6 +510,9 @@
 
   var onpopstate = (function () {
     var loaded = false;
+    if ('undefined' === typeof window) {
+      return;
+    }
     if (document.readyState === 'complete') {
       loaded = true;
     } else {

@@ -2,6 +2,10 @@
 
   'use strict';
 
+  var hasAddEventListener = typeof window.addEventListener === 'function';
+
+  var hasPushState = typeof window.history.pushState === 'function';
+
   /**
    * Module dependencies.
    */
@@ -158,8 +162,8 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
-    if (false !== options.click) {
+    if (false !== options.popstate && hasAddEventListener) window.addEventListener('popstate', onpopstate, false);
+    if (false !== options.click && hasAddEventListener) {
       document.addEventListener(clickEvent, onclick, false);
     }
     if (true === options.hashbang) hashbang = true;
@@ -179,8 +183,11 @@
     page.current = '';
     page.len = 0;
     running = false;
-    document.removeEventListener(clickEvent, onclick, false);
-    window.removeEventListener('popstate', onpopstate, false);
+
+    if (hasAddEventListener) {
+      document.removeEventListener(clickEvent, onclick, false);
+      window.removeEventListener('popstate', onpopstate, false);
+    }
   };
 
   /**
@@ -414,7 +421,9 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (hasPushState) {
+      history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -424,7 +433,9 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (hasPushState) {
+      history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -515,7 +526,7 @@
     }
     if (document.readyState === 'complete') {
       loaded = true;
-    } else {
+    } else if (hasAddEventListener) {
       window.addEventListener('load', function() {
         setTimeout(function() {
           loaded = true;

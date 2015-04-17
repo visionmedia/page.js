@@ -4,6 +4,10 @@
 
   'use strict';
 
+  var hasAddEventListener = typeof window.addEventListener === 'function';
+
+  var hasPushState = typeof window.history.pushState === 'function';
+
   /**
    * Module dependencies.
    */
@@ -19,7 +23,7 @@
   /**
    * Detect click event
    */
-  var clickEvent = document.ontouchstart ? 'touchstart' : 'click';
+  var clickEvent = ('undefined' !== typeof document) && document.ontouchstart ? 'touchstart' : 'click';
 
   /**
    * To work properly with the URL
@@ -160,9 +164,9 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
-    if (false !== options.click) {
-      window.addEventListener(clickEvent, onclick, false);
+    if (false !== options.popstate && hasAddEventListener) window.addEventListener('popstate', onpopstate, false);
+    if (false !== options.click && hasAddEventListener) {
+      document.addEventListener(clickEvent, onclick, false);
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
@@ -181,8 +185,11 @@
     page.current = '';
     page.len = 0;
     running = false;
-    window.removeEventListener(clickEvent, onclick, false);
-    window.removeEventListener('popstate', onpopstate, false);
+
+    if (hasAddEventListener) {
+      document.removeEventListener(clickEvent, onclick, false);
+      window.removeEventListener('popstate', onpopstate, false);
+    }
   };
 
   /**
@@ -416,7 +423,9 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (hasPushState) {
+      history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -426,7 +435,9 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (hasPushState) {
+      history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -511,13 +522,19 @@
    */
 
   var onpopstate = (function () {
-    // this hack resolves https://github.com/visionmedia/page.js/issues/213
     var loaded = false;
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        loaded = true;
-      }, 0);
-    });
+    if ('undefined' === typeof window) {
+      return;
+    }
+    if (document.readyState === 'complete') {
+      loaded = true;
+    } else if (hasAddEventListener) {
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          loaded = true;
+        }, 0);
+      });
+    }
     return function onpopstate(e) {
       if (!loaded) return;
       if (e.state) {

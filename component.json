@@ -1,7 +1,7 @@
 {
   "name": "page",
   "repo": "visionmedia/page.js",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "Tiny client-side router",
   "keywords": ["page", "route", "router", "routes", "pushState"],
   "scripts": ["index.js"],

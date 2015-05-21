@@ -190,6 +190,19 @@
           page.back('/first');
           expect(page.len).to.be.equal(lenAtFirst);
         });
+        it('should define popstate on the state', function(done) {
+          var firstTime = true;
+          page('/third', function(ctx) {
+              if (!firstTime) {
+                  expect(ctx.state.popstate).to.be.true;
+                  done();
+              }
+              firstTime = false;
+          });
+          page('/third');
+          page('/second');
+          page.back();
+        });
       });
 
       describe('ctx.querystring', function() {

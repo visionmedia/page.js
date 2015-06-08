@@ -2,6 +2,7 @@
   "name": "page",
   "description": "Tiny client-side router",
   "version": "1.6.3",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/visionmedia/page.js.git"

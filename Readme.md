@@ -136,6 +136,7 @@ page('/default');
 
   - `click` bind to click events [__true__]
   - `popstate` bind to popstate [__true__]
+  - 'hashchange' bind to hashchange [__false__]
   - `dispatch` perform initial dispatch [__true__]
   - `hashbang` add `#!` before urls [__false__]
   - `decodeURLComponents` remove URL encoding from path components (query string, pathname, hash) [__true__]

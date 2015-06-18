@@ -347,7 +347,7 @@
         describe('when next() is invoked', function() {
           it('should invoke subsequent matching middleware', function(done) {
             page('/forum/*', function(ctx, next) {
-              ctx.fullPath = ctx.params[0];
+              ctx.visited = true;
               next();
             });
 
@@ -356,7 +356,7 @@
             });
 
             page('/forum/:fid/thread/:tid', function(ctx) {
-              expect(ctx.params.tid).to.equal('2');
+              expect(ctx.visited).to.be.ok;
               done();
             });
 

@@ -20,9 +20,10 @@
     "make": "browserify index.js --standalone page -o page.js"
   },
   "dependencies": {
-    "path-to-regexp": "~1.0.1"
+    "path-to-regexp": "~1.2.0"
   },
   "devDependencies": {
+    "bluebird": "^2.9.30",
     "browserify": "^6.3.2",
     "chai": "^1.10.0",
     "coveralls": "^2.11.2",

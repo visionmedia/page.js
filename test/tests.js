@@ -15,10 +15,12 @@
     page = this.page,
     baseTag,
     htmlWrapper,
-    $;
+    $,
+    Promise;
 
   if (isNode) {
     require('./support/jsdom');
+    Promise = require('bluebird');
   }
 
   before(function() {
@@ -361,6 +363,26 @@
             });
 
             page('/forum/1/thread/2');
+          });
+        });
+
+        describe('when a promise is returned by a middleware', function() {
+          it('should invoke subsequent matching middleware', function(done) {
+            page('/forums/*', function(ctx, next) {
+              ctx.visited = true;
+              return Promise.resolve();
+            });
+
+            page('/user', function() {
+
+            });
+
+            page('/forums/:fid/thread/:tid', function(ctx) {
+              expect(ctx.visited).to.be.ok;
+              done();
+            });
+
+            page('/forums/1/thread/2');
           });
         });
 

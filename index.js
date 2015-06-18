@@ -294,14 +294,16 @@
     }
 
     function nextEnter() {
-      var fn = page.callbacks[i++];
+      var calledFn,
+          fn = page.callbacks[i++];
 
       if (ctx.path !== page.current) {
         ctx.handled = false;
         return;
       }
       if (!fn) return unhandled(ctx);
-      fn(ctx, nextEnter);
+      calledFn = fn(ctx, nextEnter);
+      if (calledFn && calledFn.then) calledFn.then(nextEnter);
     }
 
     if (prev) {

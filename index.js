@@ -201,7 +201,7 @@
       if (false !== ctx.handled && false !== push) ctx.pushState();
     }
     if (false !== dispatch) {
-      page.dispatchExit(ctx, dispatchNext);
+      page.dispatchExit(dispatchNext);
     } else {
       dispatchNext();
     }
@@ -282,17 +282,15 @@
 
 
   /**
-   * Dispatch the exit routes for current `ctx`.
+   * Dispatch the exit routes for prevContext.
    *
-   * @param {Object} ctx
    * @param {Function} cb
    * @api private
    */
 
-  page.dispatchExit = function (ctx, cb) {
+  page.dispatchExit = function (cb) {
     var prev = prevContext,
       i = 0;
-    prevContext = ctx;
 
     function nextExit() {
       var fn = page.exits[i++];
@@ -316,6 +314,7 @@
 
   page.dispatchEnter = function(ctx) {
     var i = 0;
+    prevContext = ctx;
 
     function nextEnter() {
       var fn = page.callbacks[i++];
@@ -339,7 +338,7 @@
    */
 
   page.dispatch = function(ctx) {
-    page.dispatchExit(ctx, function () {
+    page.dispatchExit(function () {
       page.dispatchEnter(ctx);
     });
   };

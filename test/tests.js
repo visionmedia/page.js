@@ -1,4 +1,4 @@
-/* globals before, after, chai, expect, page, describe, it */
+/* globals before, after, beforeEach, afterEach, chai, expect, page, describe, it */
 (function() {
 
   'use strict';
@@ -53,8 +53,6 @@
 
     },
     beforeTests = function(options) {
-      page.callbacks = [];
-      page.exits = [];
       options = options || {};
 
       page('/', function() {
@@ -382,6 +380,8 @@
       called = false;
       page.stop();
       page.base('');
+      page.callbacks = [];
+      page.exits = [];
       page('/');
       base = '';
 
@@ -389,13 +389,13 @@
 
   describe('Html5 history navigation', function() {
 
-    before(function() {
+    beforeEach(function() {
       beforeTests();
     });
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
 
@@ -403,7 +403,7 @@
 
   describe('Hashbang option enabled', function() {
 
-    before(function() {
+    beforeEach(function() {
       hashbang = true;
       beforeTests({
         hashbang: hashbang
@@ -412,7 +412,7 @@
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
 
@@ -420,7 +420,7 @@
 
   describe('Different Base', function() {
 
-    before(function() {
+    beforeEach(function() {
       base = '/newBase';
       page.base(base);
       beforeTests();
@@ -428,14 +428,14 @@
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
 
   });
 
   describe('URL path component decoding disabled', function() {
-    before(function() {
+    beforeEach(function() {
       decodeURLComponents = false;
       beforeTests({
         decodeURLComponents: decodeURLComponents
@@ -444,7 +444,7 @@
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
   });

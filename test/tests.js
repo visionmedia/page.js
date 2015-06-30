@@ -1,4 +1,4 @@
-/* globals before, after, chai, expect, page, describe, it */
+/* globals before, beforeEach, after, afterEach, chai, expect, page, describe, it */
 (function() {
 
   'use strict';
@@ -132,6 +132,15 @@
 
           page('/exit');
           page('/');
+        });
+
+        it('should run default exit routes when exiting any page', function(done) {
+          page.exit(function() {
+            expect(true).to.equal(true);
+            done();
+          });
+
+          page('/exit');
         });
 
         it('should only run on matched routes', function(done) {

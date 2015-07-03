@@ -548,8 +548,9 @@
 
 
     // ensure link
-    var el = e.path[0];
-    while (el && 'A' !== el.nodeName) el = el.parentNode;
+    var i = 0;
+    var el = e.path[i];
+    while (el && 'A' !== el.nodeName) el = e.path[++i];
     if (!el || 'A' !== el.nodeName) return;
 
 

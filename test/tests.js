@@ -15,10 +15,12 @@
     page = this.page,
     baseTag,
     htmlWrapper,
-    $;
+    $,
+    Promise;
 
   if (isNode) {
     require('./support/jsdom');
+    Promise = require('bluebird');
   }
 
   before(function() {
@@ -347,7 +349,7 @@
         describe('when next() is invoked', function() {
           it('should invoke subsequent matching middleware', function(done) {
             page('/forum/*', function(ctx, next) {
-              ctx.fullPath = ctx.params[0];
+              ctx.visited = true;
               next();
             });
 
@@ -356,11 +358,31 @@
             });
 
             page('/forum/:fid/thread/:tid', function(ctx) {
-              expect(ctx.params.tid).to.equal('2');
+              expect(ctx.visited).to.be.ok;
               done();
             });
 
             page('/forum/1/thread/2');
+          });
+        });
+
+        describe('when a promise is returned by a middleware', function() {
+          it('should invoke subsequent matching middleware', function(done) {
+            page('/forums/*', function(ctx, next) {
+              ctx.visited = true;
+              return Promise.resolve();
+            });
+
+            page('/user', function() {
+
+            });
+
+            page('/forums/:fid/thread/:tid', function(ctx) {
+              expect(ctx.visited).to.be.ok;
+              done();
+            });
+
+            page('/forums/1/thread/2');
           });
         });
 

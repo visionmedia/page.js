@@ -284,7 +284,9 @@
     var prev = prevContext,
       i = 0,
       j = 0;
-
+    if (prev && prev.path === ctx.path) {
+      return;
+    }
     prevContext = ctx;
 
     function nextExit() {

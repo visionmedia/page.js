@@ -162,7 +162,10 @@
     if (false !== options.click) {
       document.addEventListener(clickEvent, onclick, false);
     }
-    if (true === options.hashbang) hashbang = true;
+    if (true === options.hashbang) {
+      hashbang = true;
+      window.addEventListener('hashchange', onhashchange, false);
+    }
     if (!dispatch) return;
     var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
@@ -181,6 +184,7 @@
     running = false;
     document.removeEventListener(clickEvent, onclick, false);
     window.removeEventListener('popstate', onpopstate, false);
+    window.removeEventListener('hashchange', onhashchange, false);
   };
 
   /**
@@ -325,7 +329,7 @@
     var current;
 
     if (hashbang) {
-      current = base + location.hash.replace('#!', '');
+      current = location.pathname + location.hash;
     } else {
       current = location.pathname + location.search;
     }
@@ -532,6 +536,16 @@
       }
     };
   })();
+
+  /**
+   * Handle "hash" events.
+   */
+
+   var onhashchange = function () {
+     var url = (~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+     page.replace(url, null, true, dispatch);
+   };
+
   /**
    * Handle "click" events.
    */

@@ -1,11 +1,11 @@
 {
-  "name": "page",
-  "description": "Tiny client-side router",
-  "keywords": ["page", "route", "router", "routes", "pushState"],
+  "name": "bqpage",
+  "description": "Tiny client-side router (fork of visionmedia/page.js)",
+  "keywords": ["page", "route", "router", "routes", "pushState", "shadowDom"],
   "main": "page.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/visionmedia/page.js"
+    "url": "git://github.com/bquarks/page.js"
   },
   "ignore": [
     ".gitignore",

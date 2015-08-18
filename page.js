@@ -548,8 +548,11 @@
 
 
     // ensure link
-    var el = e.target;
-    while (el && 'A' !== el.nodeName) el = el.parentNode;
+    var i = 0,
+       path = e.path || false,
+       el = path ? e.path[i] : e.target;
+       
+    while (el && 'A' !== el.nodeName) el = path ? e.path[++i] : el.parentElement;
     if (!el || 'A' !== el.nodeName) return;
 
 

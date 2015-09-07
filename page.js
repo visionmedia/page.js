@@ -166,8 +166,7 @@
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
-    page.replace(url, null, true, dispatch);
+    page.replace(page.getCurrentUrl(), null, true, dispatch);
   };
 
   /**
@@ -356,6 +355,20 @@
   };
 
   /**
+   * Get the URL for cases that path is not provided.
+   *
+   * Like:
+   *
+   *    - page.start with dispatch is set to true.
+   *    - On popstate event when state is not provided.
+   *
+   * @return {str} URL current URL location
+   */
+  page.getCurrentUrl = function(){
+    return (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+  };
+
+  /**
    * Remove URL encoding from the given `str`.
    * Accommodates whitespace in both x-www-form-urlencoded
    * and regular percent-encoded form.
@@ -530,7 +543,7 @@
         var path = e.state.path;
         page.replace(path, e.state);
       } else {
-        page.show(location.pathname + location.hash, undefined, undefined, false);
+        page.show(page.getCurrentUrl(), null, true, dispatch);
       }
     };
   })();

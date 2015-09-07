@@ -260,6 +260,17 @@ page('*', function(){
 })
 ```
 
+### Non-URL symbols in paths
+
+  When writing a path for routing, be aware that any symbols
+  that normally require URL-encoding to appear in a URL will
+  need to be URL-encoded in the registered path.
+
+```js
+page('/this won't work');
+page('this%20will');
+```
+
 ### Default 404 behaviour
 
   By default when a route is not matched,

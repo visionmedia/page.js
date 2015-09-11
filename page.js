@@ -293,15 +293,20 @@
   page.dispatchExit = function (cb) {
     var prev = prevContext,
       i = 0;
-
+    var inExitChain = true;
     function nextExit() {
       var fn = page.exits[i++];
-      if (!fn) return cb();
+      if (!fn) {
+        inExitChain = false;
+        return cb();
+      }
       fn(prev, nextExit);
     }
 
     if (prev) {
       nextExit();
+      if (inExitChain && page.revertState) page.revertState(prev);
+      page.revertState = null;
     } else {
       cb();
     }
@@ -325,7 +330,9 @@
         ctx.handled = false;
         return;
       }
-      if (!fn) return unhandled(ctx);
+      if (!fn) {
+        return unhandled(ctx);
+      }
       fn(ctx, nextEnter);
     }
 
@@ -558,6 +565,9 @@
     }
     return function onpopstate(e) {
       if (!loaded) return;
+      page.revertState = function (prevState) {
+        page.show(prevState.pathname, prevState.state, false);
+      }
       if (e.state) {
         var path = e.state.path;
         page.replace(path, e.state);

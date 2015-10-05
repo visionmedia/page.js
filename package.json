@@ -1,7 +1,7 @@
 {
   "name": "page",
   "description": "Tiny client-side router",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
     "make": "browserify index.js --standalone page -o page.js"
   },
   "dependencies": {
-    "path-to-regexp": "~1.0.1"
+    "path-to-regexp": "~1.2.1"
   },
   "devDependencies": {
     "browserify": "^6.3.2",

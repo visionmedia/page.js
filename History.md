@@ -1,3 +1,8 @@
+1.6.4 / 2015-10-09
+==================
+
+* fix wildcard route support (update path-to-regexp to v1.2.1)
+
 1.6.3 / 2015-04-19
 ==================
 

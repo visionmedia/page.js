@@ -1,4 +1,4 @@
-/* globals before, after, chai, expect, page, describe, it */
+/* globals before, beforeEach, after, afterEach, chai, expect, page, describe, it */
 (function() {
 
   'use strict';
@@ -53,8 +53,6 @@
 
     },
     beforeTests = function(options) {
-      page.callbacks = [];
-      page.exits = [];
       options = options || {};
 
       page('/', function() {
@@ -136,6 +134,15 @@
           page('/');
         });
 
+        it('should run default exit routes when exiting any page', function(done) {
+          page.exit(function() {
+            expect(true).to.equal(true);
+            done();
+          });
+
+          page('/exit');
+        });
+
         it('should only run on matched routes', function(done) {
           page('/should-exit', function() {});
           page('/', function() {});
@@ -167,6 +174,45 @@
 
           page('/bootstrap');
           page('/');
+        });
+
+        it('should not call further route handlers if an exit route interrupts', function () {
+          var routes = [];
+          page('/before', function () {});
+          page('/after', function () {
+            routes.push('arrived');
+          });
+          page.exit('/before', function (ctx, next) {
+            routes.push('one');
+            next();
+          });
+          page.exit('/before', function (ctx, next) {
+            routes.push('two');
+            // Note absence of next() call.
+          });
+          page.exit('/before', function (ctx, next) {
+            routes.push('three');
+            next();
+          });
+          page('/before');
+          routes = [];
+          page('/after');
+          expect(routes.join(' ')).to.equal('one two');
+        });
+
+        it('should not update the current history location if exit route interrupts', function () {
+          page('/before', function (ctx, next) {});
+          page('/after', function (ctx, next) {});
+          page.exit('/before', function (ctx, next) {
+            expect(ctx.path).to.equal('/before');
+            // Note absence of next() call.
+          });
+          page('/before');
+          page('/after');
+          var path = hashbang
+            ? location.hash.replace('#!', '')
+            : location.pathname;
+          expect(path).to.be.equal('/before');
         });
       });
 
@@ -380,6 +426,8 @@
       called = false;
       page.stop();
       page.base('');
+      page.callbacks = [];
+      page.exits = [];
       page('/');
       base = '';
 
@@ -387,13 +435,13 @@
 
   describe('Html5 history navigation', function() {
 
-    before(function() {
+    beforeEach(function() {
       beforeTests();
     });
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
 
@@ -401,7 +449,7 @@
 
   describe('Hashbang option enabled', function() {
 
-    before(function() {
+    beforeEach(function() {
       hashbang = true;
       beforeTests({
         hashbang: hashbang
@@ -410,7 +458,7 @@
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
 
@@ -418,7 +466,7 @@
 
   describe('Different Base', function() {
 
-    before(function() {
+    beforeEach(function() {
       base = '/newBase';
       page.base(base);
       beforeTests();
@@ -426,14 +474,14 @@
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
 
   });
 
   describe('URL path component decoding disabled', function() {
-    before(function() {
+    beforeEach(function() {
       decodeURLComponents = false;
       beforeTests({
         decodeURLComponents: decodeURLComponents
@@ -442,7 +490,7 @@
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
   });

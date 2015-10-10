@@ -198,8 +198,15 @@
   page.show = function(path, state, dispatch, push) {
     var ctx = new Context(path, state);
     page.current = ctx.path;
-    if (false !== dispatch) page.dispatch(ctx);
-    if (false !== ctx.handled && false !== push) ctx.pushState();
+    function dispatchNext() {
+      if (false !== dispatch) page.dispatchEnter(ctx);
+      if (false !== ctx.handled && false !== push) ctx.pushState();
+    }
+    if (false !== dispatch) {
+      page.dispatchExit(dispatchNext);
+    } else {
+      dispatchNext();
+    }
     return ctx;
   };
 
@@ -275,25 +282,46 @@
     return ctx;
   };
 
+
   /**
-   * Dispatch the given `ctx`.
+   * Dispatch the exit routes for prevContext.
+   *
+   * @param {Function} cb
+   * @api private
+   */
+
+  page.dispatchExit = function (cb) {
+    var prev = prevContext,
+      i = 0;
+    var inExitChain = true;
+    function nextExit() {
+      var fn = page.exits[i++];
+      if (!fn) {
+        inExitChain = false;
+        return cb();
+      }
+      fn(prev, nextExit);
+    }
+
+    if (prev) {
+      nextExit();
+      if (inExitChain && page.revertState) page.revertState(prev);
+      page.revertState = null;
+    } else {
+      cb();
+    }
+  };
+
+  /**
+   * Dispatch the entry routes for `ctx`.
    *
    * @param {Object} ctx
    * @api private
    */
 
-  page.dispatch = function(ctx) {
-    var prev = prevContext,
-      i = 0,
-      j = 0;
-
+  page.dispatchEnter = function(ctx) {
+    var i = 0;
     prevContext = ctx;
-
-    function nextExit() {
-      var fn = page.exits[j++];
-      if (!fn) return nextEnter();
-      fn(prev, nextExit);
-    }
 
     function nextEnter() {
       var fn = page.callbacks[i++];
@@ -302,15 +330,26 @@
         ctx.handled = false;
         return;
       }
-      if (!fn) return unhandled(ctx);
+      if (!fn) {
+        return unhandled(ctx);
+      }
       fn(ctx, nextEnter);
     }
 
-    if (prev) {
-      nextExit();
-    } else {
-      nextEnter();
-    }
+    nextEnter();
+  };
+
+  /**
+   * Dispatch all routes for 'ctx'
+   *
+   * @param {Object} ctx
+   * @api private
+   */
+
+  page.dispatch = function(ctx) {
+    page.dispatchExit(function () {
+      page.dispatchEnter(ctx);
+    });
   };
 
   /**
@@ -526,6 +565,9 @@
     }
     return function onpopstate(e) {
       if (!loaded) return;
+      page.revertState = function (prevState) {
+        page.show(prevState.pathname, prevState.state, false);
+      }
       if (e.state) {
         var path = e.state.path;
         page.replace(path, e.state);

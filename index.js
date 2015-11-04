@@ -40,6 +40,11 @@
   var decodeURLComponents = true;
 
   /**
+   * Handle pushState
+   */
+  var handlePushState = true;
+
+  /**
    * Base path.
    */
 
@@ -158,6 +163,7 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
+    if (false === options.handlePushState) handlePushState = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) {
       document.addEventListener(clickEvent, onclick, false);
@@ -416,6 +422,7 @@
 
   Context.prototype.pushState = function() {
     page.len++;
+    if (!handlePushState) return;
     history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 

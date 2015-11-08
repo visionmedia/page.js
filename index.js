@@ -160,7 +160,7 @@
     if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
     if (false !== options.click) {
-      document.addEventListener(clickEvent, onclick, false);
+      document.addEventListener(clickEvent, page.onclick, false);
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
@@ -179,7 +179,7 @@
     page.current = '';
     page.len = 0;
     running = false;
-    document.removeEventListener(clickEvent, onclick, false);
+    document.removeEventListener(clickEvent, page.onclick, false);
     window.removeEventListener('popstate', onpopstate, false);
   };
 
@@ -538,7 +538,7 @@
    * Handle "click" events.
    */
 
-  function onclick(e) {
+  page.onclick = function(e) {
 
     if (1 !== which(e)) return;
 
@@ -597,7 +597,7 @@
 
     e.preventDefault();
     page.show(orig);
-  }
+  };
 
   /**
    * Event button.

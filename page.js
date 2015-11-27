@@ -433,7 +433,7 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (location.protocol.match(/https?/)) history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**

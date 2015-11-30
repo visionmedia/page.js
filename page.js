@@ -62,7 +62,14 @@
   /**
    * Handle Get Params option
    */
+
   var handleGetParams = true;
+
+  /**
+   * Can push state
+   */
+
+  var canPush = (location && location.protocol.match(/https?/));
 
   /**
    * Previous context, for capturing
@@ -423,7 +430,7 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (canPush) history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -433,7 +440,7 @@
    */
 
   Context.prototype.save = function() {
-    if (location.protocol.match(/https?/)) history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (canPush) history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**

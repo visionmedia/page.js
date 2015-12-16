@@ -346,17 +346,15 @@
 
         describe('when next() is invoked', function() {
           it('should invoke subsequent matching middleware', function(done) {
+
+            var visistedFirst = false;
             page('/forum/*', function(ctx, next) {
-              ctx.fullPath = ctx.params[0];
+              visistedFirst = true;
               next();
             });
 
-            page('/user', function() {
-
-            });
-
             page('/forum/:fid/thread/:tid', function(ctx) {
-              expect(ctx.params.tid).to.equal('2');
+              expect(visistedFirst).to.equal(true);
               done();
             });
 

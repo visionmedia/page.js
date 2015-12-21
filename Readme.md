@@ -125,7 +125,7 @@ page('/default');
 ### page([options])
 
   Register page's `popstate` / `click` bindings. If you're
-  doing selective binding you'll like want to pass `{ click: false }`
+  doing selective binding you'll likely want to pass `{ click: false }`
   to specify this yourself. The following options are available:
 
   - `click` bind to click events [__true__]

@@ -85,7 +85,9 @@
   function page(path, fn) {
     // <callback>
     if ('function' === typeof path) {
-      return page('*', path);
+      var args = ['*'];
+      Array.prototype.push.apply(args, arguments);
+      return page.apply(this, args);
     }
 
     // route <path> to <callback ...>

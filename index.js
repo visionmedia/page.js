@@ -496,7 +496,7 @@
 
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
-      var val = decodeURLEncodedURIComponent(m[i]);
+      var val = m[i];
       if (val !== undefined || !(hasOwnProperty.call(params, key.name))) {
         params[key.name] = val;
       }

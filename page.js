@@ -160,7 +160,10 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
+    if (false !== options.popstate) {
+      window.addEventListener('hashchange', onpopstate, false);
+      window.addEventListener('popstate', onpopstate, false);
+    }
     if (false !== options.click) {
       document.addEventListener(clickEvent, onclick, false);
     }
@@ -183,6 +186,7 @@
     running = false;
     document.removeEventListener(clickEvent, onclick, false);
     window.removeEventListener('popstate', onpopstate, false);
+    window.removeEventListener('hashchange', onpopstate, false);
   };
 
   /**

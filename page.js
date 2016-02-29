@@ -382,7 +382,7 @@
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
-    if (hashbang) this.path = this.path.replace('#!', '') || '/';
+    if (hashbang) this.path = this.path.replace('#!/', '') || '/';
 
     this.title = document.title;
     this.state = state || {};

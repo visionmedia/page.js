@@ -3,7 +3,7 @@
 
 * [#284] - Use shadow dom when available ([@mwalid])
 * [#329] - Add type annotations for full closure-compiler advanced optimization support ([@chadkillingsworth])
-* [#328] - Include ctx in page.after example, fixes [#290]() [@aaronshaf]
+* [#328] - Include ctx in page.after example, fixes [#290]() ([@aaronshaf])
 
 [#284]: https://github.com/visionmedia/page.js/issues/284
 [#329]: https://github.com/visionmedia/page.js/issues/329

@@ -133,6 +133,7 @@ page('/default');
   - `dispatch` perform initial dispatch [__true__]
   - `hashbang` add `#!` before urls [__false__]
   - `decodeURLComponents` remove URL encoding from path components (query string, pathname, hash) [__true__]
+  - `ignoreClassName` ignore click event if element has this class name [__null__]
 
   If you wish to load serve initial content
   from the server you likely will want to

@@ -40,6 +40,11 @@
   var decodeURLComponents = true;
 
   /**
+   * Class name to ignore click event
+   */
+  var ignoreClassName = null;
+
+  /**
    * Base path.
    */
 
@@ -162,6 +167,7 @@
     if (false !== options.click) {
       document.addEventListener(clickEvent, onclick, false);
     }
+    if (options.ignoreClassName) ignoreClassName = options.ignoreClassName
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
     var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
@@ -557,7 +563,8 @@
     // Ignore if tag has
     // 1. "download" attribute
     // 2. rel="external" attribute
-    if (el.hasAttribute('download') || el.getAttribute('rel') === 'external') return;
+    // 3. same class name as ignoreClassName
+    if (el.hasAttribute('download') || el.getAttribute('rel') === 'external' || (el.className || '').split(' ').indexOf(ignoreClassName) !== -1) return;
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');

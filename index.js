@@ -167,7 +167,7 @@
     if (false !== options.click) {
       document.addEventListener(clickEvent, onclick, false);
     }
-    if (options.ignoreClassName) ignoreClassName = options.ignoreClassName
+    if (options.ignoreClassName) ignoreClassName = options.ignoreClassName;
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
     var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;

@@ -1,3 +1,10 @@
+1.7.1 / 2016-03-17
+==================
+
+* [#363] - Reinstate shadow DOM fixes which were reverted
+
+[#363]: https://github.com/visionmedia/page.js/issues/363
+
 1.7.0 / 2016-03-12
 ==================
 

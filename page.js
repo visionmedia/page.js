@@ -401,6 +401,7 @@
       this.path = parts[0];
       this.hash = decodeURLEncodedURIComponent(parts[1]) || '';
       this.querystring = this.querystring.split('#')[0];
+      this.pathname = this.pathname.split('#')[0];
     }
   }
 

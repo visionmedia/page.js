@@ -381,7 +381,7 @@
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
-    this.path = path.replace(base, '') || '/';
+    this.path = path.replace(new RegExp('^' + base), '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;

@@ -419,6 +419,7 @@
   Context.prototype.pushState = function() {
     page.len++;
     history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    document.title = this.title;
   };
 
   /**
@@ -429,6 +430,7 @@
 
   Context.prototype.save = function() {
     history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    document.title = this.title;
   };
 
   /**

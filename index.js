@@ -95,7 +95,7 @@
         page.callbacks.push(route.middleware(arguments[i]));
       }
       // show <path> with [state]
-    } else if ('string' === typeof path) {
+    } else if ('string' === typeof path && fn !== undefined) {
       page['string' === typeof fn ? 'redirect' : 'show'](path, fn);
       // start [options]
     } else {

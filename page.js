@@ -528,7 +528,7 @@
     }
     return function onpopstate(e) {
       if (!loaded) return;
-      if (e.state) {
+      if (e.state && e.state.path) {
         var path = e.state.path;
         page.replace(path, e.state);
       } else {

@@ -551,13 +551,12 @@
     // use shadow dom when available
     var el = e.path ? e.path[0] : e.target;
 
-    // check if link is inside an svg | in this case, both href and target are always inside an object
-    var svg = ( typeof el.href === 'object' ) && el.href.constructor.name === 'SVGAnimatedString';
-
     // continue ensure link | el.nodeName for svg links are 'a' instead of 'A' and fail when testing only in the latter
     while (el && ( 'A' !== el.nodeName && 'a' !== el.nodeName ) ) el = el.parentNode;
     if (!el || ( 'A' !== el.nodeName && 'a' !== el.nodeName ) ) return;
 
+    // check if link is inside an svg | in this case, both href and target are always inside an object
+    var svg = ( typeof el.href === 'object' ) && el.href.constructor.name === 'SVGAnimatedString';
 
 
     // Ignore if tag has

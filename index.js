@@ -13,6 +13,9 @@
    */
 
   module.exports = page;
+  module.exports.Context = Context;
+  module.exports.Route = Route;
+  module.exports.sameOrigin = sameOrigin;
 
   /**
    * Detect click event

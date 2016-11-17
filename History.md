@@ -1,3 +1,25 @@
+1.7.1 / 2016-03-17
+==================
+
+* [#363] - Reinstate shadow DOM fixes which were reverted
+
+[#363]: https://github.com/visionmedia/page.js/issues/363
+
+1.7.0 / 2016-03-12
+==================
+
+* [#284] - Use shadow dom when available ([@mwalid])
+* [#329] - Add type annotations for full closure-compiler advanced optimization support ([@chadkillingsworth])
+* [#328] - Include ctx in page.after example, fixes [#290]() ([@aaronshaf])
+
+[#284]: https://github.com/visionmedia/page.js/issues/284
+[#329]: https://github.com/visionmedia/page.js/issues/329
+[#328]: https://github.com/visionmedia/page.js/issues/328
+[#290]: https://github.com/visionmedia/page.js/issues/290
+[@mwalid]: https://github.com/mwalid
+[@chadkillingsworth]: https://github.com/chadkillingsworth
+[@aaronshaf]: https://github.com/aaronshaf
+
 1.6.4 / 2015-10-09
 ==================
 

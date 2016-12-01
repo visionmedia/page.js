@@ -338,6 +338,25 @@
   }
 
   /**
+   * Create a shallow copy of `source`
+   *
+   * @param {Object} source
+   * @api private
+   */
+
+  function extend(source) {
+    var target = {};
+
+    for(var prop in source) {
+      if(Object.hasOwnProperty.call(source, prop)) {
+        target[prop] = source[prop];
+      }
+    }
+
+    return prop;
+  }
+
+  /**
    * Register an exit route on `path` with
    * callback `fn()`, which will be called
    * on the previous context when a new
@@ -385,7 +404,7 @@
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;
-    this.state = state || {};
+    this.state = extend(state) || {};
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
     this.pathname = decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);

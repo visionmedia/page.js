@@ -46,6 +46,12 @@
   var base = '';
 
   /**
+   * Strict path matching.
+   */
+
+  var strict = false;
+
+  /**
    * Running flag.
    */
 
@@ -137,6 +143,18 @@
   page.base = function(path) {
     if (0 === arguments.length) return base;
     base = path;
+  };
+
+  /**
+   * Get or set strict path matching to `enable`
+   *
+   * @param {boolean} enable
+   * @api public
+   */
+
+  page.strict = function(enable) {
+    if (0 === arguments.length) return strict;
+    strict = enable;
   };
 
   /**
@@ -446,6 +464,7 @@
 
   function Route(path, options) {
     options = options || {};
+    options.strict = options.strict || strict;
     this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
     this.regexp = pathtoRegexp(this.path,

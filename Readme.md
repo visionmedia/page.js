@@ -151,6 +151,11 @@ page('/default');
   Get or set the base `path`. For example if page.js
   is operating within `/blog/*` set the base path to "/blog".
 
+### page.strict([enable])
+
+  Get or set the strict path matching mode to `enable`. If enabled
+  `/blog` will not match "/blog/" and `/blog/` will not match "/blog".
+
 ### page.exit(path, callback[, callback ...])
 
   Defines an exit route mapping `path` to the given `callback(s)`.

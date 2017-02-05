@@ -74,6 +74,8 @@
       html += '      <li><a class="index" href="./">/</a></li>';
       html += '      <li><a class="whoop" href="#whoop">#whoop</a></li>';
       html += '      <li><a class="about" href="./about">/about</a></li>';
+      html += '      <li><a class="link-trailing" href="./link-trailing/">/link-trailing/</a></li>';
+      html += '      <li><a class="link-no-trailing" href="./link-no-trailing">/link-no-trailing</a></li>';
       html += '      <li><a class="contact" href="./contact">/contact</a></li>';
       html += '      <li><a class="contact-me" href="./contact/me">/contact/me</a></li>';
       html += '      <li><a class="not-found" href="./not-found?foo=bar">/not-found</a></li>';
@@ -267,7 +269,7 @@
             expect(ctx.params).to.be.an('object');
             done();
           });
-          page('/ctxparams/test');
+          page('/ctxparams/test/');
         });
       });
 
@@ -289,6 +291,30 @@
             done();
           });
           fireEvent($('.about'), 'click');
+        });
+
+        it('should handle trailing slashes in URL', function(done) {
+          page('/link-trailing', function() {
+            expect(page.strict()).to.equal(false);
+            done();
+          });
+          page('/link-trailing/', function() {
+            expect(page.strict()).to.equal(true);
+            done();
+          });
+          fireEvent($('.link-trailing'), 'click');
+        });
+
+        it('should handle trailing slashes in route', function(done) {
+          page('/link-no-trailing/', function() {
+            expect(page.strict()).to.equal(false);
+            done();
+          });
+          page('/link-no-trailing', function() {
+            expect(page.strict()).to.equal(true);
+            done();
+          });
+          fireEvent($('.link-no-trailing'), 'click');
         });
 
         it('should invoke the callback with the right params', function(done) {
@@ -333,6 +359,30 @@
           });
 
           page('/user/tj');
+        });
+
+        it('should handle trailing slashes in path', function(done) {
+          page('/no-trailing', function() {
+            expect(page.strict()).to.equal(false);
+            done();
+          });
+          page('/no-trailing/', function() {
+            expect(page.strict()).to.equal(true);
+            done();
+          });
+          page('/no-trailing/');
+        });
+
+        it('should handle trailing slashes in route', function(done) {
+          page('/trailing/', function() {
+            expect(page.strict()).to.equal(false);
+            done();
+          });
+          page('/trailing', function() {
+            expect(page.strict()).to.equal(true);
+            done();
+          });
+          page('/trailing');
         });
 
         it('should populate ctx.params', function(done) {
@@ -380,6 +430,7 @@
       called = false;
       page.stop();
       page.base('');
+      page.strict(false);
       page('/');
       base = '';
 
@@ -438,6 +489,19 @@
       beforeTests({
         decodeURLComponents: decodeURLComponents
       });
+    });
+
+    tests();
+
+    after(function() {
+      afterTests();
+    });
+  });
+
+  describe('Strict path matching enabled', function() {
+    before(function() {
+      page.strict(true);
+      beforeTests();
     });
 
     tests();

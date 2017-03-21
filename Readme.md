@@ -339,7 +339,7 @@ page('/user/:id', load, show)
   the browser the route would be invoked
   and the query would be made yet-again.
 
-  An example implemenation might look as follows:
+  An example implementation might look as follows:
 
 ```js
 function show(ctx){
@@ -501,7 +501,7 @@ Before calling `page.base()` use: `history.redirect([prefixType], [basepath])` -
 ### Pull Requests
 
   * Break commits into a single objective.
-  * An objective should be a chunk of code that is related but requires explaination.
+  * An objective should be a chunk of code that is related but requires explanation.
   * Commits should be in the form of what-it-is: how-it-does-it and or why-it's-needed or what-it-is for trivial changes
   * Pull requests and commits should be a guide to the code.
 

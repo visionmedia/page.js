@@ -60,6 +60,18 @@
   var hashbang = false;
 
   /**
+   * Handle Get Params option
+   */
+
+  var handleGetParams = true;
+
+  /**
+   * Can push state
+   */
+
+  var canPush = (location && location.protocol.match(/https?/));
+
+  /**
    * Previous context, for capturing
    * page exit events.
    */
@@ -160,13 +172,17 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
+    if (false !== options.popstate) {
+      window.addEventListener('popstate', onpopstate, false);
+      window.addEventListener('hashchange', onpopstate, false);
+    }
     if (false !== options.click) {
       document.addEventListener(clickEvent, onclick, false);
     }
     if (true === options.hashbang) hashbang = true;
+    if (true !== options.handleGetParams) handleGetParams = false;
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+    var url = (hashbang && ~location.hash.indexOf('#!')) ? (location.hash.substr(2) + (handleGetParams ? location.search : '')) : (location.pathname + (handleGetParams ? location.search : '') + location.hash);
     page.replace(url, null, true, dispatch);
   };
 
@@ -183,6 +199,7 @@
     running = false;
     document.removeEventListener(clickEvent, onclick, false);
     window.removeEventListener('popstate', onpopstate, false);
+    window.removeEventListener('hashchange', onpopstate, false);
   };
 
   /**
@@ -385,6 +402,7 @@
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
+    this.path = this.path.replace(/\/+/g, '/');
 
     this.title = document.title;
     this.state = state || {};
@@ -418,7 +436,7 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (canPush) history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -428,7 +446,7 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (canPush) history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -527,12 +545,19 @@
       });
     }
     return function onpopstate(e) {
-      if (!loaded) return;
-      if (e.state) {
-        var path = e.state.path;
-        page.replace(path, e.state);
+      if (e.type == 'popstate') {
+        if (!loaded) return;
+        if (e.state) {
+          var path = e.state.path;
+          page.replace(path, e.state);
+        } else {
+          page.show(location.pathname + location.hash, undefined, undefined, false);
+        }
       } else {
-        page.show(location.pathname + location.hash, undefined, undefined, false);
+        var hash = location.hash.slice(hashbang ? 2 : 1);
+        if (hash !== page.current) {
+          page(hash);
+        }
       }
     };
   })();

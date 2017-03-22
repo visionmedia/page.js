@@ -532,7 +532,7 @@
         var path = e.state.path;
         page.replace(path, e.state);
       } else {
-        page.show(location.pathname + location.hash, undefined, undefined, false);
+        page.show(location.pathname + location.search + location.hash, undefined, undefined, false);
       }
     };
   })();

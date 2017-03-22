@@ -380,12 +380,12 @@
 
   function Context(path, state) {
     if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
+    if (hashbang) path = path.replace('/#!', '') || '/';
+
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
-    if (hashbang) this.path = this.path.replace('#!', '') || '/';
-
     this.title = document.title;
     this.state = state || {};
     this.state.path = path;

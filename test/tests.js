@@ -1,4 +1,4 @@
-/* globals before, after, chai, expect, page, describe, it */
+/* globals before, after, beforeEach, afterEach, chai, expect, page, describe, it */
 (function() {
 
   'use strict';
@@ -53,8 +53,6 @@
 
     },
     beforeTests = function(options) {
-      page.callbacks = [];
-      page.exits = [];
       options = options || {};
 
       page('/', function() {
@@ -241,7 +239,7 @@
         });
 
         it('should accommodate URL encoding', function(done) {
-          page('/long path with whitespace', function(ctx) {
+          page('/long%20path%20with%20whitespace', function(ctx) {
             expect(ctx.pathname).to.equal(base + (base && hashbang ? '#!' : '') +
               (decodeURLComponents ? '/long path with whitespace' : '/long%20path%20with%20whitespace'));
             done();
@@ -252,9 +250,13 @@
       });
 
       describe('ctx.params', function() {
-        it('should always be URL-decoded', function(done) {
+        it('should be URL-decoded unless configured not to', function(done) {
           page('/whatever/:param', function(ctx) {
-            expect(ctx.params.param).to.equal('param with whitespace');
+            if (decodeURLComponents) {
+              expect(ctx.params.param).to.equal('param with whitespace');
+            } else {
+              expect(ctx.params.param).to.equal('param%20with%20whitespace');
+            }
             done();
           });
 
@@ -380,6 +382,8 @@
       called = false;
       page.stop();
       page.base('');
+      page.callbacks = [];
+      page.exits = [];
       page('/');
       base = '';
 
@@ -387,13 +391,13 @@
 
   describe('Html5 history navigation', function() {
 
-    before(function() {
+    beforeEach(function() {
       beforeTests();
     });
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
 
@@ -401,7 +405,7 @@
 
   describe('Hashbang option enabled', function() {
 
-    before(function() {
+    beforeEach(function() {
       hashbang = true;
       beforeTests({
         hashbang: hashbang
@@ -410,7 +414,7 @@
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
 
@@ -418,7 +422,7 @@
 
   describe('Different Base', function() {
 
-    before(function() {
+    beforeEach(function() {
       base = '/newBase';
       page.base(base);
       beforeTests();
@@ -426,14 +430,14 @@
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
 
   });
 
   describe('URL path component decoding disabled', function() {
-    before(function() {
+    beforeEach(function() {
       decodeURLComponents = false;
       beforeTests({
         decodeURLComponents: decodeURLComponents
@@ -442,7 +446,7 @@
 
     tests();
 
-    after(function() {
+    afterEach(function() {
       afterTests();
     });
   });

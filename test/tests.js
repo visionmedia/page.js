@@ -371,6 +371,15 @@
           });
         });
 
+        it('should prevent double redirect on the same page', function(done) {
+          page('/only-once', function(ctx) {
+            done();
+          });
+
+          page('/only-once');
+          page('/only-once');
+        });
+
       });
     },
     afterTests = function() {

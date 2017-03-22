@@ -166,8 +166,7 @@
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
-    page.replace(url, null, true, dispatch);
+    page.replace(page.getPath(), null, true, dispatch);
   };
 
   /**
@@ -357,6 +356,25 @@
   };
 
   /**
+   * Get the path for cases that it is not provided.
+   *
+   * Like:
+   *
+   *    - page.start with dispatch is set to true.
+   *    - On popstate event when state is not provided.
+   *    - Rebuild path on click event listener.
+   *
+   * @param {object} location to generate path.
+   * @return {str} path path generated.
+   */
+  page.getPath = function(oLocation){
+    oLocation = oLocation || location;
+    return (hashbang && ~oLocation.hash.indexOf('#!')) ?
+      oLocation.hash.substr(2) + oLocation.search :
+      oLocation.pathname + oLocation.search + oLocation.hash;
+  };
+
+  /**
    * Remove URL encoding from the given `str`.
    * Accommodates whitespace in both x-www-form-urlencoded
    * and regular percent-encoded form.
@@ -532,7 +550,7 @@
         var path = e.state.path;
         page.replace(path, e.state);
       } else {
-        page.show(location.pathname + location.hash, undefined, undefined, false);
+        page.show(page.getPath(), null, true, dispatch);
       }
     };
   })();
@@ -580,7 +598,7 @@
 
 
     // rebuild path
-    var path = el.pathname + el.search + (el.hash || '');
+    var path = page.getPath(el);
 
     // strip leading "/[drive letter]:" on NW.js on Windows
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {

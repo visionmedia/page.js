@@ -87,7 +87,9 @@
   function page(path, fn) {
     // <callback>
     if ('function' === typeof path) {
-      return page('*', path);
+      var args = ['*'];
+      Array.prototype.push.apply(args, arguments);
+      return page.apply(this, args);
     }
 
     // route <path> to <callback ...>
@@ -291,13 +293,13 @@
 
     prevContext = ctx;
 
-    function nextExit() {
+    function nextExit(err) {
       var fn = page.exits[j++];
-      if (!fn) return nextEnter();
+      if (!fn) return nextEnter(err);
       fn(prev, nextExit);
     }
 
-    function nextEnter() {
+    function nextEnter(err) {
       var fn = page.callbacks[i++];
 
       if (ctx.path !== page.current) {
@@ -305,7 +307,14 @@
         return;
       }
       if (!fn) return unhandled(ctx);
-      fn(ctx, nextEnter);
+
+      if (fn.length === 3) {
+        if (err) {
+          fn(err, ctx, nextEnter);
+        }
+      } else {
+        fn(ctx, nextEnter);
+      }
     }
 
     if (prev) {
@@ -472,10 +481,15 @@
 
   Route.prototype.middleware = function(fn) {
     var self = this;
-    return function(ctx, next) {
-      if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
-      next();
-    };
+    return fn.length === 3 ?
+      function(err, ctx, next) {
+        if (self.match(ctx.path, ctx.params)) return fn(err, ctx, next);
+        next(err);
+      } :
+      function(ctx, next) {
+        if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
+        next();
+      };
   };
 
   /**

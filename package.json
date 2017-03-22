@@ -13,11 +13,11 @@
     }
   },
   "scripts": {
-    "test": "jshint index.js test/tests.js && mocha test/tests.js",
-    "serve": "serve test",
-    "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
+    "test": "$(npm bin)/jshint index.js test/tests.js && mocha test/tests.js",
+    "serve": "$(npm bin)/serve test",
+    "test-cov": "$(npm bin)/jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
     "prepublish": "npm run make",
-    "make": "browserify index.js --standalone page -o page.js"
+    "make": "$(npm bin)/browserify index.js --standalone page -o page.js"
   },
   "dependencies": {
     "path-to-regexp": "~1.2.1"

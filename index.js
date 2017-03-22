@@ -159,6 +159,7 @@
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
     if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
+    if (true === options.hashchange) window.addEventListener('hashchange', onpopstate, false);
     if (false !== options.click) {
       document.addEventListener(clickEvent, onclick, false);
     }

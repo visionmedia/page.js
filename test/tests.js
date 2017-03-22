@@ -416,6 +416,20 @@
 
   });
 
+  describe('hashchange option enabled', function() {
+    before(function() {
+      beforeTests({
+        hashchange: true
+      });
+    });
+
+    tests();
+
+    after(function() {
+      afterTests();
+    });
+  });
+
   describe('Different Base', function() {
 
     before(function() {

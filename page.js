@@ -199,8 +199,8 @@
   page.show = function(path, state, dispatch, push) {
     var ctx = new Context(path, state);
     page.current = ctx.path;
-    if (false !== dispatch) page.dispatch(ctx);
     if (false !== ctx.handled && false !== push) ctx.pushState();
+    if (false !== dispatch) page.dispatch(ctx);
     return ctx;
   };
 
@@ -528,7 +528,7 @@
     }
     return function onpopstate(e) {
       if (!loaded) return;
-      if (e.state) {
+      if (e.state && e.state.path) {
         var path = e.state.path;
         page.replace(path, e.state);
       } else {

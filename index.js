@@ -34,7 +34,7 @@
 
 
   /**
-   * Decode URL components (query string, pathname, hash).
+   * Decode URL components (pathname, hash).
    * Accommodates both regular percent encoding and x-www-form-urlencoded format.
    */
   var decodeURLComponents = true;
@@ -387,7 +387,7 @@
     this.title = (typeof document !== 'undefined' && document.title);
     this.state = state || {};
     this.state.path = path;
-    this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
+    this.querystring = ~i ? path.slice(i + 1) : '';
     this.pathname = decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
     this.params = {};
 

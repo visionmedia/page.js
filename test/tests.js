@@ -213,7 +213,7 @@
 
         it('should accommodate URL encoding', function(done) {
           page('/whatever', function(ctx) {
-            expect(ctx.querystring).to.equal(decodeURLComponents ? 'queryParam=string with whitespace' : 'queryParam=string%20with%20whitespace');
+            expect(ctx.querystring).to.equal('queryParam=string%20with%20whitespace');
             done();
           });
 

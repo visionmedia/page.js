@@ -277,6 +277,19 @@
   };
 
   /**
+   * Redirect to page with given `url`.
+   *
+   * @param {String} path
+   * @api public
+   */
+
+  page.redirect = function(url) {
+    setTimeout(function() {
+      page(url);
+    }, 0);
+  };
+
+  /**
    * Dispatch the given `ctx`.
    *
    * @param {Context} ctx

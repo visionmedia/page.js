@@ -594,6 +594,10 @@
       path = path.substr(base.length);
     }
 
+    if (orig.indexOf('.') === 0) {
+      orig = orig.replace(/^\./, base);
+    }
+
     if (hashbang) path = path.replace('#!', '');
 
     if (base && orig === path) return;

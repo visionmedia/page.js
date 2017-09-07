@@ -564,7 +564,11 @@
     var link = el.getAttribute('href');
     if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
-
+    // prevent handling links with the same url
+    if (el.pathname === location.pathname) {
+      e.preventDefault();
+      return;
+    }
 
     // Check for mailto: in the href
     if (link && link.indexOf('mailto:') > -1) return;

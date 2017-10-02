@@ -565,7 +565,7 @@
     if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
     // prevent handling links with the same url
-    if (el.pathname === location.pathname) {
+    if (el.pathname + el.search === location.pathname + location.search) {
       e.preventDefault();
       return;
     }

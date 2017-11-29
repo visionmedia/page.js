@@ -58,6 +58,12 @@
   var hashbang = false;
 
   /**
+   * Hash character
+   */
+
+  var hashChar;
+
+  /**
    * Previous context, for capturing
    * page exit events.
    */
@@ -162,9 +168,12 @@
     if (false !== options.click) {
       document.addEventListener(clickEvent, onclick, false);
     }
-    if (true === options.hashbang) hashbang = true;
+    if (true === options.hashbang || '#' === options.hashbang) {
+      hashbang = true;
+      hashChar = ('#' === options.hashbang) ? '#' : '#!';
+    }
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+    var url = (hashbang && ~location.hash.indexOf(hashChar)) ? location.hash.substr(hashChar.length) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -326,7 +335,7 @@
     var current;
 
     if (hashbang) {
-      current = base + location.hash.replace('#!', '');
+      current = base + location.hash.replace(hashChar, '');
     } else {
       current = location.pathname + location.search;
     }
@@ -377,12 +386,12 @@
    */
 
   function Context(path, state) {
-    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
+    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? hashChar : '') + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
-    if (hashbang) this.path = this.path.replace('#!', '') || '/';
+    if (hashbang) this.path = this.path.replace(hashChar, '') || '/';
 
     this.title = (typeof document !== 'undefined' && document.title);
     this.state = state || {};
@@ -416,7 +425,7 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? hashChar + this.path : this.canonicalPath);
   };
 
   /**
@@ -426,7 +435,7 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? hashChar + this.path : this.canonicalPath);
   };
 
   /**
@@ -592,7 +601,7 @@
       path = path.substr(base.length);
     }
 
-    if (hashbang) path = path.replace('#!', '');
+    if (hashbang) path = path.replace(hashChar, '');
 
     if (base && orig === path) return;
 

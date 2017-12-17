@@ -580,7 +580,7 @@
 
 
     // rebuild path
-    var path = el.pathname + el.search + (el.hash || '');
+    var path = (el.pathname == '/' ? '' : el.pathname) + el.search + (el.hash || '');
 
     // strip leading "/[drive letter]:" on NW.js on Windows
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {

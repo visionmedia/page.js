@@ -573,7 +573,7 @@
     if (el.target) return;
 
     // x-origin
-    if (!sameOrigin(el.href)) return;
+    if (!page.sameOrigin(el.href)) return;
 
 
 

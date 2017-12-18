@@ -9,6 +9,7 @@
     html = '',
     base = '',
     hashbang = false,
+    hashChar = '#!',
     decodeURLComponents = true,
     chai = this.chai,
     expect = this.expect,
@@ -180,7 +181,7 @@
         it('should move back to history', function() {
           page.back('/first');
           var path = hashbang
-            ? location.hash.replace('#!', '')
+            ? location.hash.replace(hashChar, '')
             : location.pathname;
           expect(path).to.be.equal('/first');
         });
@@ -224,7 +225,7 @@
       describe('ctx.pathname', function() {
         it('should default to ctx.path', function(done) {
           page('/pathname-default', function(ctx) {
-            expect(ctx.pathname).to.equal(base + (base && hashbang ? '#!' : '') + '/pathname-default');
+            expect(ctx.pathname).to.equal(base + (base && hashbang ? hashChar : '') + '/pathname-default');
             done();
           });
 
@@ -233,7 +234,7 @@
 
         it('should omit the query string', function(done) {
           page('/pathname', function(ctx) {
-            expect(ctx.pathname).to.equal(base + (base && hashbang ? '#!' : '') + '/pathname');
+            expect(ctx.pathname).to.equal(base + (base && hashbang ? hashChar : '') + '/pathname');
             done();
           });
 
@@ -242,7 +243,7 @@
 
         it('should accommodate URL encoding', function(done) {
           page('/long path with whitespace', function(ctx) {
-            expect(ctx.pathname).to.equal(base + (base && hashbang ? '#!' : '') +
+            expect(ctx.pathname).to.equal(base + (base && hashbang ? hashChar : '') +
               (decodeURLComponents ? '/long path with whitespace' : '/long%20path%20with%20whitespace'));
             done();
           });
@@ -395,6 +396,42 @@
 
     after(function() {
       afterTests();
+    });
+
+  });
+
+  describe('Hashbang option set incorrectly does nothing', function() {
+
+    before(function() {
+      hashbang = false;
+      beforeTests({
+        hashbang: '##',
+      });
+    });
+
+    tests();
+
+    after(function() {
+      afterTests();
+    });
+
+  });
+
+  describe('Hashbang option set to hash', function() {
+
+    before(function() {
+      hashbang = hashChar = '#';
+      beforeTests({
+        hashbang: hashbang,
+      });
+    });
+
+    tests();
+
+    after(function() {
+      afterTests();
+      hashbang = false;
+      hashChar = '#!';
     });
 
   });

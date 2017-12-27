@@ -158,8 +158,8 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
-    if (false !== options.click) {
+    if (false !== options.popstate && 'undefined' !== typeof window) window.addEventListener('popstate', onpopstate, false);
+    if (false !== options.click && 'undefined' !== typeof document) {
       document.addEventListener(clickEvent, onclick, false);
     }
     if (true === options.hashbang) hashbang = true;
@@ -179,8 +179,8 @@
     page.current = '';
     page.len = 0;
     running = false;
-    document.removeEventListener(clickEvent, onclick, false);
-    window.removeEventListener('popstate', onpopstate, false);
+    ('undefined' !== typeof document) && document.removeEventListener(clickEvent, onclick, false);
+    ('undefined' !== typeof window) && window.removeEventListener('popstate', onpopstate, false);
   };
 
   /**
@@ -215,7 +215,7 @@
     if (page.len > 0) {
       // this may need more testing to see if all browsers
       // wait for the next tick to go back in history
-      history.back();
+      ('undefined' !== typeof history) && history.back();
       page.len--;
     } else if (path) {
       setTimeout(function() {
@@ -326,15 +326,15 @@
     var current;
 
     if (hashbang) {
-      current = base + location.hash.replace('#!', '');
+      current = base + (('undefined' !== typeof location) && location.hash.replace('#!', ''));
     } else {
-      current = location.pathname + location.search;
+      current = ('undefined' !== typeof location) && (location.pathname + location.search);
     }
 
     if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.handled = false;
-    location.href = ctx.canonicalPath;
+    ('undefined' !== typeof location) && (location.href = ctx.canonicalPath);
   }
 
   /**
@@ -416,7 +416,7 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    ('undefined' !== typeof history) && history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -426,7 +426,7 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    ('undefined' !== typeof history) && history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -562,7 +562,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
+    if (!hashbang && ('undefined' !== typeof location) && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
 
 
@@ -605,7 +605,7 @@
    */
 
   function which(e) {
-    e = e || window.event;
+    e = e || ('undefined' !== typeof window && window.event);
     return null === e.which ? e.button : e.which;
   }
 
@@ -614,6 +614,7 @@
    */
 
   function sameOrigin(href) {
+    if ('undefined' === typeof location) return;
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
     return (href && (0 === href.indexOf(origin)));

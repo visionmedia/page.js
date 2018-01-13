@@ -36,21 +36,28 @@
   });
 
   var fireEvent = function(node, eventName) {
+      var event;
 
-      var event = document.createEvent('MouseEvents');
+      if(typeof window.Event === 'function') {
+        event = new window.MouseEvent(eventName, {
+          bubbles: true,
+          button: 1
+        });
+      } else {
+        event = document.createEvent('MouseEvents');
 
-      // https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
-      event.initEvent(
-        eventName, true, true, this, 0,
-        event.screenX, event.screenY, event.clientX, event.clientY,
-        false, false, false, false,
-        0, null);
+        // https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
+        event.initEvent(
+          eventName, true, true, this, 0,
+          event.screenX, event.screenY, event.clientX, event.clientY,
+          false, false, false, false,
+          0, null);
 
-      event.button = 1;
-      event.which = null;
+        event.button = 1;
+        event.which = null;
+      }
 
       node.dispatchEvent(event);
-
     },
     beforeTests = function(options) {
       page.callbacks = [];
@@ -88,6 +95,28 @@
 
       page(options);
 
+    },
+    replaceable = function(route) {
+      function realCallback(ctx) {
+        obj.callback(ctx);
+      }
+
+      var obj = {
+        callback: Function.prototype,
+        replace: function(cb){
+          obj.callback = cb;
+        },
+        once: function(cb){
+          obj.replace(function(ctx){
+            obj.callback = Function.prototype;
+            cb(ctx);
+          });
+        }
+      };
+
+      page(route, realCallback);
+
+      return obj;
     },
     tests = function() {
       describe('on page load', function() {
@@ -173,18 +202,25 @@
       });
 
       describe('page.back', function() {
+        var first;
+
         before(function() {
-          page('/first', function() {});
+          first = replaceable('/first', function(){});
           page('/second', function() {});
           page('/first');
           page('/second');
         });
-        it('should move back to history', function() {
+        it('should move back to history', function(done) {
+          first.once(function(){
+            var path = hashbang
+              ? location.hash.replace('#!', '')
+              : location.pathname;
+            expect(path).to.be.equal('/first');
+            done();
+          });
+
           page.back('/first');
-          var path = hashbang
-            ? location.hash.replace('#!', '')
-            : location.pathname;
-          expect(path).to.be.equal('/first');
+
         });
         it('should decrement page.len on back()', function() {
           var lenAtFirst = page.len;
@@ -287,9 +323,11 @@
       describe('links dispatcher', function() {
 
         it('should invoke the callback', function(done) {
+          //this.timeout(60000);
           page('/about', function() {
             done();
           });
+
           fireEvent($('.about'), 'click');
         });
 

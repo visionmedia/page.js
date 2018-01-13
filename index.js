@@ -563,7 +563,6 @@
    */
 
   function onclick(e) {
-
     if (1 !== which(e)) return;
 
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
@@ -632,7 +631,7 @@
 
   function which(e) {
     e = e || window.event;
-    return null === e.which ? e.button : e.which;
+    return null == e.which ? e.button : e.which;
   }
 
   /**

@@ -201,6 +201,41 @@
         });
       });
 
+      describe('no dispatch', function() {
+        it('should use the previous context when not dispatching', function(done) {
+          var count = 0;
+
+          page('/', function() {});
+
+          page.exit('*', function(context) {
+            var path = context.path;
+            setTimeout( function() {
+              expect(path).to.equal('/');
+              page.replace( '/', null, false, false);
+              if ( count === 2 ) {
+                done();
+                return;
+              }
+              count++;
+            }, 0);
+          });
+
+          page('/');
+
+          page('/bootstrap');
+
+          setTimeout( function() {
+            page('/bootstrap');
+          }, 0 );
+        });
+
+
+        after(function() {
+          // remove exit handler that was added
+          page.exits.pop();
+        });
+      });
+
       describe('page.back', function() {
         var first;
 

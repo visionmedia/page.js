@@ -217,9 +217,11 @@
    */
 
   page.show = function(path, state, dispatch, push) {
-    var ctx = new Context(path, state);
+    var ctx = new Context(path, state),
+      prev = prevContext;
+    prevContext = ctx;
     page.current = ctx.path;
-    if (false !== dispatch) page.dispatch(ctx);
+    if (false !== dispatch) page.dispatch(ctx, prev);
     if (false !== ctx.handled && false !== push) ctx.pushState();
     return ctx;
   };
@@ -290,11 +292,13 @@
 
 
   page.replace = function(path, state, init, dispatch) {
-    var ctx = new Context(path, state);
+    var ctx = new Context(path, state),
+      prev = prevContext;
+    prevContext = ctx;
     page.current = ctx.path;
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
-    if (false !== dispatch) page.dispatch(ctx);
+    if (false !== dispatch) page.dispatch(ctx, prev);
     return ctx;
   };
 
@@ -304,12 +308,10 @@
    * @param {Context} ctx
    * @api private
    */
-  page.dispatch = function(ctx) {
-    var prev = prevContext,
-      i = 0,
-      j = 0;
 
-    prevContext = ctx;
+  page.dispatch = function(ctx, prev) {
+    var i = 0,
+      j = 0;
 
     function nextExit() {
       var fn = page.exits[j++];

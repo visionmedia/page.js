@@ -15,6 +15,7 @@
    */
 
   module.exports = page;
+  module.exports.default = page;
 
   /**
    * Detect click event
@@ -386,7 +387,7 @@
     this.path = path.replace(base, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
-    this.title = document.title;
+    this.title = (typeof document !== 'undefined' && document.title);
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
@@ -581,6 +582,8 @@
 
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');
+
+    path = path[0] !== '/' ? '/' + path : path;
 
     // strip leading "/[drive letter]:" on NW.js on Windows
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {

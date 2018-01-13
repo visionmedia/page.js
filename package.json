@@ -13,6 +13,7 @@
     }
   },
   "scripts": {
+    "engine-deps": "install-engine-dependencies",
     "test": "jshint index.js test/tests.js && mocha test/tests.js",
     "serve": "serve test",
     "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
@@ -26,15 +27,25 @@
     "browserify": "^6.3.2",
     "chai": "^1.10.0",
     "coveralls": "^2.11.2",
+    "engine-dependencies": "^0.2.0",
     "express": "^4.10.2",
     "jade": "^1.7.0",
     "jscoverage": "^0.5.9",
-    "jsdom": "^1.3.1",
+    "jsdom": "^11.5.1",
     "jshint": "^2.5.10",
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
     "serve": "*",
     "should": "*"
+  },
+  "engineDependencies": {
+    "node": {
+      "0.10.x": {
+        "devDependencies": {
+          "jsdom": "^1.3.1"
+        }
+      }
+    }
   },
   "files": [
     "index.js",

@@ -16,6 +16,7 @@
   module.exports.Context = Context;
   module.exports.Route = Route;
   module.exports.sameOrigin = sameOrigin;
+  module.exports.default = page;
 
   /**
    * Detect click event
@@ -47,6 +48,12 @@
    */
 
   var base = '';
+
+  /**
+   * Strict path matching.
+   */
+
+  var strict = false;
 
   /**
    * Running flag.
@@ -140,6 +147,18 @@
   page.base = function(path) {
     if (0 === arguments.length) return base;
     base = path;
+  };
+
+  /**
+   * Get or set strict path matching to `enable`
+   *
+   * @param {boolean} enable
+   * @api public
+   */
+
+  page.strict = function(enable) {
+    if (0 === arguments.length) return strict;
+    strict = enable;
   };
 
   /**
@@ -387,7 +406,7 @@
     this.path = path.replace(base, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
-    this.title = document.title;
+    this.title = (typeof document !== 'undefined' && document.title);
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
@@ -419,7 +438,9 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if(typeof history !== 'undefined') {
+      history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -429,7 +450,9 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if(typeof history !== 'undefined') {
+      history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -449,6 +472,7 @@
 
   function Route(path, options) {
     options = options || {};
+    options.strict = options.strict || strict;
     this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
     this.regexp = pathtoRegexp(this.path,
@@ -542,7 +566,6 @@
    */
 
   function onclick(e) {
-
     if (1 !== which(e)) return;
 
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
@@ -583,6 +606,8 @@
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');
 
+    path = path[0] !== '/' ? '/' + path : path;
+
     // strip leading "/[drive letter]:" on NW.js on Windows
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
       path = path.replace(/^\/[a-zA-Z]:\//, '/');
@@ -609,7 +634,7 @@
 
   function which(e) {
     e = e || window.event;
-    return null === e.which ? e.button : e.which;
+    return null == e.which ? e.button : e.which;
   }
 
   /**

@@ -518,10 +518,10 @@
     if ('undefined' === typeof window) {
       return;
     }
-    if (document.readyState === 'complete') {
+    if (document.readyState === 'interactive') {
       loaded = true;
     } else {
-      window.addEventListener('load', function() {
+      document.addEventListener('DOMContentLoaded', function() {
         setTimeout(function() {
           loaded = true;
         }, 0);

@@ -13,6 +13,7 @@
    */
 
   module.exports = page;
+  module.exports.default = page;
 
   /**
    * Detect click event

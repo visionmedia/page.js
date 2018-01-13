@@ -59,6 +59,12 @@
    */
 
   var hashbang = false;
+  
+  /**
+   * BaseUrlInPathname option
+   */
+
+  var baseUrlInPathname = true;
 
   /**
    * Previous context, for capturing
@@ -166,6 +172,7 @@
       document.addEventListener(clickEvent, onclick, false);
     }
     if (true === options.hashbang) hashbang = true;
+    if (false === options.baseUrlInPathname) baseUrlInPathname = false;
     if (!dispatch) return;
     var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
@@ -599,7 +606,7 @@
 
     if (hashbang) path = path.replace('#!', '');
 
-    if (base && orig === path) return;
+    if (baseUrlInPathname && base && orig === path) return;
 
     e.preventDefault();
     page.show(orig);

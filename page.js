@@ -533,7 +533,8 @@
         var path = e.state.path;
         page.replace(path, e.state);
       } else {
-        page.show(location.pathname + location.hash, undefined, undefined, false);
+        var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+        page.show(url, undefined, undefined, false);
       }
     };
   })();

@@ -578,9 +578,13 @@
     if (!sameOrigin(el.href)) return;
 
 
+    // fix for IE9 for not having leading slash (issue #259)
+    var pathname = el.pathname;
+    pathname = pathname[0] !== "/" ? "/" + pathname : pathname;
+
 
     // rebuild path
-    var path = el.pathname + el.search + (el.hash || '');
+    var path = pathname + el.search + (el.hash || '');
 
     // strip leading "/[drive letter]:" on NW.js on Windows
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {

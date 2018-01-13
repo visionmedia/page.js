@@ -2,6 +2,7 @@
   "browser": true,
   "node":true,
   "expr": true,
+  "eqnull": true,
   "laxcomma": true,
   "-W079": true,
   "-W014": true,

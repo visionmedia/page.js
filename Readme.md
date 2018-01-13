@@ -2,14 +2,6 @@
 
 Tiny Express-inspired client-side router.
 
-# This project is no longer maintained!
-Alternatives:
-* https://github.com/krasimir/navigo
-* https://github.com/router5/router5
-* https://github.com/riot/route
-* https://github.com/Rich-Harris/roadtrip
-
-
  [![Build Status](https://travis-ci.org/visionmedia/page.js.svg?branch=master)](https://travis-ci.org/visionmedia/page.js)
 [![Coverage Status](https://coveralls.io/repos/visionmedia/page.js/badge.svg?branch=master)](https://coveralls.io/r/visionmedia/page.js?branch=master)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/visionmedia/page.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)

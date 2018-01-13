@@ -15,6 +15,7 @@
    */
 
   module.exports = page;
+  module.exports.default = page;
 
   /**
    * Detect click event
@@ -79,8 +80,8 @@
    *   page('/from', '/to')
    *   page();
    *
-   * @param {String|Function} path
-   * @param {Function} fn...
+   * @param {string|!Function|!Object} path
+   * @param {Function=} fn
    * @api public
    */
 
@@ -92,7 +93,7 @@
 
     // route <path> to <callback ...>
     if ('function' === typeof fn) {
-      var route = new Route(path);
+      var route = new Route(/** @type {string} */ (path));
       for (var i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
@@ -114,7 +115,7 @@
 
   /**
    * Current path being processed
-   * @type {String}
+   * @type {string}
    */
   page.current = '';
 
@@ -132,7 +133,7 @@
   /**
    * Get or set basepath to `path`.
    *
-   * @param {String} path
+   * @param {string} path
    * @api public
    */
 
@@ -188,10 +189,11 @@
   /**
    * Show `path` with optional `state` object.
    *
-   * @param {String} path
-   * @param {Object} state
-   * @param {Boolean} dispatch
-   * @return {Context}
+   * @param {string} path
+   * @param {Object=} state
+   * @param {boolean=} dispatch
+   * @param {boolean=} push
+   * @return {!Context}
    * @api public
    */
 
@@ -207,8 +209,8 @@
    * Goes back in the history
    * Back should always let the current route push state and then go back.
    *
-   * @param {String} path - fallback path to go back if no more history exists, if undefined defaults to page.base
-   * @param {Object} [state]
+   * @param {string} path - fallback path to go back if no more history exists, if undefined defaults to page.base
+   * @param {Object=} state
    * @api public
    */
 
@@ -234,8 +236,8 @@
    * Register route to redirect from one path to other
    * or just redirect to another route
    *
-   * @param {String} from - if param 'to' is undefined redirects to 'from'
-   * @param {String} [to]
+   * @param {string} from - if param 'to' is undefined redirects to 'from'
+   * @param {string=} to
    * @api public
    */
   page.redirect = function(from, to) {
@@ -243,7 +245,7 @@
     if ('string' === typeof from && 'string' === typeof to) {
       page(from, function(e) {
         setTimeout(function() {
-          page.replace(to);
+          page.replace(/** @type {!string} */ (to));
         }, 0);
       });
     }
@@ -259,9 +261,11 @@
   /**
    * Replace `path` with optional `state` object.
    *
-   * @param {String} path
-   * @param {Object} state
-   * @return {Context}
+   * @param {string} path
+   * @param {Object=} state
+   * @param {boolean=} init
+   * @param {boolean=} dispatch
+   * @return {!Context}
    * @api public
    */
 
@@ -278,10 +282,9 @@
   /**
    * Dispatch the given `ctx`.
    *
-   * @param {Object} ctx
+   * @param {Context} ctx
    * @api private
    */
-
   page.dispatch = function(ctx) {
     var prev = prevContext,
       i = 0,
@@ -321,7 +324,6 @@
    * @param {Context} ctx
    * @api private
    */
-
   function unhandled(ctx) {
     if (ctx.handled) return;
     var current;
@@ -360,7 +362,7 @@
    * Accommodates whitespace in both x-www-form-urlencoded
    * and regular percent-encoded form.
    *
-   * @param {str} URL component to decode
+   * @param {string} val - URL component to decode
    */
   function decodeURLEncodedURIComponent(val) {
     if (typeof val !== 'string') { return val; }
@@ -371,8 +373,9 @@
    * Initialize a new "request" `Context`
    * with the given `path` and optional initial `state`.
    *
-   * @param {String} path
-   * @param {Object} state
+   * @constructor
+   * @param {string} path
+   * @param {Object=} state
    * @api public
    */
 
@@ -384,7 +387,7 @@
     this.path = path.replace(base, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
-    this.title = document.title;
+    this.title = (typeof document !== 'undefined' && document.title);
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
@@ -438,8 +441,9 @@
    *   - `sensitive`    enable case-sensitive routes
    *   - `strict`       enable strict matching for trailing slashes
    *
-   * @param {String} path
-   * @param {Object} options.
+   * @constructor
+   * @param {string} path
+   * @param {Object=} options
    * @api private
    */
 
@@ -449,8 +453,7 @@
     this.method = 'GET';
     this.regexp = pathtoRegexp(this.path,
       this.keys = [],
-      options.sensitive,
-      options.strict);
+      options);
   }
 
   /**
@@ -480,9 +483,9 @@
    * Check if this route matches `path`, if so
    * populate `params`.
    *
-   * @param {String} path
+   * @param {string} path
    * @param {Object} params
-   * @return {Boolean}
+   * @return {boolean}
    * @api private
    */
 
@@ -548,7 +551,8 @@
 
 
     // ensure link
-    var el = e.target;
+    // use shadow dom when available
+    var el = e.path ? e.path[0] : e.target;
     while (el && 'A' !== el.nodeName) el = el.parentNode;
     if (!el || 'A' !== el.nodeName) return;
 
@@ -578,6 +582,8 @@
 
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');
+
+    path = path[0] !== '/' ? '/' + path : path;
 
     // strip leading "/[drive letter]:" on NW.js on Windows
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
@@ -710,12 +716,16 @@ process.chdir = function (dir) {
 };
 
 },{}],3:[function(require,module,exports){
-var isArray = require('isarray');
+var isarray = require('isarray')
 
 /**
  * Expose `pathToRegexp`.
  */
-module.exports = pathToRegexp;
+module.exports = pathToRegexp
+module.exports.parse = parse
+module.exports.compile = compile
+module.exports.tokensToFunction = tokensToFunction
+module.exports.tokensToRegExp = tokensToRegExp
 
 /**
  * The main path matching regexp utility.
@@ -729,12 +739,175 @@ var PATH_REGEXP = new RegExp([
   // Match Express-style parameters and un-named parameters with a prefix
   // and optional suffixes. Matches appear as:
   //
-  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?"]
-  // "/route(\\d+)" => [undefined, undefined, undefined, "\d+", undefined]
-  '([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?',
-  // Match regexp special characters that are always escaped.
-  '([.+*?=^!:${}()[\\]|\\/])'
-].join('|'), 'g');
+  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?", undefined]
+  // "/route(\\d+)"  => [undefined, undefined, undefined, "\d+", undefined, undefined]
+  // "/*"            => ["/", undefined, undefined, undefined, undefined, "*"]
+  '([\\/.])?(?:(?:\\:(\\w+)(?:\\(((?:\\\\.|[^()])+)\\))?|\\(((?:\\\\.|[^()])+)\\))([+*?])?|(\\*))'
+].join('|'), 'g')
+
+/**
+ * Parse a string for the raw tokens.
+ *
+ * @param  {String} str
+ * @return {Array}
+ */
+function parse (str) {
+  var tokens = []
+  var key = 0
+  var index = 0
+  var path = ''
+  var res
+
+  while ((res = PATH_REGEXP.exec(str)) != null) {
+    var m = res[0]
+    var escaped = res[1]
+    var offset = res.index
+    path += str.slice(index, offset)
+    index = offset + m.length
+
+    // Ignore already escaped sequences.
+    if (escaped) {
+      path += escaped[1]
+      continue
+    }
+
+    // Push the current path onto the tokens.
+    if (path) {
+      tokens.push(path)
+      path = ''
+    }
+
+    var prefix = res[2]
+    var name = res[3]
+    var capture = res[4]
+    var group = res[5]
+    var suffix = res[6]
+    var asterisk = res[7]
+
+    var repeat = suffix === '+' || suffix === '*'
+    var optional = suffix === '?' || suffix === '*'
+    var delimiter = prefix || '/'
+    var pattern = capture || group || (asterisk ? '.*' : '[^' + delimiter + ']+?')
+
+    tokens.push({
+      name: name || key++,
+      prefix: prefix || '',
+      delimiter: delimiter,
+      optional: optional,
+      repeat: repeat,
+      pattern: escapeGroup(pattern)
+    })
+  }
+
+  // Match any characters still remaining.
+  if (index < str.length) {
+    path += str.substr(index)
+  }
+
+  // If the path exists, push it onto the end.
+  if (path) {
+    tokens.push(path)
+  }
+
+  return tokens
+}
+
+/**
+ * Compile a string to a template function for the path.
+ *
+ * @param  {String}   str
+ * @return {Function}
+ */
+function compile (str) {
+  return tokensToFunction(parse(str))
+}
+
+/**
+ * Expose a method for transforming tokens into the path function.
+ */
+function tokensToFunction (tokens) {
+  // Compile all the tokens into regexps.
+  var matches = new Array(tokens.length)
+
+  // Compile all the patterns before compilation.
+  for (var i = 0; i < tokens.length; i++) {
+    if (typeof tokens[i] === 'object') {
+      matches[i] = new RegExp('^' + tokens[i].pattern + '$')
+    }
+  }
+
+  return function (obj) {
+    var path = ''
+    var data = obj || {}
+
+    for (var i = 0; i < tokens.length; i++) {
+      var token = tokens[i]
+
+      if (typeof token === 'string') {
+        path += token
+
+        continue
+      }
+
+      var value = data[token.name]
+      var segment
+
+      if (value == null) {
+        if (token.optional) {
+          continue
+        } else {
+          throw new TypeError('Expected "' + token.name + '" to be defined')
+        }
+      }
+
+      if (isarray(value)) {
+        if (!token.repeat) {
+          throw new TypeError('Expected "' + token.name + '" to not repeat, but received "' + value + '"')
+        }
+
+        if (value.length === 0) {
+          if (token.optional) {
+            continue
+          } else {
+            throw new TypeError('Expected "' + token.name + '" to not be empty')
+          }
+        }
+
+        for (var j = 0; j < value.length; j++) {
+          segment = encodeURIComponent(value[j])
+
+          if (!matches[i].test(segment)) {
+            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
+          }
+
+          path += (j === 0 ? token.prefix : token.delimiter) + segment
+        }
+
+        continue
+      }
+
+      segment = encodeURIComponent(value)
+
+      if (!matches[i].test(segment)) {
+        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
+      }
+
+      path += token.prefix + segment
+    }
+
+    return path
+  }
+}
+
+/**
+ * Escape a regular expression string.
+ *
+ * @param  {String} str
+ * @return {String}
+ */
+function escapeString (str) {
+  return str.replace(/([.+*?=^!:${}()[\]|\/])/g, '\\$1')
+}
 
 /**
  * Escape the capturing group by escaping special characters and meaning.
@@ -743,7 +916,7 @@ var PATH_REGEXP = new RegExp([
  * @return {String}
  */
 function escapeGroup (group) {
-  return group.replace(/([=!:$\/()])/g, '\\$1');
+  return group.replace(/([=!:$\/()])/g, '\\$1')
 }
 
 /**
@@ -754,8 +927,8 @@ function escapeGroup (group) {
  * @return {RegExp}
  */
 function attachKeys (re, keys) {
-  re.keys = keys;
-  return re;
+  re.keys = keys
+  return re
 }
 
 /**
@@ -765,7 +938,7 @@ function attachKeys (re, keys) {
  * @return {String}
  */
 function flags (options) {
-  return options.sensitive ? '' : 'i';
+  return options.sensitive ? '' : 'i'
 }
 
 /**
@@ -777,20 +950,22 @@ function flags (options) {
  */
 function regexpToRegexp (path, keys) {
   // Use a negative lookahead to match only capturing groups.
-  var groups = path.source.match(/\((?!\?)/g);
+  var groups = path.source.match(/\((?!\?)/g)
 
   if (groups) {
     for (var i = 0; i < groups.length; i++) {
       keys.push({
-        name:      i,
+        name: i,
+        prefix: null,
         delimiter: null,
-        optional:  false,
-        repeat:    false
-      });
+        optional: false,
+        repeat: false,
+        pattern: null
+      })
     }
   }
 
-  return attachKeys(path, keys);
+  return attachKeys(path, keys)
 }
 
 /**
@@ -802,61 +977,101 @@ function regexpToRegexp (path, keys) {
  * @return {RegExp}
  */
 function arrayToRegexp (path, keys, options) {
-  var parts = [];
+  var parts = []
 
   for (var i = 0; i < path.length; i++) {
-    parts.push(pathToRegexp(path[i], keys, options).source);
+    parts.push(pathToRegexp(path[i], keys, options).source)
   }
 
-  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
-  return attachKeys(regexp, keys);
+  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options))
+
+  return attachKeys(regexp, keys)
 }
 
 /**
- * Replace the specific tags with regexp strings.
+ * Create a path regexp from string input.
  *
  * @param  {String} path
  * @param  {Array}  keys
- * @return {String}
+ * @param  {Object} options
+ * @return {RegExp}
  */
-function replacePath (path, keys) {
-  var index = 0;
+function stringToRegexp (path, keys, options) {
+  var tokens = parse(path)
+  var re = tokensToRegExp(tokens, options)
 
-  function replace (_, escaped, prefix, key, capture, group, suffix, escape) {
-    if (escaped) {
-      return escaped;
+  // Attach keys back to the regexp.
+  for (var i = 0; i < tokens.length; i++) {
+    if (typeof tokens[i] !== 'string') {
+      keys.push(tokens[i])
     }
-
-    if (escape) {
-      return '\\' + escape;
-    }
-
-    var repeat   = suffix === '+' || suffix === '*';
-    var optional = suffix === '?' || suffix === '*';
-
-    keys.push({
-      name:      key || index++,
-      delimiter: prefix || '/',
-      optional:  optional,
-      repeat:    repeat
-    });
-
-    prefix = prefix ? ('\\' + prefix) : '';
-    capture = escapeGroup(capture || group || '[^' + (prefix || '\\/') + ']+?');
-
-    if (repeat) {
-      capture = capture + '(?:' + prefix + capture + ')*';
-    }
-
-    if (optional) {
-      return '(?:' + prefix + '(' + capture + '))?';
-    }
-
-    // Basic parameter support.
-    return prefix + '(' + capture + ')';
   }
 
-  return path.replace(PATH_REGEXP, replace);
+  return attachKeys(re, keys)
+}
+
+/**
+ * Expose a function for taking tokens and returning a RegExp.
+ *
+ * @param  {Array}  tokens
+ * @param  {Array}  keys
+ * @param  {Object} options
+ * @return {RegExp}
+ */
+function tokensToRegExp (tokens, options) {
+  options = options || {}
+
+  var strict = options.strict
+  var end = options.end !== false
+  var route = ''
+  var lastToken = tokens[tokens.length - 1]
+  var endsWithSlash = typeof lastToken === 'string' && /\/$/.test(lastToken)
+
+  // Iterate over the tokens and create our regexp string.
+  for (var i = 0; i < tokens.length; i++) {
+    var token = tokens[i]
+
+    if (typeof token === 'string') {
+      route += escapeString(token)
+    } else {
+      var prefix = escapeString(token.prefix)
+      var capture = token.pattern
+
+      if (token.repeat) {
+        capture += '(?:' + prefix + capture + ')*'
+      }
+
+      if (token.optional) {
+        if (prefix) {
+          capture = '(?:' + prefix + '(' + capture + '))?'
+        } else {
+          capture = '(' + capture + ')?'
+        }
+      } else {
+        capture = prefix + '(' + capture + ')'
+      }
+
+      route += capture
+    }
+  }
+
+  // In non-strict mode we allow a slash at the end of match. If the path to
+  // match already ends with a slash, we remove it for consistency. The slash
+  // is valid at the end of a path match, not in the middle. This is important
+  // in non-ending mode, where "/test/" shouldn't match "/test//route".
+  if (!strict) {
+    route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?'
+  }
+
+  if (end) {
+    route += '$'
+  } else {
+    // In non-ending mode, we need the capturing groups to match as much as
+    // possible by using a positive lookahead to the end or next path segment.
+    route += strict && endsWithSlash ? '' : '(?=\\/|$)'
+  }
+
+  return new RegExp('^' + route, flags(options))
 }
 
 /**
@@ -872,45 +1087,24 @@ function replacePath (path, keys) {
  * @return {RegExp}
  */
 function pathToRegexp (path, keys, options) {
-  keys = keys || [];
+  keys = keys || []
 
-  if (!isArray(keys)) {
-    options = keys;
-    keys = [];
+  if (!isarray(keys)) {
+    options = keys
+    keys = []
   } else if (!options) {
-    options = {};
+    options = {}
   }
 
   if (path instanceof RegExp) {
-    return regexpToRegexp(path, keys, options);
+    return regexpToRegexp(path, keys, options)
   }
 
-  if (isArray(path)) {
-    return arrayToRegexp(path, keys, options);
+  if (isarray(path)) {
+    return arrayToRegexp(path, keys, options)
   }
 
-  var strict = options.strict;
-  var end = options.end !== false;
-  var route = replacePath(path, keys);
-  var endsWithSlash = path.charAt(path.length - 1) === '/';
-
-  // In non-strict mode we allow a slash at the end of match. If the path to
-  // match already ends with a slash, we remove it for consistency. The slash
-  // is valid at the end of a path match, not in the middle. This is important
-  // in non-ending mode, where "/test/" shouldn't match "/test//route".
-  if (!strict) {
-    route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?';
-  }
-
-  if (end) {
-    route += '$';
-  } else {
-    // In non-ending mode, we need the capturing groups to match as much as
-    // possible by using a positive lookahead to the end or next path segment.
-    route += strict && endsWithSlash ? '' : '(?=\\/|$)';
-  }
-
-  return attachKeys(new RegExp('^' + route, flags(options)), keys);
+  return stringToRegexp(path, keys, options)
 }
 
 },{"isarray":4}],4:[function(require,module,exports){

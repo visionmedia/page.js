@@ -13,6 +13,10 @@
    */
 
   module.exports = page;
+  module.exports.default = page;
+  module.exports.Context = Context;
+  module.exports.Route = Route;
+  module.exports.sameOrigin = sameOrigin;
 
   /**
    * Detect click event
@@ -46,6 +50,12 @@
   var base = '';
 
   /**
+   * Strict path matching.
+   */
+
+  var strict = false;
+
+  /**
    * Running flag.
    */
 
@@ -77,8 +87,8 @@
    *   page('/from', '/to')
    *   page();
    *
-   * @param {String|Function} path
-   * @param {Function} fn...
+   * @param {string|!Function|!Object} path
+   * @param {Function=} fn
    * @api public
    */
 
@@ -90,7 +100,7 @@
 
     // route <path> to <callback ...>
     if ('function' === typeof fn) {
-      var route = new Route(path);
+      var route = new Route(/** @type {string} */ (path));
       for (var i = 1; i < arguments.length; ++i) {
         page.callbacks.push(route.middleware(arguments[i]));
       }
@@ -112,7 +122,7 @@
 
   /**
    * Current path being processed
-   * @type {String}
+   * @type {string}
    */
   page.current = '';
 
@@ -130,13 +140,25 @@
   /**
    * Get or set basepath to `path`.
    *
-   * @param {String} path
+   * @param {string} path
    * @api public
    */
 
   page.base = function(path) {
     if (0 === arguments.length) return base;
     base = path;
+  };
+
+  /**
+   * Get or set strict path matching to `enable`
+   *
+   * @param {boolean} enable
+   * @api public
+   */
+
+  page.strict = function(enable) {
+    if (0 === arguments.length) return strict;
+    strict = enable;
   };
 
   /**
@@ -186,10 +208,11 @@
   /**
    * Show `path` with optional `state` object.
    *
-   * @param {String} path
-   * @param {Object} state
-   * @param {Boolean} dispatch
-   * @return {Context}
+   * @param {string} path
+   * @param {Object=} state
+   * @param {boolean=} dispatch
+   * @param {boolean=} push
+   * @return {!Context}
    * @api public
    */
 
@@ -207,8 +230,8 @@
    * Goes back in the history
    * Back should always let the current route push state and then go back.
    *
-   * @param {String} path - fallback path to go back if no more history exists, if undefined defaults to page.base
-   * @param {Object} [state]
+   * @param {string} path - fallback path to go back if no more history exists, if undefined defaults to page.base
+   * @param {Object=} state
    * @api public
    */
 
@@ -234,8 +257,8 @@
    * Register route to redirect from one path to other
    * or just redirect to another route
    *
-   * @param {String} from - if param 'to' is undefined redirects to 'from'
-   * @param {String} [to]
+   * @param {string} from - if param 'to' is undefined redirects to 'from'
+   * @param {string=} to
    * @api public
    */
   page.redirect = function(from, to) {
@@ -243,7 +266,7 @@
     if ('string' === typeof from && 'string' === typeof to) {
       page(from, function(e) {
         setTimeout(function() {
-          page.replace(to);
+          page.replace(/** @type {!string} */ (to));
         }, 0);
       });
     }
@@ -259,9 +282,11 @@
   /**
    * Replace `path` with optional `state` object.
    *
-   * @param {String} path
-   * @param {Object} state
-   * @return {Context}
+   * @param {string} path
+   * @param {Object=} state
+   * @param {boolean=} init
+   * @param {boolean=} dispatch
+   * @return {!Context}
    * @api public
    */
 
@@ -280,7 +305,7 @@
   /**
    * Dispatch the given `ctx`.
    *
-   * @param {Object} ctx
+   * @param {Context} ctx
    * @api private
    */
 
@@ -320,7 +345,6 @@
    * @param {Context} ctx
    * @api private
    */
-
   function unhandled(ctx) {
     if (ctx.handled) return;
     var current;
@@ -359,7 +383,7 @@
    * Accommodates whitespace in both x-www-form-urlencoded
    * and regular percent-encoded form.
    *
-   * @param {str} URL component to decode
+   * @param {string} val - URL component to decode
    */
   function decodeURLEncodedURIComponent(val) {
     if (typeof val !== 'string') { return val; }
@@ -370,8 +394,9 @@
    * Initialize a new "request" `Context`
    * with the given `path` and optional initial `state`.
    *
-   * @param {String} path
-   * @param {Object} state
+   * @constructor
+   * @param {string} path
+   * @param {Object=} state
    * @api public
    */
 
@@ -383,7 +408,7 @@
     this.path = path.replace(base, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
-    this.title = document.title;
+    this.title = (typeof document !== 'undefined' && document.title);
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
@@ -415,7 +440,9 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if(typeof history !== 'undefined') {
+      history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -425,7 +452,9 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if(typeof history !== 'undefined') {
+      history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -437,19 +466,20 @@
    *   - `sensitive`    enable case-sensitive routes
    *   - `strict`       enable strict matching for trailing slashes
    *
-   * @param {String} path
-   * @param {Object} options.
+   * @constructor
+   * @param {string} path
+   * @param {Object=} options
    * @api private
    */
 
   function Route(path, options) {
     options = options || {};
+    options.strict = options.strict || strict;
     this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
     this.regexp = pathtoRegexp(this.path,
       this.keys = [],
-      options.sensitive,
-      options.strict);
+      options);
   }
 
   /**
@@ -479,9 +509,9 @@
    * Check if this route matches `path`, if so
    * populate `params`.
    *
-   * @param {String} path
+   * @param {string} path
    * @param {Object} params
-   * @return {Boolean}
+   * @return {boolean}
    * @api private
    */
 
@@ -538,7 +568,6 @@
    */
 
   function onclick(e) {
-
     if (1 !== which(e)) return;
 
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
@@ -547,7 +576,8 @@
 
 
     // ensure link
-    var el = e.target;
+    // use shadow dom when available
+    var el = e.path ? e.path[0] : e.target;
     while (el && 'A' !== el.nodeName) el = el.parentNode;
     if (!el || 'A' !== el.nodeName) return;
 
@@ -578,6 +608,8 @@
     // rebuild path
     var path = el.pathname + el.search + (el.hash || '');
 
+    path = path[0] !== '/' ? '/' + path : path;
+
     // strip leading "/[drive letter]:" on NW.js on Windows
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
       path = path.replace(/^\/[a-zA-Z]:\//, '/');
@@ -604,7 +636,7 @@
 
   function which(e) {
     e = e || window.event;
-    return null === e.which ? e.button : e.which;
+    return null == e.which ? e.button : e.which;
   }
 
   /**

@@ -3,8 +3,8 @@
 Tiny Express-inspired client-side router.
 
  [![Build Status](https://travis-ci.org/visionmedia/page.js.svg?branch=master)](https://travis-ci.org/visionmedia/page.js)
-[![Coverage Status](https://coveralls.io/repos/visionmedia/page.js/badge.png?branch=master)](https://coveralls.io/r/visionmedia/page.js?branch=master)
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/visionmedia/page.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Coverage Status](https://coveralls.io/repos/visionmedia/page.js/badge.svg?branch=master)](https://coveralls.io/r/visionmedia/page.js?branch=master)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/visionmedia/page.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ```js
 page('/', index)
@@ -25,12 +25,6 @@ page()
   $ npm install page # for browserify
   $ component install visionmedia/page.js
   $ bower install visionmedia/page.js
-  ```
-
-  Via CDN and script tag:
-
-  ```html
-  <script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
   ```
 
 ## Running examples
@@ -157,6 +151,11 @@ page('/default');
   Get or set the base `path`. For example if page.js
   is operating within `/blog/*` set the base path to "/blog".
 
+### page.strict([enable])
+
+  Get or set the strict path matching mode to `enable`. If enabled
+  `/blog` will not match "/blog/" and `/blog/` will not match "/blog".
+
 ### page.exit(path, callback[, callback ...])
 
   Defines an exit route mapping `path` to the given `callback(s)`.
@@ -170,7 +169,7 @@ page('/sidebar', function(ctx, next) {
   next()
 })
 
-page.exit('/sidebar', function(next) {
+page.exit('/sidebar', function(ctx, next) {
   sidebar.open = false
   next()
 })
@@ -345,7 +344,7 @@ page('/user/:id', load, show)
   the browser the route would be invoked
   and the query would be made yet-again.
 
-  An example implemenation might look as follows:
+  An example implementation might look as follows:
 
 ```js
 function show(ctx){
@@ -507,7 +506,7 @@ Before calling `page.base()` use: `history.redirect([prefixType], [basepath])` -
 ### Pull Requests
 
   * Break commits into a single objective.
-  * An objective should be a chunk of code that is related but requires explaination.
+  * An objective should be a chunk of code that is related but requires explanation.
   * Commits should be in the form of what-it-is: how-it-does-it and or why-it's-needed or what-it-is for trivial changes
   * Pull requests and commits should be a guide to the code.
 

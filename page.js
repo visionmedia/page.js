@@ -420,6 +420,7 @@
   Context.prototype.pushState = function() {
     page.len++;
     history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    document.title = this.title;
   };
 
   /**
@@ -430,6 +431,7 @@
 
   Context.prototype.save = function() {
     history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    document.title = this.title;
   };
 
   /**
@@ -567,7 +569,11 @@
     var link = el.getAttribute('href');
     if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
-
+    // prevent handling links with the same url
+    if (el.pathname + el.search === location.pathname + location.search) {
+      e.preventDefault();
+      return;
+    }
 
     // Check for mailto: in the href
     if (link && link.indexOf('mailto:') > -1) return;

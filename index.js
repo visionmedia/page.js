@@ -649,14 +649,10 @@
    * Convert to a URL object
    */
   function toURL(href) {
-    if(typeof URL === "function") {
-      if(href.indexOf("http") !== 0) {
-        return new URL(href, "http://example.com");
-      }
-
-      return new URL(href);
+    if(typeof URL === 'function') {
+      return new URL(href, location.toString());
     } else {
-      var anc = document.createElement("a");
+      var anc = document.createElement('a');
       anc.href = href;
       return anc;
     }

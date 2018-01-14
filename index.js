@@ -13,6 +13,10 @@
    */
 
   module.exports = page;
+  module.exports.default = page;
+  module.exports.Context = Context;
+  module.exports.Route = Route;
+  module.exports.sameOrigin = sameOrigin;
 
   /**
    * Detect click event
@@ -44,6 +48,12 @@
    */
 
   var base = '';
+
+  /**
+   * Strict path matching.
+   */
+
+  var strict = false;
 
   /**
    * Running flag.
@@ -140,6 +150,18 @@
   };
 
   /**
+   * Get or set strict path matching to `enable`
+   *
+   * @param {boolean} enable
+   * @api public
+   */
+
+  page.strict = function(enable) {
+    if (0 === arguments.length) return strict;
+    strict = enable;
+  };
+
+  /**
    * Bind with the given `options`.
    *
    * Options:
@@ -195,9 +217,11 @@
    */
 
   page.show = function(path, state, dispatch, push) {
-    var ctx = new Context(path, state);
+    var ctx = new Context(path, state),
+      prev = prevContext;
+    prevContext = ctx;
     page.current = ctx.path;
-    if (false !== dispatch) page.dispatch(ctx);
+    if (false !== dispatch) page.dispatch(ctx, prev);
     if (false !== ctx.handled && false !== push) ctx.pushState();
     return ctx;
   };
@@ -268,11 +292,13 @@
 
 
   page.replace = function(path, state, init, dispatch) {
-    var ctx = new Context(path, state);
+    var ctx = new Context(path, state),
+      prev = prevContext;
+    prevContext = ctx;
     page.current = ctx.path;
     ctx.init = init;
     ctx.save(); // save before dispatching, which may redirect
-    if (false !== dispatch) page.dispatch(ctx);
+    if (false !== dispatch) page.dispatch(ctx, prev);
     return ctx;
   };
 
@@ -282,12 +308,10 @@
    * @param {Context} ctx
    * @api private
    */
-  page.dispatch = function(ctx) {
-    var prev = prevContext,
-      i = 0,
-      j = 0;
 
-    prevContext = ctx;
+  page.dispatch = function(ctx, prev) {
+    var i = 0,
+      j = 0;
 
     function nextExit() {
       var fn = page.exits[j++];
@@ -417,6 +441,9 @@
   Context.prototype.pushState = function() {
     page.len++;
     ('undefined' !== typeof history) && history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if(typeof history !== 'undefined') {
+      history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -427,6 +454,9 @@
 
   Context.prototype.save = function() {
     ('undefined' !== typeof history) && history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if(typeof history !== 'undefined') {
+      history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    }
   };
 
   /**
@@ -446,6 +476,7 @@
 
   function Route(path, options) {
     options = options || {};
+    options.strict = options.strict || strict;
     this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
     this.regexp = pathtoRegexp(this.path,
@@ -539,7 +570,6 @@
    */
 
   function onclick(e) {
-
     if (1 !== which(e)) return;
 
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
@@ -550,10 +580,15 @@
     // ensure link
     // use shadow dom when available
     var el = e.path ? e.path[0] : e.target;
-    while (el && 'A' !== el.nodeName) el = el.parentNode;
-    if (!el || 'A' !== el.nodeName) return;
 
+    // continue ensure link
+    // el.nodeName for svg links are 'a' instead of 'A'
+    while (el && 'A' !== el.nodeName.toUpperCase()) el = el.parentNode;
+    if (!el || 'A' !== el.nodeName.toUpperCase()) return;
 
+    // check if link is inside an svg
+    // in this case, both href and target are always inside an object
+    var svg = (typeof el.href === 'object') && el.href.constructor.name === 'SVGAnimatedString';
 
     // Ignore if tag has
     // 1. "download" attribute
@@ -564,21 +599,24 @@
     var link = el.getAttribute('href');
     if (!hashbang && ('undefined' !== typeof location) && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
-
-
     // Check for mailto: in the href
     if (link && link.indexOf('mailto:') > -1) return;
 
     // check target
-    if (el.target) return;
+    // svg target is an object and its desired value is in .baseVal property
+    if (svg ? el.target.baseVal : el.target) return;
 
     // x-origin
-    if (!sameOrigin(el.href)) return;
-
-
+    // note: svg links that are not relative don't call click events (and skip page.js)
+    // consequently, all svg links tested inside page.js are relative and in the same origin
+    if (!svg && !sameOrigin(el.href)) return;
 
     // rebuild path
-    var path = el.pathname + el.search + (el.hash || '');
+    // There aren't .pathname and .search properties in svg links, so we use href
+    // Also, svg href is an object and its desired value is in .baseVal property
+    var path = svg ? el.href.baseVal : (el.pathname + el.search + (el.hash || ''));
+
+    path = path[0] !== '/' ? '/' + path : path;
 
     // strip leading "/[drive letter]:" on NW.js on Windows
     if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
@@ -607,6 +645,21 @@
   function which(e) {
     e = e || ('undefined' !== typeof window && window.event);
     return null === e.which ? e.button : e.which;
+    e = e || window.event;
+    return null == e.which ? e.button : e.which;
+  }
+
+  /**
+   * Convert to a URL object
+   */
+  function toURL(href) {
+    if(typeof URL === 'function') {
+      return new URL(href, location.toString());
+    } else {
+      var anc = document.createElement('a');
+      anc.href = href;
+      return anc;
+    }
   }
 
   /**
@@ -618,6 +671,12 @@
     var origin = location.protocol + '//' + location.hostname;
     if (location.port) origin += ':' + location.port;
     return (href && (0 === href.indexOf(origin)));
+    if(!href) return false;
+    var url = toURL(href);
+
+    return location.protocol === url.protocol &&
+      location.hostname === url.hostname &&
+      location.port === url.port;
   }
 
   page.sameOrigin = sameOrigin;

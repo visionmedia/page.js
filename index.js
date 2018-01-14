@@ -579,7 +579,7 @@
     // use shadow dom when available
     var el = e.path ? e.path[0] : e.target;
 
-    // continue ensure link 
+    // continue ensure link
     // el.nodeName for svg links are 'a' instead of 'A'
     while (el && 'A' !== el.nodeName.toUpperCase()) el = el.parentNode;
     if (!el || 'A' !== el.nodeName.toUpperCase()) return;
@@ -646,13 +646,29 @@
   }
 
   /**
+   * Convert to a URL object
+   */
+  function toURL(href) {
+    if(typeof URL === 'function') {
+      return new URL(href, location.toString());
+    } else {
+      var anc = document.createElement('a');
+      anc.href = href;
+      return anc;
+    }
+  }
+
+  /**
    * Check if `href` is the same origin.
    */
 
   function sameOrigin(href) {
-    var origin = location.protocol + '//' + location.hostname;
-    if (location.port) origin += ':' + location.port;
-    return (href && (0 === href.indexOf(origin)));
+    if(!href) return false;
+    var url = toURL(href);
+
+    return location.protocol === url.protocol &&
+      location.hostname === url.hostname &&
+      location.port === url.port;
   }
 
   page.sameOrigin = sameOrigin;

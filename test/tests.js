@@ -43,6 +43,7 @@
           bubbles: true,
           button: 1
         });
+        Object.defineProperty(event, 'which', { value: null });
       } else {
         event = document.createEvent('MouseEvents');
 
@@ -86,6 +87,7 @@
       html += '      <li><a class="contact" href="./contact">/contact</a></li>';
       html += '      <li><a class="contact-me" href="./contact/me">/contact/me</a></li>';
       html += '      <li><a class="not-found" href="./not-found?foo=bar">/not-found</a></li>';
+      html += '      <li><a class="diff-domain" href="http://example.com.uk/diff/domain">another domain</a></li>';
       html += '</ul>';
 
       htmlWrapper.innerHTML = html;
@@ -405,6 +407,19 @@
           fireEvent($('.whoop'), 'click');
         });
 
+        it('should not fire when navigating to a different domain', function(done){
+          page('/diff-domain', function(ctx){
+            expect(true).to.equal(false);
+          });
+
+          document.addEventListener('click', function onDocClick(ev){
+            ev.preventDefault();
+            document.removeEventListener('click', onDocClick);
+            done();
+          });
+
+          fireEvent($('.diff-domain'), 'click');
+        });
       });
 
 

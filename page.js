@@ -26,7 +26,7 @@
 
   var isDocument = ('undefined' !== typeof document);
   var isWindow = ('undefined' !== typeof window);
-  var isHistory = ('undefined' !== typeof history);
+  var hasHistory = ('undefined' !== typeof history);
 
   /**
    * Detect click event
@@ -38,8 +38,7 @@
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
 
-  var location = isWindow && (window.history.location || window.location);
-  var isLocation = !!location;
+  var isLocation = isWindow && !!(window.history.location || window.location);
 
   /**
    * Perform initial dispatch.
@@ -250,7 +249,7 @@
     if (page.len > 0) {
       // this may need more testing to see if all browsers
       // wait for the next tick to go back in history
-      isHistory && history.back();
+      hasHistory && history.back();
       page.len--;
     } else if (path) {
       setTimeout(function() {
@@ -258,7 +257,7 @@
       });
     }else{
       setTimeout(function() {
-        page.show(base, state);
+        page.show(getBase(), state);
       });
     }
   };
@@ -361,7 +360,7 @@
     var current;
 
     if (hashbang) {
-      current = isLocation && base + location.hash.replace('#!', '');
+      current = isLocation && getBase() + location.hash.replace('#!', '');
     } else {
       current = isLocation && location.pathname + location.search;
     }
@@ -412,11 +411,12 @@
    */
 
   function Context(path, state) {
-    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
+    var pageBase = getBase();
+    if ('/' === path[0] && 0 !== path.indexOf(pageBase)) path = pageBase + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
-    this.path = path.replace(base, '') || '/';
+    this.path = path.replace(pageBase, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = (isDocument && document.title);
@@ -451,7 +451,7 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    if (isHistory) {
+    if (hasHistory) {
         history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
@@ -463,7 +463,7 @@
    */
 
   Context.prototype.save = function() {
-    if (isHistory) {
+    if (hasHistory && location.protocol !== 'file:') {
         history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
@@ -634,14 +634,15 @@
 
     // same page
     var orig = path;
+    var pageBase = getBase();
 
-    if (path.indexOf(base) === 0) {
+    if (path.indexOf(pageBase) === 0) {
       path = path.substr(base.length);
     }
 
     if (hashbang) path = path.replace('#!', '');
 
-    if (base && orig === path) return;
+    if (pageBase && orig === path) return;
 
     e.preventDefault();
     page.show(orig);
@@ -682,12 +683,104 @@
       location.port === url.port;
   }
 
+  /**
+   * Gets the `base`, which depends on whether we are using History or
+   * hashbang routing.
+   */
+  function getBase() {
+    if(!!base) return base;
+    return (hashbang && location.protocol === 'file:') ? location.pathname : base;
+  }
+
   page.sameOrigin = sameOrigin;
 
 }).call(this,require('_process'))
-},{"_process":4,"path-to-regexp":3}],2:[function(require,module,exports){
-module.exports = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
+},{"_process":2,"path-to-regexp":3}],2:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+process.nextTick = (function () {
+    var canSetImmediate = typeof window !== 'undefined'
+    && window.setImmediate;
+    var canMutationObserver = typeof window !== 'undefined'
+    && window.MutationObserver;
+    var canPost = typeof window !== 'undefined'
+    && window.postMessage && window.addEventListener
+    ;
+
+    if (canSetImmediate) {
+        return function (f) { return window.setImmediate(f) };
+    }
+
+    var queue = [];
+
+    if (canMutationObserver) {
+        var hiddenDiv = document.createElement("div");
+        var observer = new MutationObserver(function () {
+            var queueList = queue.slice();
+            queue.length = 0;
+            queueList.forEach(function (fn) {
+                fn();
+            });
+        });
+
+        observer.observe(hiddenDiv, { attributes: true });
+
+        return function nextTick(fn) {
+            if (!queue.length) {
+                hiddenDiv.setAttribute('yes', 'no');
+            }
+            queue.push(fn);
+        };
+    }
+
+    if (canPost) {
+        window.addEventListener('message', function (ev) {
+            var source = ev.source;
+            if ((source === window || source === null) && ev.data === 'process-tick') {
+                ev.stopPropagation();
+                if (queue.length > 0) {
+                    var fn = queue.shift();
+                    fn();
+                }
+            }
+        }, true);
+
+        return function nextTick(fn) {
+            queue.push(fn);
+            window.postMessage('process-tick', '*');
+        };
+    }
+
+    return function nextTick(fn) {
+        setTimeout(fn, 0);
+    };
+})();
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
 };
 
 },{}],3:[function(require,module,exports){
@@ -1082,92 +1175,9 @@ function pathToRegexp (path, keys, options) {
   return stringToRegexp(path, keys, options)
 }
 
-},{"isarray":2}],4:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canMutationObserver = typeof window !== 'undefined'
-    && window.MutationObserver;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
-
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
-    }
-
-    var queue = [];
-
-    if (canMutationObserver) {
-        var hiddenDiv = document.createElement("div");
-        var observer = new MutationObserver(function () {
-            var queueList = queue.slice();
-            queue.length = 0;
-            queueList.forEach(function (fn) {
-                fn();
-            });
-        });
-
-        observer.observe(hiddenDiv, { attributes: true });
-
-        return function nextTick(fn) {
-            if (!queue.length) {
-                hiddenDiv.setAttribute('yes', 'no');
-            }
-            queue.push(fn);
-        };
-    }
-
-    if (canPost) {
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
-
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
-    }
-
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
+},{"isarray":4}],4:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
 },{}]},{},[1])(1)

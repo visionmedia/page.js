@@ -645,17 +645,15 @@
   function which(e) {
     e = e || ('undefined' !== typeof window && window.event);
     return null === e.which ? e.button : e.which;
-    e = e || window.event;
-    return null == e.which ? e.button : e.which;
   }
 
   /**
    * Convert to a URL object
    */
   function toURL(href) {
-    if(typeof URL === 'function') {
+    if(typeof URL === 'function' && 'undefined' !== typeof location) {
       return new URL(href, location.toString());
-    } else {
+    } else if ('undefined' !== typeof document) {
       var anc = document.createElement('a');
       anc.href = href;
       return anc;
@@ -667,11 +665,7 @@
    */
 
   function sameOrigin(href) {
-    if ('undefined' === typeof location) return;
-    var origin = location.protocol + '//' + location.hostname;
-    if (location.port) origin += ':' + location.port;
-    return (href && (0 === href.indexOf(origin)));
-    if(!href) return false;
+    if ('undefined' === typeof location || !href) return false;
     var url = toURL(href);
 
     return location.protocol === url.protocol &&

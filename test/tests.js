@@ -8,6 +8,7 @@
     called = false,
     html = '',
     base = '',
+    setbase = true,
     hashbang = false,
     decodeURLComponents = true,
     chai = this.chai,
@@ -15,10 +16,11 @@
     page = this.page,
     baseTag,
     htmlWrapper,
-    $;
+    $,
+    jsdomSupport;
 
   if (isNode) {
-    require('./support/jsdom');
+    jsdomSupport = require('./support/jsdom');
   }
 
   before(function() {
@@ -69,12 +71,14 @@
         called = true;
       });
 
-      if (!baseTag) {
-        baseTag = document.createElement('base');
-        $('head').appendChild(baseTag);
-      }
+      if(setbase) {
+        if (!baseTag) {
+          baseTag = document.createElement('base');
+          $('head').appendChild(baseTag);
+        }
 
-      baseTag.setAttribute('href', (base ? base + '/' : '/'));
+        baseTag.setAttribute('href', (base ? base + '/' : '/'));
+      }
 
       htmlWrapper = document.createElement('div');
 
@@ -93,10 +97,7 @@
       htmlWrapper.innerHTML = html;
       document.body.appendChild(htmlWrapper);
 
-
-
       page(options);
-
     },
     replaceable = function(route) {
       function realCallback(ctx) {
@@ -521,6 +522,7 @@
       page.strict(false);
       page('/');
       base = '';
+      setbase = true;
 
     };
 
@@ -596,6 +598,29 @@
 
     after(function() {
       afterTests();
+    });
+  });
+
+  var describei = jsdomSupport ? describe : describe.skip;
+
+  describei('File protocol', function() {
+    before(function(){
+      jsdomSupport.setup({
+        url: 'file:///var/html/index.html'
+      }, Function.prototype);
+
+      setbase = false;
+      hashbang = true;
+      beforeTests({
+        hashbang: hashbang
+      });
+    });
+
+    it('test', function(){
+      page('/about', function(ctx){
+        expect(ctx.path).to.equal('/about');
+      });
+      page('/about');
     });
   });
 

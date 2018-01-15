@@ -24,7 +24,7 @@
 
   var isDocument = ('undefined' !== typeof document);
   var isWindow = ('undefined' !== typeof window);
-  var isHistory = ('undefined' !== typeof history);
+  var hasHistory = ('undefined' !== typeof history);
 
   /**
    * Detect click event
@@ -36,8 +36,7 @@
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
 
-  var location = isWindow && (window.history.location || window.location);
-  var isLocation = !!location;
+  var isLocation = isWindow && !!(window.history.location || window.location);
 
   /**
    * Perform initial dispatch.
@@ -248,7 +247,7 @@
     if (page.len > 0) {
       // this may need more testing to see if all browsers
       // wait for the next tick to go back in history
-      isHistory && history.back();
+      hasHistory && history.back();
       page.len--;
     } else if (path) {
       setTimeout(function() {
@@ -256,7 +255,7 @@
       });
     }else{
       setTimeout(function() {
-        page.show(base, state);
+        page.show(getBase(), state);
       });
     }
   };
@@ -359,7 +358,7 @@
     var current;
 
     if (hashbang) {
-      current = isLocation && base + location.hash.replace('#!', '');
+      current = isLocation && getBase() + location.hash.replace('#!', '');
     } else {
       current = isLocation && location.pathname + location.search;
     }
@@ -410,11 +409,12 @@
    */
 
   function Context(path, state) {
-    if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
+    var pageBase = getBase();
+    if ('/' === path[0] && 0 !== path.indexOf(pageBase)) path = pageBase + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
-    this.path = path.replace(base, '') || '/';
+    this.path = path.replace(pageBase, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = (isDocument && document.title);
@@ -449,7 +449,7 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    if (isHistory) {
+    if (hasHistory) {
         history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
@@ -461,7 +461,7 @@
    */
 
   Context.prototype.save = function() {
-    if (isHistory) {
+    if (hasHistory && location.protocol !== 'file:') {
         history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
@@ -632,14 +632,15 @@
 
     // same page
     var orig = path;
+    var pageBase = getBase();
 
-    if (path.indexOf(base) === 0) {
+    if (path.indexOf(pageBase) === 0) {
       path = path.substr(base.length);
     }
 
     if (hashbang) path = path.replace('#!', '');
 
-    if (base && orig === path) return;
+    if (pageBase && orig === path) return;
 
     e.preventDefault();
     page.show(orig);
@@ -678,6 +679,15 @@
     return location.protocol === url.protocol &&
       location.hostname === url.hostname &&
       location.port === url.port;
+  }
+
+  /**
+   * Gets the `base`, which depends on whether we are using History or
+   * hashbang routing.
+   */
+  function getBase() {
+    if(!!base) return base;
+    return (hashbang && location.protocol === 'file:') ? location.pathname : base;
   }
 
   page.sameOrigin = sameOrigin;

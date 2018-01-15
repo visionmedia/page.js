@@ -97,10 +97,7 @@
       htmlWrapper.innerHTML = html;
       document.body.appendChild(htmlWrapper);
 
-
-
       page(options);
-
     },
     replaceable = function(route) {
       function realCallback(ctx) {
@@ -525,6 +522,7 @@
       page.strict(false);
       page('/');
       base = '';
+      setbase = true;
 
     };
 

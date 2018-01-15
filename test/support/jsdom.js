@@ -19,6 +19,7 @@ function setupJsdom(options, next) {
   if(jsdom.env) {
     jsdom.env({
       html: html,
+      url: options.url || 'http://example.com',
       done: function(errors, window) {
         setupGlobals(window);
         if (errors) {

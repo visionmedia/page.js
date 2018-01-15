@@ -19,16 +19,25 @@
   module.exports.sameOrigin = sameOrigin;
 
   /**
+   * Short-cuts for global-object checks
+   */
+
+  var isDocument = ('undefined' !== typeof document);
+  var isWindow = ('undefined' !== typeof window);
+  var isHistory = ('undefined' !== typeof history);
+
+  /**
    * Detect click event
    */
-  var clickEvent = ('undefined' !== typeof document) && document.ontouchstart ? 'touchstart' : 'click';
+  var clickEvent = isDocument && document.ontouchstart ? 'touchstart' : 'click';
 
   /**
    * To work properly with the URL
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
 
-  var location = ('undefined' !== typeof window) && (window.history.location || window.location);
+  var location = isWindow && (window.history.location || window.location);
+  var isLocation = !!location;
 
   /**
    * Perform initial dispatch.
@@ -180,13 +189,13 @@
     running = true;
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate) window.addEventListener('popstate', onpopstate, false);
-    if (false !== options.click) {
+    if (false !== options.popstate && isWindow) window.addEventListener('popstate', onpopstate, false);
+    if (false !== options.click && isDocument) {
       document.addEventListener(clickEvent, onclick, false);
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+    var url = (hashbang && isLocation && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -201,8 +210,8 @@
     page.current = '';
     page.len = 0;
     running = false;
-    document.removeEventListener(clickEvent, onclick, false);
-    window.removeEventListener('popstate', onpopstate, false);
+    isDocument && document.removeEventListener(clickEvent, onclick, false);
+    isWindow && window.removeEventListener('popstate', onpopstate, false);
   };
 
   /**
@@ -239,7 +248,7 @@
     if (page.len > 0) {
       // this may need more testing to see if all browsers
       // wait for the next tick to go back in history
-      history.back();
+      isHistory && history.back();
       page.len--;
     } else if (path) {
       setTimeout(function() {
@@ -350,15 +359,15 @@
     var current;
 
     if (hashbang) {
-      current = base + location.hash.replace('#!', '');
+      current = isLocation && base + location.hash.replace('#!', '');
     } else {
-      current = location.pathname + location.search;
+      current = isLocation && location.pathname + location.search;
     }
 
     if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.handled = false;
-    location.href = ctx.canonicalPath;
+    isLocation && (location.href = ctx.canonicalPath);
   }
 
   /**
@@ -408,7 +417,7 @@
     this.path = path.replace(base, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
-    this.title = (typeof document !== 'undefined' && document.title);
+    this.title = (isDocument && document.title);
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
@@ -440,8 +449,8 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    if(typeof history !== 'undefined') {
-      history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (isHistory) {
+        history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
 
@@ -452,8 +461,8 @@
    */
 
   Context.prototype.save = function() {
-    if(typeof history !== 'undefined') {
-      history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (isHistory) {
+        history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
 
@@ -541,10 +550,10 @@
 
   var onpopstate = (function () {
     var loaded = false;
-    if ('undefined' === typeof window) {
+    if ( ! isWindow ) {
       return;
     }
-    if (document.readyState === 'complete') {
+    if (isDocument && document.readyState === 'complete') {
       loaded = true;
     } else {
       window.addEventListener('load', function() {
@@ -558,7 +567,7 @@
       if (e.state) {
         var path = e.state.path;
         page.replace(path, e.state);
-      } else {
+      } else if (isLocation) {
         page.show(location.pathname + location.hash, undefined, undefined, false);
       }
     };
@@ -595,7 +604,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
+    if (!hashbang && isLocation && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
     // Check for mailto: in the href
     if (link && link.indexOf('mailto:') > -1) return;
@@ -641,7 +650,7 @@
    */
 
   function which(e) {
-    e = e || window.event;
+    e = e || (isWindow && window.event);
     return null == e.which ? e.button : e.which;
   }
 
@@ -649,9 +658,9 @@
    * Convert to a URL object
    */
   function toURL(href) {
-    if(typeof URL === 'function') {
+    if(typeof URL === 'function' && isLocation) {
       return new URL(href, location.toString());
-    } else {
+    } else if (isDocument) {
       var anc = document.createElement('a');
       anc.href = href;
       return anc;
@@ -663,7 +672,7 @@
    */
 
   function sameOrigin(href) {
-    if(!href) return false;
+    if(!href || !isLocation) return false;
     var url = toURL(href);
 
     return location.protocol === url.protocol &&

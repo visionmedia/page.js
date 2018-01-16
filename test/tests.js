@@ -499,6 +499,15 @@
           page('/blog/post/something');
         });
 
+        it('should not include hash in ctx.pathname', function(done){
+          page('/contact', function(ctx){
+            expect(ctx.pathname).to.equal('/contact');
+            done();
+          });
+
+          page(hashbang ? '/contact' : '/contact#bang');
+        });
+
         describe('when next() is invoked', function() {
           it('should invoke subsequent matching middleware', function(done) {
 

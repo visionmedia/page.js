@@ -42,14 +42,14 @@
   var fireEvent = function(node, eventName) {
       var event;
 
-      if(typeof window.Event === 'function') {
-        event = new window.MouseEvent(eventName, {
+      if(typeof testWindow().Event === 'function') {
+        event = new testWindow().MouseEvent(eventName, {
           bubbles: true,
           button: 1
         });
         Object.defineProperty(event, 'which', { value: null });
       } else {
-        event = document.createEvent('MouseEvents');
+        event = testWindow().document.createEvent('MouseEvents');
 
         // https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
         event.initEvent(
@@ -366,7 +366,6 @@
       describe('links dispatcher', function() {
 
         it('should invoke the callback', function(done) {
-          //this.timeout(60000);
           page('/about', function() {
             done();
           });

@@ -594,8 +594,6 @@
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
 
-
-
     // ensure link
     // use shadow dom when available
     var el = e.path ? e.path[0] : e.target;
@@ -688,9 +686,10 @@
     if(!href || !isLocation) return false;
     var url = toURL(href);
 
-    return location.protocol === url.protocol &&
-      location.hostname === url.hostname &&
-      location.port === url.port;
+    var loc = pageWindow.location;
+    return loc.protocol === url.protocol &&
+      loc.hostname === url.hostname &&
+      loc.port === url.port;
   }
 
   /**

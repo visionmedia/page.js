@@ -573,6 +573,17 @@
 
     tests();
 
+    it('Using hashbang, url\'s pathname not included in path', function(done){
+      page.stop();
+      page.callbacks = [];
+      page.exits = [];
+      page('/', function(ctx){
+        expect(ctx.path).to.equal('/');
+        done();
+      });
+      page({ hashbang: true, window: frame.contentWindow });
+    });
+
     after(function() {
       hashbang = false;
       afterTests();

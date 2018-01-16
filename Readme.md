@@ -330,6 +330,8 @@ function show(ctx){
 page('/user/:id', load, show)
 ```
 
+**NOTE:** The value of `ctx.params.NAME` is decoded via `decodeURIComponent(sliceOfUrl)`. One exception though is the use of the plus sign (+) in the url, e.g. `/user/john+doe`, which is decoded to a space: `ctx.params.id == 'john doe'`. Also an encoded plus sign (`%2B`) is decoded to a space.
+
 ### Working with state
 
   When working with the `pushState` API,

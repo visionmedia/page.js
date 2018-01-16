@@ -43,7 +43,8 @@
       var event;
 
       if(typeof testWindow().Event === 'function') {
-        event = new testWindow().MouseEvent(eventName, {
+        var MouseEvent = testWindow().MouseEvent;
+        event = new MouseEvent(eventName, {
           bubbles: true,
           button: 1
         });

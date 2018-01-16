@@ -266,11 +266,22 @@
           page.back('/first');
 
         });
+
         it('should decrement page.len on back()', function() {
           var lenAtFirst = page.len;
           page('/second');
           page.back('/first');
           expect(page.len).to.be.equal(lenAtFirst);
+        });
+
+        it('calling back() when there is nothing in the history should go to the given path', function(done){
+          page('/fourth', function(){
+            expect(page.len).to.be.equal(0);
+            done();
+          });
+          page.len = 0;
+          page.back('/fourth');
+
         });
       });
 

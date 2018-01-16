@@ -15,7 +15,7 @@
     expect = this.expect,
     page = this.page,
     baseTag,
-    htmlWrapper,
+    frame,
     $,
     jsdomSupport;
 
@@ -33,21 +33,24 @@
       expect = chai.expect;
     }
 
-    $ = document.querySelector.bind(document);
+    $ = function(sel) {
+      return frame.contentWindow.document.querySelector(sel);
+    };
 
   });
 
   var fireEvent = function(node, eventName) {
       var event;
 
-      if(typeof window.Event === 'function') {
-        event = new window.MouseEvent(eventName, {
+      if(typeof testWindow().Event === 'function') {
+        var MouseEvent = testWindow().MouseEvent;
+        event = new MouseEvent(eventName, {
           bubbles: true,
           button: 1
         });
         Object.defineProperty(event, 'which', { value: null });
       } else {
-        event = document.createEvent('MouseEvents');
+        event = testWindow().document.createEvent('MouseEvents');
 
         // https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
         event.initEvent(
@@ -62,7 +65,10 @@
 
       node.dispatchEvent(event);
     },
-    beforeTests = function(options) {
+    testWindow = function(){
+      return frame.contentWindow;
+    },
+    beforeTests = function(options, done) {
       page.callbacks = [];
       page.exits = [];
       options = options || {};
@@ -71,33 +77,32 @@
         called = true;
       });
 
-      if(setbase) {
-        if (!baseTag) {
-          baseTag = document.createElement('base');
-          $('head').appendChild(baseTag);
+      function onFrameLoad(){
+        if(setbase) {
+          var baseTag = frame.contentWindow.document.createElement('base');
+          frame.contentWindow.document.head.appendChild(baseTag);
+
+          baseTag.setAttribute('href', (base ? base + '/' : '/'));
         }
 
-        baseTag.setAttribute('href', (base ? base + '/' : '/'));
+        options.window = frame.contentWindow;
+        page(options);
+        page(base ? base + '/' : '/');
+        done();
       }
 
-      htmlWrapper = document.createElement('div');
-
-      html += '<ul class="links">';
-      html += '      <li><a class="index" href="./">/</a></li>';
-      html += '      <li><a class="whoop" href="#whoop">#whoop</a></li>';
-      html += '      <li><a class="about" href="./about">/about</a></li>';
-      html += '      <li><a class="link-trailing" href="./link-trailing/">/link-trailing/</a></li>';
-      html += '      <li><a class="link-no-trailing" href="./link-no-trailing">/link-no-trailing</a></li>';
-      html += '      <li><a class="contact" href="./contact">/contact</a></li>';
-      html += '      <li><a class="contact-me" href="./contact/me">/contact/me</a></li>';
-      html += '      <li><a class="not-found" href="./not-found?foo=bar">/not-found</a></li>';
-      html += '      <li><a class="diff-domain" href="http://example.com.uk/diff/domain">another domain</a></li>';
-      html += '</ul>';
-
-      htmlWrapper.innerHTML = html;
-      document.body.appendChild(htmlWrapper);
-
-      page(options);
+      frame = document.createElement('iframe');
+      document.body.appendChild(frame);
+      if(isNode) {
+        var cntn = require('fs').readFileSync(__dirname + '/test-page.html', 'utf8');
+        cntn = cntn.replace('<!doctype html>', '').trim();
+        cntn = cntn.replace('<html lang="en">', '');
+        frame.contentWindow.document.documentElement.innerHTML = cntn;
+        onFrameLoad();
+      } else {
+        frame.src = './test-page.html';
+        frame.addEventListener('load', onFrameLoad);
+      }
     },
     replaceable = function(route) {
       function realCallback(ctx) {
@@ -251,8 +256,9 @@
         it('should move back to history', function(done) {
           first.once(function(){
             var path = hashbang
-              ? location.hash.replace('#!', '')
-              : location.pathname;
+              ? testWindow().location.hash.replace('#!', '')
+              : testWindow().location.pathname;
+            path = path.replace(base, '');
             expect(path).to.be.equal('/first');
             done();
           });
@@ -260,11 +266,22 @@
           page.back('/first');
 
         });
+
         it('should decrement page.len on back()', function() {
           var lenAtFirst = page.len;
           page('/second');
           page.back('/first');
           expect(page.len).to.be.equal(lenAtFirst);
+        });
+
+        it('calling back() when there is nothing in the history should go to the given path', function(done){
+          page('/fourth', function(){
+            expect(page.len).to.be.equal(0);
+            done();
+          });
+          page.len = 0;
+          page.back('/fourth');
+
         });
       });
 
@@ -361,7 +378,6 @@
       describe('links dispatcher', function() {
 
         it('should invoke the callback', function(done) {
-          //this.timeout(60000);
           page('/about', function() {
             done();
           });
@@ -413,9 +429,9 @@
             expect(true).to.equal(false);
           });
 
-          document.addEventListener('click', function onDocClick(ev){
+          testWindow().document.addEventListener('click', function onDocClick(ev){
             ev.preventDefault();
-            document.removeEventListener('click', onDocClick);
+            testWindow().document.removeEventListener('click', onDocClick);
             done();
           });
 
@@ -513,23 +529,20 @@
       });
     },
     afterTests = function() {
-
-      document.body.removeChild(htmlWrapper);
-
       called = false;
       page.stop();
       page.base('');
       page.strict(false);
-      page('/');
+      //page('/');
       base = '';
       setbase = true;
-
+      document.body.removeChild(frame);
     };
 
   describe('Html5 history navigation', function() {
 
-    before(function() {
-      beforeTests();
+    before(function(done) {
+      beforeTests(null, done);
     });
 
     tests();
@@ -542,16 +555,17 @@
 
   describe('Hashbang option enabled', function() {
 
-    before(function() {
+    before(function(done) {
       hashbang = true;
       beforeTests({
         hashbang: hashbang
-      });
+      }, done);
     });
 
     tests();
 
     after(function() {
+      hashbang = false;
       afterTests();
     });
 
@@ -559,10 +573,10 @@
 
   describe('Different Base', function() {
 
-    before(function() {
+    before(function(done) {
       base = '/newBase';
       page.base(base);
-      beforeTests();
+      beforeTests(null, done);
     });
 
     tests();
@@ -574,11 +588,11 @@
   });
 
   describe('URL path component decoding disabled', function() {
-    before(function() {
+    before(function(done) {
       decodeURLComponents = false;
       beforeTests({
         decodeURLComponents: decodeURLComponents
-      });
+      }, done);
     });
 
     tests();
@@ -589,9 +603,9 @@
   });
 
   describe('Strict path matching enabled', function() {
-    before(function() {
+    before(function(done) {
       page.strict(true);
-      beforeTests();
+      beforeTests(null, done);
     });
 
     tests();
@@ -604,7 +618,7 @@
   var describei = jsdomSupport ? describe : describe.skip;
 
   describei('File protocol', function() {
-    before(function(){
+    before(function(done){
       jsdomSupport.setup({
         url: 'file:///var/html/index.html'
       }, Function.prototype);
@@ -613,7 +627,11 @@
       hashbang = true;
       beforeTests({
         hashbang: hashbang
-      });
+      }, done);
+    });
+
+    after(function(){
+      hashbang = false;
     });
 
     it('test', function(){

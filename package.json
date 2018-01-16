@@ -18,13 +18,14 @@
     "serve": "serve test",
     "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
     "prepublish": "npm run make",
-    "make": "browserify index.js --standalone page -o page.js"
+    "make": "browserify index.js --standalone page -o page.js && browserify index.js --standalone page | uglifyjs > page.min.js"
   },
   "dependencies": {
     "path-to-regexp": "~1.2.1"
   },
   "devDependencies": {
     "browserify": "^6.3.2",
+    "uglify-js": "^2.4.20",
     "chai": "^1.10.0",
     "coveralls": "^2.11.2",
     "engine-dependencies": "^0.2.0",

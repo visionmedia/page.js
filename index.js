@@ -22,21 +22,21 @@
    * Short-cuts for global-object checks
    */
 
-  var isDocument = ('undefined' !== typeof document);
-  var isWindow = ('undefined' !== typeof window);
+  var hasDocument = ('undefined' !== typeof document);
+  var hasWindow = ('undefined' !== typeof window);
   var hasHistory = ('undefined' !== typeof history);
 
   /**
    * Detect click event
    */
-  var clickEvent = isDocument && document.ontouchstart ? 'touchstart' : 'click';
+  var clickEvent = hasDocument && document.ontouchstart ? 'touchstart' : 'click';
 
   /**
    * To work properly with the URL
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
 
-  var isLocation = isWindow && !!(window.history.location || window.location);
+  var isLocation = hasWindow && !!(window.history.location || window.location);
 
   /**
    * Perform initial dispatch.
@@ -81,6 +81,11 @@
    */
 
   var prevContext;
+
+  /**
+   * The window for which this `page` is running
+   */
+  var pageWindow;
 
   /**
    * Register `path` with callback `fn()`,
@@ -186,15 +191,19 @@
     options = options || {};
     if (running) return;
     running = true;
+    pageWindow = options.window || (hasWindow && window);
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate && isWindow) window.addEventListener('popstate', onpopstate, false);
-    if (false !== options.click && isDocument) {
-      document.addEventListener(clickEvent, onclick, false);
+    if (false !== options.popstate && hasWindow) pageWindow.addEventListener('popstate', onpopstate, false);
+    if (false !== options.click && hasDocument) {
+      pageWindow.document.addEventListener(clickEvent, onclick, false);
     }
-    if (true === options.hashbang) hashbang = true;
+    hashbang = !!options.hashbang;
     if (!dispatch) return;
-    var url = (hashbang && isLocation && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+    var url = (hashbang && isLocation && ~pageWindow.location.hash.indexOf('#!'))
+      ? pageWindow.location.hash.substr(2) + pageWindow.location.search
+      : pageWindow.location.pathname + pageWindow.location.search + pageWindow.location.hash;
+
     page.replace(url, null, true, dispatch);
   };
 
@@ -209,8 +218,8 @@
     page.current = '';
     page.len = 0;
     running = false;
-    isDocument && document.removeEventListener(clickEvent, onclick, false);
-    isWindow && window.removeEventListener('popstate', onpopstate, false);
+    hasDocument && pageWindow.document.removeEventListener(clickEvent, onclick, false);
+    hasWindow && pageWindow.removeEventListener('popstate', onpopstate, false);
   };
 
   /**
@@ -247,7 +256,7 @@
     if (page.len > 0) {
       // this may need more testing to see if all browsers
       // wait for the next tick to go back in history
-      hasHistory && history.back();
+      hasHistory && pageWindow.history.back();
       page.len--;
     } else if (path) {
       setTimeout(function() {
@@ -358,15 +367,15 @@
     var current;
 
     if (hashbang) {
-      current = isLocation && getBase() + location.hash.replace('#!', '');
+      current = isLocation && getBase() + pageWindow.location.hash.replace('#!', '');
     } else {
-      current = isLocation && location.pathname + location.search;
+      current = isLocation && pageWindow.location.pathname + pageWindow.location.search;
     }
 
     if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.handled = false;
-    isLocation && (location.href = ctx.canonicalPath);
+    isLocation && (pageWindow.location.href = ctx.canonicalPath);
   }
 
   /**
@@ -417,7 +426,7 @@
     this.path = path.replace(pageBase, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
-    this.title = (isDocument && document.title);
+    this.title = (hasDocument && pageWindow.document.title);
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
@@ -450,7 +459,8 @@
   Context.prototype.pushState = function() {
     page.len++;
     if (hasHistory) {
-        history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+        pageWindow.history.pushState(this.state, this.title,
+          hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
 
@@ -461,8 +471,9 @@
    */
 
   Context.prototype.save = function() {
-    if (hasHistory && location.protocol !== 'file:') {
-        history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (hasHistory && pageWindow.location.protocol !== 'file:') {
+        pageWindow.history.replaceState(this.state, this.title,
+          hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
 
@@ -550,10 +561,10 @@
 
   var onpopstate = (function () {
     var loaded = false;
-    if ( ! isWindow ) {
+    if ( ! hasWindow ) {
       return;
     }
-    if (isDocument && document.readyState === 'complete') {
+    if (hasDocument && document.readyState === 'complete') {
       loaded = true;
     } else {
       window.addEventListener('load', function() {
@@ -568,7 +579,8 @@
         var path = e.state.path;
         page.replace(path, e.state);
       } else if (isLocation) {
-        page.show(location.pathname + location.hash, undefined, undefined, false);
+        var loc = pageWindow.location;
+        page.show(loc.pathname + loc.hash, undefined, undefined, false);
       }
     };
   })();
@@ -651,7 +663,7 @@
    */
 
   function which(e) {
-    e = e || (isWindow && window.event);
+    e = e || (hasWindow && window.event);
     return null == e.which ? e.button : e.which;
   }
 
@@ -661,7 +673,7 @@
   function toURL(href) {
     if(typeof URL === 'function' && isLocation) {
       return new URL(href, location.toString());
-    } else if (isDocument) {
+    } else if (hasDocument) {
       var anc = document.createElement('a');
       anc.href = href;
       return anc;
@@ -687,7 +699,8 @@
    */
   function getBase() {
     if(!!base) return base;
-    return (hashbang && location.protocol === 'file:') ? location.pathname : base;
+    var loc = pageWindow.location;
+    return (hashbang && loc.protocol === 'file:') ? loc.pathname : base;
   }
 
   page.sameOrigin = sameOrigin;

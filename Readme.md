@@ -27,6 +27,22 @@ page()
   $ bower install visionmedia/page.js
   ```
 
+  Or use with a CDN. We support:
+
+  * [cdnjs](https://cdnjs.com/libraries/page.js)
+  * [unpkg](https://unpkg.com/page.js/page.js)
+
+  Example usage is:
+
+  ```html
+  <script src="https://unpkg.com/page.js/page.js"></script>
+  <script>
+    page('/about', function(){
+      // Do stuff
+    });
+  </script>
+  ```
+
 ## Running examples
 
   To run examples do the following to install dev dependencies and run the example server:

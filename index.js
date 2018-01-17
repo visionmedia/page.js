@@ -200,9 +200,19 @@
     }
     hashbang = !!options.hashbang;
     if (!dispatch) return;
-    var url = (hashbang && isLocation && ~pageWindow.location.hash.indexOf('#!'))
-      ? pageWindow.location.hash.substr(2) + pageWindow.location.search
-      : pageWindow.location.pathname + pageWindow.location.search + pageWindow.location.hash;
+    
+    var url;
+    if(isLocation) {
+      var loc = pageWindow.location;
+
+      if(hashbang && ~loc.hash.indexOf('#!')) {
+        url = loc.hash.substr(2) + loc.search;
+      } else if (hashbang) {
+        url = loc.search + loc.hash;
+      } else {
+        url = loc.pathname + loc.search + loc.hash;
+      }
+    }
 
     page.replace(url, null, true, dispatch);
   };

@@ -24,21 +24,21 @@
    * Short-cuts for global-object checks
    */
 
-  var isDocument = ('undefined' !== typeof document);
-  var isWindow = ('undefined' !== typeof window);
+  var hasDocument = ('undefined' !== typeof document);
+  var hasWindow = ('undefined' !== typeof window);
   var hasHistory = ('undefined' !== typeof history);
 
   /**
    * Detect click event
    */
-  var clickEvent = isDocument && document.ontouchstart ? 'touchstart' : 'click';
+  var clickEvent = hasDocument && document.ontouchstart ? 'touchstart' : 'click';
 
   /**
    * To work properly with the URL
    * history.location generated polyfill in https://github.com/devote/HTML5-History-API
    */
 
-  var isLocation = isWindow && !!(window.history.location || window.location);
+  var isLocation = hasWindow && !!(window.history.location || window.location);
 
   /**
    * Perform initial dispatch.
@@ -83,6 +83,11 @@
    */
 
   var prevContext;
+
+  /**
+   * The window for which this `page` is running
+   */
+  var pageWindow;
 
   /**
    * Register `path` with callback `fn()`,
@@ -188,15 +193,29 @@
     options = options || {};
     if (running) return;
     running = true;
+    pageWindow = options.window || (hasWindow && window);
     if (false === options.dispatch) dispatch = false;
     if (false === options.decodeURLComponents) decodeURLComponents = false;
-    if (false !== options.popstate && isWindow) window.addEventListener('popstate', onpopstate, false);
-    if (false !== options.click && isDocument) {
-      document.addEventListener(clickEvent, onclick, false);
+    if (false !== options.popstate && hasWindow) pageWindow.addEventListener('popstate', onpopstate, false);
+    if (false !== options.click && hasDocument) {
+      pageWindow.document.addEventListener(clickEvent, onclick, false);
     }
-    if (true === options.hashbang) hashbang = true;
+    hashbang = !!options.hashbang;
     if (!dispatch) return;
-    var url = (hashbang && isLocation && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+    
+    var url;
+    if(isLocation) {
+      var loc = pageWindow.location;
+
+      if(hashbang && ~loc.hash.indexOf('#!')) {
+        url = loc.hash.substr(2) + loc.search;
+      } else if (hashbang) {
+        url = loc.search + loc.hash;
+      } else {
+        url = loc.pathname + loc.search + loc.hash;
+      }
+    }
+
     page.replace(url, null, true, dispatch);
   };
 
@@ -211,8 +230,8 @@
     page.current = '';
     page.len = 0;
     running = false;
-    isDocument && document.removeEventListener(clickEvent, onclick, false);
-    isWindow && window.removeEventListener('popstate', onpopstate, false);
+    hasDocument && pageWindow.document.removeEventListener(clickEvent, onclick, false);
+    hasWindow && pageWindow.removeEventListener('popstate', onpopstate, false);
   };
 
   /**
@@ -249,7 +268,7 @@
     if (page.len > 0) {
       // this may need more testing to see if all browsers
       // wait for the next tick to go back in history
-      hasHistory && history.back();
+      hasHistory && pageWindow.history.back();
       page.len--;
     } else if (path) {
       setTimeout(function() {
@@ -360,15 +379,15 @@
     var current;
 
     if (hashbang) {
-      current = isLocation && getBase() + location.hash.replace('#!', '');
+      current = isLocation && getBase() + pageWindow.location.hash.replace('#!', '');
     } else {
-      current = isLocation && location.pathname + location.search;
+      current = isLocation && pageWindow.location.pathname + pageWindow.location.search;
     }
 
     if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.handled = false;
-    isLocation && (location.href = ctx.canonicalPath);
+    isLocation && (pageWindow.location.href = ctx.canonicalPath);
   }
 
   /**
@@ -419,7 +438,7 @@
     this.path = path.replace(pageBase, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
-    this.title = (isDocument && document.title);
+    this.title = (hasDocument && pageWindow.document.title);
     this.state = state || {};
     this.state.path = path;
     this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
@@ -431,7 +450,7 @@
     if (!hashbang) {
       if (!~this.path.indexOf('#')) return;
       var parts = this.path.split('#');
-      this.path = parts[0];
+      this.path = this.pathname = parts[0];
       this.hash = decodeURLEncodedURIComponent(parts[1]) || '';
       this.querystring = this.querystring.split('#')[0];
     }
@@ -452,7 +471,8 @@
   Context.prototype.pushState = function() {
     page.len++;
     if (hasHistory) {
-        history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+        pageWindow.history.pushState(this.state, this.title,
+          hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
 
@@ -463,8 +483,9 @@
    */
 
   Context.prototype.save = function() {
-    if (hasHistory && location.protocol !== 'file:') {
-        history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    if (hasHistory && pageWindow.location.protocol !== 'file:') {
+        pageWindow.history.replaceState(this.state, this.title,
+          hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
 
@@ -552,10 +573,10 @@
 
   var onpopstate = (function () {
     var loaded = false;
-    if ( ! isWindow ) {
+    if ( ! hasWindow ) {
       return;
     }
-    if (isDocument && document.readyState === 'complete') {
+    if (hasDocument && document.readyState === 'complete') {
       loaded = true;
     } else {
       window.addEventListener('load', function() {
@@ -570,7 +591,8 @@
         var path = e.state.path;
         page.replace(path, e.state);
       } else if (isLocation) {
-        page.show(location.pathname + location.hash, undefined, undefined, false);
+        var loc = pageWindow.location;
+        page.show(loc.pathname + loc.hash, undefined, undefined, false);
       }
     };
   })();
@@ -583,8 +605,6 @@
 
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     if (e.defaultPrevented) return;
-
-
 
     // ensure link
     // use shadow dom when available
@@ -653,7 +673,7 @@
    */
 
   function which(e) {
-    e = e || (isWindow && window.event);
+    e = e || (hasWindow && window.event);
     return null == e.which ? e.button : e.which;
   }
 
@@ -663,7 +683,7 @@
   function toURL(href) {
     if(typeof URL === 'function' && isLocation) {
       return new URL(href, location.toString());
-    } else if (isDocument) {
+    } else if (hasDocument) {
       var anc = document.createElement('a');
       anc.href = href;
       return anc;
@@ -678,9 +698,10 @@
     if(!href || !isLocation) return false;
     var url = toURL(href);
 
-    return location.protocol === url.protocol &&
-      location.hostname === url.hostname &&
-      location.port === url.port;
+    var loc = pageWindow.location;
+    return loc.protocol === url.protocol &&
+      loc.hostname === url.hostname &&
+      loc.port === url.port;
   }
 
   /**
@@ -689,98 +710,16 @@
    */
   function getBase() {
     if(!!base) return base;
-    return (hashbang && location.protocol === 'file:') ? location.pathname : base;
+    var loc = pageWindow.location;
+    return (hashbang && loc.protocol === 'file:') ? loc.pathname : base;
   }
 
   page.sameOrigin = sameOrigin;
 
 }).call(this,require('_process'))
-},{"_process":2,"path-to-regexp":3}],2:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canMutationObserver = typeof window !== 'undefined'
-    && window.MutationObserver;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
-
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
-    }
-
-    var queue = [];
-
-    if (canMutationObserver) {
-        var hiddenDiv = document.createElement("div");
-        var observer = new MutationObserver(function () {
-            var queueList = queue.slice();
-            queue.length = 0;
-            queueList.forEach(function (fn) {
-                fn();
-            });
-        });
-
-        observer.observe(hiddenDiv, { attributes: true });
-
-        return function nextTick(fn) {
-            if (!queue.length) {
-                hiddenDiv.setAttribute('yes', 'no');
-            }
-            queue.push(fn);
-        };
-    }
-
-    if (canPost) {
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
-
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
-    }
-
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
+},{"_process":4,"path-to-regexp":3}],2:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
 },{}],3:[function(require,module,exports){
@@ -1175,9 +1114,92 @@ function pathToRegexp (path, keys, options) {
   return stringToRegexp(path, keys, options)
 }
 
-},{"isarray":4}],4:[function(require,module,exports){
-module.exports = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
+},{"isarray":2}],4:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+process.nextTick = (function () {
+    var canSetImmediate = typeof window !== 'undefined'
+    && window.setImmediate;
+    var canMutationObserver = typeof window !== 'undefined'
+    && window.MutationObserver;
+    var canPost = typeof window !== 'undefined'
+    && window.postMessage && window.addEventListener
+    ;
+
+    if (canSetImmediate) {
+        return function (f) { return window.setImmediate(f) };
+    }
+
+    var queue = [];
+
+    if (canMutationObserver) {
+        var hiddenDiv = document.createElement("div");
+        var observer = new MutationObserver(function () {
+            var queueList = queue.slice();
+            queue.length = 0;
+            queueList.forEach(function (fn) {
+                fn();
+            });
+        });
+
+        observer.observe(hiddenDiv, { attributes: true });
+
+        return function nextTick(fn) {
+            if (!queue.length) {
+                hiddenDiv.setAttribute('yes', 'no');
+            }
+            queue.push(fn);
+        };
+    }
+
+    if (canPost) {
+        window.addEventListener('message', function (ev) {
+            var source = ev.source;
+            if ((source === window || source === null) && ev.data === 'process-tick') {
+                ev.stopPropagation();
+                if (queue.length > 0) {
+                    var fn = queue.shift();
+                    fn();
+                }
+            }
+        }, true);
+
+        return function nextTick(fn) {
+            queue.push(fn);
+            window.postMessage('process-tick', '*');
+        };
+    }
+
+    return function nextTick(fn) {
+        setTimeout(fn, 0);
+    };
+})();
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
 };
 
 },{}]},{},[1])(1)

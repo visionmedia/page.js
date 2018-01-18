@@ -256,10 +256,6 @@
           page('/second');
         });
 
-        afterEach(function(){
-          baseRoute = Function.prototype; // noop
-        });
-
         it('should move back to history', function(done) {
           first.once(function(){
             var path = hashbang
@@ -293,6 +289,7 @@
         it('calling back with nothing in the history and no path should go to the base', function(done){
           baseRoute = function(){
             expect(page.len).to.be.equal(0);
+            baseRoute = Function.prototype;
             done();
           };
           page.len = 0;

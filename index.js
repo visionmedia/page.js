@@ -199,8 +199,11 @@
       pageWindow.document.addEventListener(clickEvent, onclick, false);
     }
     hashbang = !!options.hashbang;
+    if(hashbang && hasWindow && !hasHistory) {
+      pageWindow.addEventListener('hashchange', onpopstate, false);
+    }
     if (!dispatch) return;
-    
+
     var url;
     if(isLocation) {
       var loc = pageWindow.location;
@@ -230,6 +233,7 @@
     running = false;
     hasDocument && pageWindow.document.removeEventListener(clickEvent, onclick, false);
     hasWindow && pageWindow.removeEventListener('popstate', onpopstate, false);
+    hasWindow && pageWindow.removeEventListener('hashchange', onpopstate, false);
   };
 
   /**

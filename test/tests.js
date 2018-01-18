@@ -6,6 +6,7 @@
   var isNode = typeof window !== 'object',
     global = this,
     called = false,
+    baseRoute = Function.prototype, // noop
     html = '',
     base = '',
     setbase = true,
@@ -73,8 +74,9 @@
       page.exits = [];
       options = options || {};
 
-      page('/', function() {
+      page('/', function(ctx) {
         called = true;
+        baseRoute(ctx);
       });
 
       function onFrameLoad(){
@@ -253,6 +255,7 @@
           page('/first');
           page('/second');
         });
+
         it('should move back to history', function(done) {
           first.once(function(){
             var path = hashbang
@@ -281,7 +284,16 @@
           });
           page.len = 0;
           page.back('/fourth');
+        });
 
+        it('calling back with nothing in the history and no path should go to the base', function(done){
+          baseRoute = function(){
+            expect(page.len).to.be.equal(0);
+            baseRoute = Function.prototype;
+            done();
+          };
+          page.len = 0;
+          page.back();
         });
       });
 
@@ -544,6 +556,7 @@
       page.strict(false);
       //page('/');
       base = '';
+      baseRoute = Function.prototype; // noop
       setbase = true;
       document.body.removeChild(frame);
     };
@@ -575,12 +588,10 @@
 
     it('Using hashbang, url\'s pathname not included in path', function(done){
       page.stop();
-      page.callbacks = [];
-      page.exits = [];
-      page('/', function(ctx){
+      baseRoute = function(ctx){
         expect(ctx.path).to.equal('/');
         done();
-      });
+      };
       page({ hashbang: true, window: frame.contentWindow });
     });
 

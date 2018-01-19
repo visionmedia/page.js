@@ -388,7 +388,6 @@
       });
 
       describe('links dispatcher', function() {
-
         it('should invoke the callback', function(done) {
           page('/about', function() {
             done();
@@ -568,6 +567,19 @@
     });
 
     tests();
+
+    it('Should dispatch when going to a hash on same path', function(done){
+      var cnt = 0;
+      page('/query', function(){
+        cnt++;
+        if(cnt === 2) {
+          done();
+        }
+      });
+
+      fireEvent($('.query'), 'click');
+      fireEvent($('.query-hash'), 'click');
+    });
 
     after(function() {
       afterTests();

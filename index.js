@@ -628,7 +628,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (!hashbang && isLocation && el.pathname === location.pathname && (el.hash || '#' === link)) return;
+    if(!hashbang && samePath(el) && (el.hash || '#' === link)) return;
 
     // Check for mailto: in the href
     if (link && link.indexOf('mailto:') > -1) return;
@@ -704,6 +704,13 @@
     return loc.protocol === url.protocol &&
       loc.hostname === url.hostname &&
       loc.port === url.port;
+  }
+
+  function samePath(url) {
+    if(!isLocation) return false;
+    var loc = pageWindow.location;
+    return url.pathname === loc.pathname &&
+      url.search === loc.search;
   }
 
   /**

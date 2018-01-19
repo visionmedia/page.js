@@ -527,6 +527,72 @@ Before calling `page.base()` use: `history.redirect([prefixType], [basepath])` -
   * An objective should be a chunk of code that is related but requires explanation.
   * Commits should be in the form of what-it-is: how-it-does-it and or why-it's-needed or what-it-is for trivial changes
   * Pull requests and commits should be a guide to the code.
+  
+## Server configuration
+
+  In order to load and update any URL managed by page.js, you need to configure your environment to point to your project's main file (index.html, for example) for each non-existent URL. Below you will find examples for most common server scenarios.
+
+### Nginx
+
+If using Nginx, add this to the .conf file related to your project (inside the "server" part), and **reload** your Nginx server:
+
+```nginx
+location / {
+    try_files $uri $uri/ /index.html?$args;
+}
+```
+
+### Apache
+
+If using Apache, create (or add to) the `.htaccess` file in the root of your public folder, with the code:
+
+```apache
+Options +FollowSymLinks
+RewriteEngine On
+ 
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond %{SCRIPT_FILENAME} !-f
+ 
+RewriteRule ^.*$ ./index.html
+```
+
+### Node.js - Express
+
+For development and/or production, using **Express**, you need to use `express-history-api-fallback` package. An example:
+
+```js
+import { join } from 'path';
+import express from 'express';
+import history from 'express-history-api-fallback';
+
+const app = express();
+const root = join(__dirname, '../public');
+
+app.use(express.static(root));
+app.use(history('index.html', { root }));
+
+const server = app.listen(process.env.PORT || 3000);
+
+export default server;
+```
+
+### Node.js - Browsersync
+
+For development using **Browsersync**, you need to use `history-api-fallback` package. An example:
+
+```js
+var browserSync = require("browser-sync").create();
+var historyApiFallback = require('connect-history-api-fallback');
+
+browserSync.init({
+	files: ["*.html", "css/*.css", "js/*.js"],
+	server: {
+		baseDir: ".",
+		middleware: [ historyApiFallback() ]
+	},
+	port: 3030
+});
+```
 
 ## License
 

@@ -601,7 +601,9 @@
   /**
    * Handle "click" events.
    */
-
+  /* jshint -W054 */
+  var hasProcess = new Function('return typeof process')() !== 'undefined';
+  /* jshint +W054 */
   function onclick(e) {
     if (1 !== which(e)) return;
 
@@ -650,7 +652,7 @@
     path = path[0] !== '/' ? '/' + path : path;
 
     // strip leading "/[drive letter]:" on NW.js on Windows
-    if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
+    if (hasProcess && path.match(/^\/[a-zA-Z]:\//)) {
       path = path.replace(/^\/[a-zA-Z]:\//, '/');
     }
 

@@ -406,7 +406,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    * Module dependencies.
    */
 
-  
+
 
   /**
    * Module exports.
@@ -1121,8 +1121,8 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    */
   function getBase() {
     if(!!base) return base;
-    var loc = hasWindow && pageWindow.location;
-    return (hasWindow && hashbang && loc.protocol === 'file:') ? loc.pathname : base;
+    var loc = pageWindow.location;
+    return (hashbang && loc.protocol === 'file:') ? loc.pathname : base;
   }
 
   page.sameOrigin = sameOrigin;

@@ -594,6 +594,12 @@ browserSync.init({
 });
 ```
 
+## Integrations
+
+### React
+
+For development using **React**, you can use [pagify-it](https://github.com/sonaye/pagify-it).
+
 ## License
 
 (The MIT License)

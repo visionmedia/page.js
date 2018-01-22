@@ -13,10 +13,10 @@
    */
 
   module.exports = page;
-  module.exports.default = page;
-  module.exports.Context = Context;
-  module.exports.Route = Route;
-  module.exports.sameOrigin = sameOrigin;
+  page.default = page;
+  page.Context = Context;
+  page.Route = Route;
+  page.sameOrigin = sameOrigin;
 
   /**
    * Short-cuts for global-object checks
@@ -25,6 +25,7 @@
   var hasDocument = ('undefined' !== typeof document);
   var hasWindow = ('undefined' !== typeof window);
   var hasHistory = ('undefined' !== typeof history);
+  var hasProcess = typeof process !== 'undefined';
 
   /**
    * Detect click event
@@ -601,8 +602,7 @@
   /**
    * Handle "click" events.
    */
-  /* jshint -W054 */
-  var hasProcess = new Function('return typeof process')() !== 'undefined';
+
   /* jshint +W054 */
   function onclick(e) {
     if (1 !== which(e)) return;

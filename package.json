@@ -17,14 +17,12 @@
     "test": "jshint index.js test/tests.js && mocha test/tests.js",
     "serve": "serve test",
     "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
-    "prepublish": "npm run make",
-    "make": "browserify index.js --standalone page -o page.js"
+    "make": "rollup -c rollup.config.js"
   },
   "dependencies": {
     "path-to-regexp": "~1.2.1"
   },
   "devDependencies": {
-    "browserify": "^6.3.2",
     "chai": "^1.10.0",
     "coveralls": "^2.11.2",
     "engine-dependencies": "^0.2.0",
@@ -35,6 +33,9 @@
     "jshint": "^2.5.10",
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
+    "rollup": "^0.54.1",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-node-resolve": "^3.0.2",
     "serve": "*",
     "should": "*"
   },

@@ -356,7 +356,7 @@ page('/user/:id', load, show)
   the history.
 
   For example if you had a photo application
-  and you performed a relatively expensive
+  and you performed a relatively extensive
   search to populate a list of images,
   normally when a user clicks "back" in
   the browser the route would be invoked

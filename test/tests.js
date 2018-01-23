@@ -15,6 +15,7 @@
     chai = this.chai,
     expect = this.expect,
     page = this.page,
+    globalPage = this.page,
     baseTag,
     frame,
     $,
@@ -25,12 +26,13 @@
   }
 
   before(function() {
-
     if (isNode) {
       chai = require('chai');
       expect = chai.expect;
-      page = process.env.PAGE_COV ? require('../index-cov') : require('../index');
+      globalPage = process.env.PAGE_COV ?
+        require('../index-cov') : require('../index');
     } else {
+      globalPage = window.page;
       expect = chai.expect;
     }
 
@@ -70,9 +72,8 @@
       return frame.contentWindow;
     },
     beforeTests = function(options, done) {
-      page.callbacks = [];
-      page.exits = [];
       options = options || {};
+      page = globalPage.create();
 
       page('/', function(ctx) {
         called = true;
@@ -81,6 +82,8 @@
 
       function onFrameLoad(){
         if(setbase) {
+          if(options.base)
+            page.base(options.base);
           var baseTag = frame.contentWindow.document.createElement('base');
           frame.contentWindow.document.head.appendChild(baseTag);
 
@@ -88,7 +91,9 @@
         }
 
         options.window = frame.contentWindow;
-        page(options);
+        if(options.strict != null)
+          page.strict(options.strict);
+        page.start(options);
         page(base ? base + '/' : '/');
         done();
       }
@@ -318,7 +323,10 @@
 
         it('should accommodate URL encoding', function(done) {
           page('/whatever', function(ctx) {
-            expect(ctx.querystring).to.equal(decodeURLComponents ? 'queryParam=string with whitespace' : 'queryParam=string%20with%20whitespace');
+            var expected = decodeURLComponents
+              ? 'queryParam=string with whitespace'
+              : 'queryParam=string%20with%20whitespace';
+            expect(ctx.querystring).to.equal(expected);
             done();
           });
 
@@ -557,6 +565,7 @@
       base = '';
       baseRoute = Function.prototype; // noop
       setbase = true;
+      decodeURLComponents = true;
       document.body.removeChild(frame);
     };
 
@@ -618,8 +627,9 @@
 
     before(function(done) {
       base = '/newBase';
-      page.base(base);
-      beforeTests(null, done);
+      beforeTests({
+        base: '/newBase'
+      }, done);
     });
 
     tests();
@@ -647,8 +657,9 @@
 
   describe('Strict path matching enabled', function() {
     before(function(done) {
-      page.strict(true);
-      beforeTests(null, done);
+      beforeTests({
+        strict: true
+      }, done);
     });
 
     tests();

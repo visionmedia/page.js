@@ -442,6 +442,10 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     this._running = false;
     this._hashbang = false;
 
+    // bound functions
+    this._onclick = this._onclick.bind(this);
+    this._onpopstate = this._onpopstate.bind(this);
+
     this.configure(options);
   }
 
@@ -464,23 +468,21 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
     var _window = this._window;
     if(this._popstate) {
-      // TODO local instance of popstate maybe
-      _window.addEventListener('popstate', this, false);
+      _window.addEventListener('popstate', this._onpopstate, false);
     } else if(hasWindow) {
-      _window.removeEventListener('popstate', this, false);
+      _window.removeEventListener('popstate', this._onpopstate, false);
     }
 
     if (this._click) {
-      // TODO local instance of onclick maybe
-      _window.document.addEventListener(clickEvent, this, false);
+      _window.document.addEventListener(clickEvent, this._onclick, false);
     } else if(hasDocument) {
-      _window.document.removeEventListener(clickEvent, this, false);
+      _window.document.removeEventListener(clickEvent, this._onclick, false);
     }
 
     if(this._hashbang && hasWindow && !hasHistory) {
-      _window.addEventListener('hashchange', this, false);
+      _window.addEventListener('hashchange', this._onpopstate, false);
     } else if(hasWindow) {
-      _window.removeEventListener('hashchange', this, false);
+      _window.removeEventListener('hashchange', this._onpopstate, false);
     }
   };
 
@@ -505,9 +507,8 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
   Page.prototype._getBase = function() {
     var base = this._base;
     if(!!base) return base;
-    var loc = hasWindow && this._window.location;
-    return (hasWindow && this._hashbang && loc.protocol === 'file:') ?
-      loc.pathname : base;
+    var loc = hasWindow && this._window && this._window.location;
+    return (hasWindow && this._hashbang && loc && loc.protocol === 'file:') ? loc.pathname : base;
   };
 
   /**
@@ -572,10 +573,9 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     this._running = false;
 
     var window = this._window;
-    // TODO what to do here?
-    hasDocument && window.document.removeEventListener(clickEvent, this, false);
-    hasWindow && window.removeEventListener('popstate', this, false);
-    hasWindow && window.removeEventListener('hashchange', this, false);
+    hasDocument && window.document.removeEventListener(clickEvent, this._onclick, false);
+    hasWindow && window.removeEventListener('popstate', this._onpopstate, false);
+    hasWindow && window.removeEventListener('hashchange', this._onpopstate, false);
   };
 
   /**
@@ -622,7 +622,6 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
       });
     } else {
       setTimeout(function() {
-        // TODO shouldn't getBase be from the instance?
         page.show(page._getBase(), state);
       });
     }
@@ -849,23 +848,6 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
   })();
 
   /**
-   * Handle an event that is set up in configure
-   * @api private
-   */
-  Page.prototype.handleEvent = function(ev) {
-    switch(ev.type) {
-      case 'popstate':
-      case 'hashchange':
-        this._onpopstate(ev);
-        break;
-      // Some type of click
-      default:
-        this._onclick(ev);
-        break;
-    }
-  };
-
-  /**
    * Event button.
    */
   Page.prototype._which = function(e) {
@@ -896,7 +878,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
   Page.prototype.sameOrigin = function(href) {
     if(!href || !isLocation) return false;
-    // TODO
+
     var url = this._toURL(href);
     var window = this._window;
 
@@ -937,7 +919,6 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     var pageInstance = new Page();
 
     function pageFn(/* args */) {
-      // TODO what here
       return page.apply(pageInstance, arguments);
     }
 
@@ -1064,7 +1045,6 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     var window = _page._window;
     var hashbang = _page.hashbang;
 
-    // TODO use the instance yo
     var pageBase = _page._getBase();
     if ('/' === path[0] && 0 !== path.indexOf(pageBase)) path = pageBase + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');

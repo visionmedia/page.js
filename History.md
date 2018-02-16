@@ -1,3 +1,89 @@
+1.8.3 / 2018-01-22
+==================
+
+This is a patch release which switches the build to rollup. Switching shaves 2k off of the gzipped size. In addition to this benefit, this also fixes a couple of small issues:
+
+## Issues
+
+* [#444] - Closure compiler warnings
+* [#458] - unsafe-eval error
+
+[#444]: https://github.com/visionmedia/page.js/issues/444
+[#458]: https://github.com/visionmedia/page.js/issues/458
+
+1.8.2 / 2018-01-22
+==================
+
+This is a patch release fixing an issue that was meant to be solved in 1.8.1. page.js now runs in Node.js again, when there isn't a window environment.
+
+1.8.1 / 2018-01-22
+==================
+
+This is a patch release, fixing an issue with Node.js usage.
+
+1.8.0 / 2018-01-17
+==================
+
+This is a minor release, adding one new (minor) feature and a few bug fixes and documentation improvements.
+
+## Controlling other pages
+
+The new feature of this release is that page.js can now control other pages (windows) besides the main window. This makes it possible to control an iframe's routing. You can use it by passing the window option to start:
+
+    page('/', function(){
+      // Whoa, I'm inside an iframe!
+    });
+
+page.start({ window: myiFrame.contentWindow });
+
+Note that page is still a singleton, which means you can only have 1 page, so you can't control both an iframe and the main window at the same time.
+
+This change was made to improve our testing, but in the future we'll make it possible to have multiple page objects so you really will be able to control multiple iframes and the main window all at the same time.
+
+## Better hashbang support
+
+Hashbang support has never been very good in page.js. But we're slowly improving it! In 1.8.0 we've fixed the problem where the app's full URL would show up in the hashbang upon start. http://example.com/my/page#!/my/page. Gross! No longer happens thanks to #447.
+
+## Pull Requests
+
+Those are the big things, but here's a list of all of the pull requests merged into 1.8.0:
+
+* [#445] - Prevent hash from being part of the ctx.pathname
+* [#447] - Prevent going to the root when setting up the initial hashchange route
+* [#446] - Add a note about usage with a CDN
+* [#443] - Change test infrastructure to run inside of iframes
+* [#303] - page.exit callback example missing context param
+* [#267] - Added clarification for decoded plus signs in urls
+
+[#445]: https://github.com/visionmedia/page.js/pull/4445
+[#447]: https://github.com/visionmedia/page.js/pull/4447
+[#446]: https://github.com/visionmedia/page.js/pull/4446
+[#443]: https://github.com/visionmedia/page.js/pull/4443
+[#303]: https://github.com/visionmedia/page.js/pull/4303
+[#267]: https://github.com/visionmedia/page.js/pull/4267
+
+1.7.3 / 2018-01-15
+==================
+
+This is a patch release making an improvement to how page.js works on pages that use the file protocol, such as Electron and nw.js apps.
+
+## Pull Requests
+
+* [#441] - Set the page's base to be the current location when used under the file protocol with hashbang routing.
+
+[#441]: https://github.com/visionmedia/page.js/pull/441
+
+1.7.2 / 2018-01-15
+==================
+
+Our first release in almost 2 years! This is a long overdue patch release that contains various bug fixes that have taken place over the course of the last couple of years. As releases will become much more often in the future (containing only a few fixes in most cases), I will be listing the closed issues in releases, but because there are 2 years worth it is not practical to do so in this release.
+
+While you're here, if you haven't checked out page.js in a long time now is a great time. I've recently taken over maintenance and have a plan in place to take this great small library into the future. For now I am concentrating on stabilizing 1.x by fixing as many of the backlog of issues that have built up as I can. Once that is complete we'll start thinking about 2.0.
+
+If you've submitted a PR here in the past and seen it be ignored, please come back! Your contributions are invaluable, and I promise that as long as I'm maintaining this project I'll do my best to always at least comment on pull requests and try to get them resolved.
+
+That's all for now! Please report any issues you find in 1.7.2.
+
 1.7.1 / 2016-03-17
 ==================
 

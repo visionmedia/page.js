@@ -12,6 +12,7 @@
       "page": "index.js"
     }
   },
+  "browser": "page.js",
   "scripts": {
     "engine-deps": "install-engine-dependencies",
     "test": "jshint index.js test/tests.js && mocha test/tests.js",

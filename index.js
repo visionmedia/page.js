@@ -611,8 +611,8 @@
     if (e.defaultPrevented) return;
 
     // ensure link
-    // use shadow dom when available
-    var el = e.path ? e.path[0] : e.target;
+    // use shadow dom when available if not, fall back to composedPath() for browsers that only have shady
+    var el = e.path ? e.path[0] : (e.composedPath ? e.composedPath()[0] : e.target);
 
     // continue ensure link
     // el.nodeName for svg links are 'a' instead of 'A'

@@ -1011,9 +1011,20 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     if (e.defaultPrevented) return;
 
     // ensure link
-    // use shadow dom when available
-    var el = e.path ? e.path[0] : e.target;
+    // use shadow dom when available if not, fall back to composedPath() for browsers that only have shady
+    var el = e.target;
+    var eventPath = e.path || (e.composedPath ? e.composedPath() : null);
 
+    if(eventPath) {
+      for (var i = 0; i < eventPath.length; i++) {
+        if (!eventPath[i].nodeName) continue;
+        if (eventPath[i].nodeName.toUpperCase() !== 'A') continue;
+        if (!eventPath[i].href) continue;
+
+        el = eventPath[i];
+        break;
+      }
+    }
     // continue ensure link
     // el.nodeName for svg links are 'a' instead of 'A'
     while (el && 'A' !== el.nodeName.toUpperCase()) el = el.parentNode;
@@ -1121,8 +1132,8 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    */
   function getBase() {
     if(!!base) return base;
-    var loc = hasWindow && pageWindow.location;
-    return (hasWindow && hashbang && loc.protocol === 'file:') ? loc.pathname : base;
+    var loc = hasWindow && pageWindow && pageWindow.location;
+    return (hasWindow && hashbang && loc && loc.protocol === 'file:') ? loc.pathname : base;
   }
 
   page.sameOrigin = sameOrigin;

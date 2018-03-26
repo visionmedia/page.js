@@ -30,12 +30,12 @@ page()
   Or use with a CDN. We support:
 
   * [cdnjs](https://cdnjs.com/libraries/page.js)
-  * [unpkg](https://unpkg.com/page.js/page.js)
+  * [unpkg](https://unpkg.com/page/page.js)
 
   Example usage is:
 
   ```html
-  <script src="https://unpkg.com/page.js/page.js"></script>
+  <script src="https://unpkg.com/page/page.js"></script>
   <script>
     page('/about', function(){
       // Do stuff

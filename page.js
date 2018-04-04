@@ -583,6 +583,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    *    - `click` bind to click events [true]
    *    - `popstate` bind to popstate [true]
    *    - `dispatch` perform initial dispatch [true]
+   *    - `submit` bind to submit events (GET-forms only) [true]
    *
    * @param {Object} options
    * @api public
@@ -598,6 +599,9 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     if (false !== options.popstate && hasWindow) pageWindow.addEventListener('popstate', onpopstate, false);
     if (false !== options.click && hasDocument) {
       pageWindow.document.addEventListener(clickEvent, onclick, false);
+    }
+    if (false !== options.submit && hasDocument) {
+      pageWindow.document.addEventListener('submit', onsubmit, false);
     }
     hashbang = !!options.hashbang;
     if(hashbang && hasWindow && !hasHistory) {
@@ -633,6 +637,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     page.len = 0;
     running = false;
     hasDocument && pageWindow.document.removeEventListener(clickEvent, onclick, false);
+    hasDocument && pageWindow.document.removeEventListener('submit', onsubmit, false);
     hasWindow && pageWindow.removeEventListener('popstate', onpopstate, false);
     hasWindow && pageWindow.removeEventListener('hashchange', onpopstate, false);
   };
@@ -1081,6 +1086,77 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
     e.preventDefault();
     page.show(orig);
+  }
+
+  /**
+   * Handle "submit" events.
+   */
+
+  function onsubmit(e) {
+    if (e.defaultPrevented) return;
+    
+    var form = e.target,
+      btnSubmit = checkButtonElement(document.activeElement) && document.activeElement;
+      
+    var action = form.hasAttribute('action') && form.getAttribute('action'),
+      method = form.hasAttribute('method') && form.getAttribute('method'),
+      target = form.hasAttribute('target') && form.getAttribute('target');
+
+    if (btnSubmit) {
+      if (btnSubmit.hasAttribute('formaction')) action = btnSubmit.getAttribute('formaction');
+      if (btnSubmit.hasAttribute('formmethod')) method = btnSubmit.getAttribute('formmethod');
+      if (btnSubmit.hasAttribute('formtarget')) target = btnSubmit.getAttribute('formtarget');
+    }
+
+    // Ignore if tag has
+    // 1. method and not method="get"
+    // 2. target and not target="_self"
+    if (method && method.toLowerCase() !== 'get') return;
+    if (target && target.toLowerCase() !== '_self') return;
+
+    var a = document.createElement('a');
+        a.href = action;
+
+     var pathname = a.pathname,
+        hash = a.hash || '',
+        search = [];
+        
+    var elements = form.elements, 
+        len = elements.length;
+    
+    for (var i = 0; i < len; i++) {
+    	if ( ! elements[i].name || elements[i].disabled) continue;
+      if (['checkbox', 'radio'].indexOf(elements[i].type) >= 0 && !elements[i].checked) {
+      	continue;
+      }
+      if (checkButtonElement(elements[i]) && elements[i] !== btnSubmit) {
+      	continue;
+      }
+      search.push(elements[i].name + '=' + elements[i].value);
+    }
+
+    var path = (pathname + '?' + search.join('&') + hash);
+    path = path[0] !== '/' ? '/' + path : path;
+
+    // strip leading "/[drive letter]:" on NW.js on Windows
+    if (hasProcess && path.match(/^\/[a-zA-Z]:\//)) {
+      path = path.replace(/^\/[a-zA-Z]:\//, '/');
+    }
+
+    var pageBase = getBase();
+
+    if (path.indexOf(pageBase) === 0) {
+      path = path.substr(base.length);
+    }
+
+    if (hashbang) path = path.replace('#!', '');
+    
+    e.preventDefault();
+    page.show(path);
+  }
+
+  function checkButtonElement(el) {
+    return (el.type && ['button', 'submit', 'image'].indexOf(el.type) >= 0) || el.tagName === 'button';
   }
 
   /**

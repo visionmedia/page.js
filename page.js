@@ -610,9 +610,9 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
       var loc = pageWindow.location;
 
       if(hashbang && ~loc.hash.indexOf('#!')) {
-        url = loc.hash.substr(2) + loc.search;
+        url = loc.hash.substr(2);
       } else if (hashbang) {
-        url = loc.search + loc.hash;
+        url = loc.hash;
       } else {
         url = loc.pathname + loc.search + loc.hash;
       }
@@ -993,6 +993,9 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
       if (e.state) {
         var path = e.state.path;
         page.replace(path, e.state);
+      } else if (isLocation && hashbang) {
+        var loc = pageWindow.location;
+        page.show(loc.hash, undefined, undefined, false);
       } else if (isLocation) {
         var loc = pageWindow.location;
         page.show(loc.pathname + loc.hash, undefined, undefined, false);

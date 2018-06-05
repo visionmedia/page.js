@@ -594,8 +594,7 @@
         var path = e.state.path;
         page.replace(path, e.state);
       } else if (isLocation && hashbang) {
-        var loc = pageWindow.location;
-        page.show(loc.hash, undefined, undefined, false);
+        page.show(pageWindow.location.hash, undefined, undefined, false);
       } else if (isLocation) {
         var loc = pageWindow.location;
         page.show(loc.pathname + loc.hash, undefined, undefined, false);

@@ -600,7 +600,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
       pageWindow.document.addEventListener(clickEvent, onclick, false);
     }
     hashbang = !!options.hashbang;
-    if(hashbang && hasWindow && !hasHistory) {
+    if((hashbang && hasWindow) && !hasHistory) {
       pageWindow.addEventListener('hashchange', onpopstate, false);
     }
     if (!dispatch) return;
@@ -1115,8 +1115,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
     var loc = pageWindow.location;
     return loc.protocol === url.protocol &&
-      loc.hostname === url.hostname &&
-      loc.port === url.port;
+      loc.host === url.host;
   }
 
   function samePath(url) {

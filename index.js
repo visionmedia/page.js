@@ -200,7 +200,7 @@
       pageWindow.document.addEventListener(clickEvent, onclick, false);
     }
     hashbang = !!options.hashbang;
-    if(hashbang && hasWindow && !hasHistory) {
+    if((hashbang && hasWindow) && !hasHistory) {
       pageWindow.addEventListener('hashchange', onpopstate, false);
     }
     if (!dispatch) return;
@@ -715,8 +715,7 @@
 
     var loc = pageWindow.location;
     return loc.protocol === url.protocol &&
-      loc.hostname === url.hostname &&
-      loc.port === url.port;
+      loc.host === url.host;
   }
 
   function samePath(url) {

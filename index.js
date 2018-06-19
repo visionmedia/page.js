@@ -715,8 +715,7 @@
 
     var loc = pageWindow.location;
     return loc.protocol === url.protocol &&
-      loc.hostname === url.hostname &&
-      loc.port === url.port;
+      loc.host === url.host;
   }
 
   function samePath(url) {

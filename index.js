@@ -342,24 +342,48 @@
    */
 
   page.dispatch = function(ctx, prev) {
-    var i = 0,
-      j = 0;
-
     function nextExit() {
-      var fn = page.exits[j++];
-      if (!fn) return nextEnter();
-      fn(prev, nextExit);
+      var nextCalled;
+      var nextCallback = function() {
+        nextCalled = true;
+      };
+
+      var j = 0;
+
+      do {
+        nextCalled = false;
+        var fn = page.exits[j];
+        if (!fn) return nextEnter();
+        fn(prev, nextCallback);
+
+        if (!nextCalled) {
+          return;
+        }
+      } while(j++ < page.exits.length);
     }
 
     function nextEnter() {
-      var fn = page.callbacks[i++];
+      var nextCalled;
+      var nextCallback = function() {
+        nextCalled = true;
+      };
 
-      if (ctx.path !== page.current) {
-        ctx.handled = false;
-        return;
+      for (var i = 0; i < page.callbacks.length; i++) {
+        var fn = page.callbacks[i];
+        nextCalled = false;
+
+        if (ctx.path !== page.current) {
+          ctx.handled = false;
+          return;
+        }
+        if (!fn) return unhandled(ctx);
+
+        fn(ctx, nextCallback);
+
+        if (!nextCalled) {
+          return;
+        }
       }
-      if (!fn) return unhandled(ctx);
-      fn(ctx, nextEnter);
     }
 
     if (prev) {

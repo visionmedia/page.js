@@ -368,7 +368,9 @@
         nextCalled = true;
       };
 
-      for (var i = 0; i < page.callbacks.length; i++) {
+      var i = 0;
+
+      do {
         var fn = page.callbacks[i];
         nextCalled = false;
 
@@ -383,7 +385,7 @@
         if (!nextCalled) {
           return;
         }
-      }
+      } while(i++ < page.callbacks.length);
     }
 
     if (prev) {

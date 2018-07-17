@@ -133,6 +133,19 @@
         it('should invoke the matching callback', function() {
           expect(called).to.equal(true);
         });
+
+        it('should invoke the matching async callbacks', function(done) {
+          page('/async', function(ctx, next) {
+            setTimeout(function() {
+              next();
+            }, 10);
+          }, function(ctx, next) {
+            setTimeout(function() {
+              done();
+            }, 10);
+          });
+          page('/async');
+        });
       });
 
       describe('on redirect', function() {
@@ -174,6 +187,27 @@
           });
 
           page('/exit');
+          page('/');
+        });
+
+        it('should run async callbacks when exiting the page', function(done) {
+          var visited = false;
+          page('/async-exit', function() {
+            visited = true;
+          });
+
+          page.exit('/async-exit', function(ctx, next) {
+            setTimeout(function() {
+              next();
+            }, 10);
+          }, function(ctx, next) {
+            setTimeout(function () {
+              expect(visited).to.equal(true);
+              done();
+            }, 10);
+          });
+
+          page('/async-exit');
           page('/');
         });
 

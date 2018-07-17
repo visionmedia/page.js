@@ -742,33 +742,47 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    */
 
   page.dispatch = function(ctx, prev) {
-    function nextExit() {
+    function nextExit(initValue) {
       var nextCalled;
-      var nextCallback = function() {
+      var processRecursively = false;
+
+      var callbackWrapper = function() {
         nextCalled = true;
+        if (processRecursively) {
+          return nextExit(j + 1);
+        }
       };
 
-      var j = 0;
+      var j = initValue !== undefined ? initValue : 0;
 
       do {
         nextCalled = false;
         var fn = page.exits[j];
         if (!fn) return nextEnter();
-        fn(prev, nextCallback);
 
+        fn(prev, callbackWrapper);
+        // No callback yet, which means the callback is asynchronous.
+        // Toggle flag so that the callback wrapper handles the rest.
         if (!nextCalled) {
+          processRecursively = true;
           return;
         }
+
       } while(j++ < page.exits.length);
     }
 
-    function nextEnter() {
+    function nextEnter(initValue) {
       var nextCalled;
-      var nextCallback = function() {
+      var processRecursively = false;
+
+      var callbackWrapper = function() {
         nextCalled = true;
+        if (processRecursively) {
+          return nextEnter(i + 1);
+        }
       };
 
-      var i = 0;
+      var i = initValue !== undefined ? initValue : 0;
 
       do {
         var fn = page.callbacks[i];
@@ -780,9 +794,11 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
         }
         if (!fn) return unhandled(ctx);
 
-        fn(ctx, nextCallback);
-
+        fn(ctx, callbackWrapper);
+        // No callback yet, which means the callback is asynchronous.
+        // Toggle flag so that the callback wrapper handles the rest.
         if (!nextCalled) {
+          processRecursively = true;
           return;
         }
       } while(i++ < page.callbacks.length);

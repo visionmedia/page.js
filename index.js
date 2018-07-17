@@ -342,24 +342,66 @@
    */
 
   page.dispatch = function(ctx, prev) {
-    var i = 0,
-      j = 0;
+    function nextExit(initValue) {
+      var nextCalled;
+      var processRecursively = false;
 
-    function nextExit() {
-      var fn = page.exits[j++];
-      if (!fn) return nextEnter();
-      fn(prev, nextExit);
+      var callbackWrapper = function() {
+        nextCalled = true;
+        if (processRecursively) {
+          return nextExit(j + 1);
+        }
+      };
+
+      var j = initValue !== undefined ? initValue : 0;
+
+      do {
+        nextCalled = false;
+        var fn = page.exits[j];
+        if (!fn) return nextEnter();
+
+        fn(prev, callbackWrapper);
+        // No callback yet, which means the callback is asynchronous.
+        // Toggle flag so that the callback wrapper handles the rest.
+        if (!nextCalled) {
+          processRecursively = true;
+          return;
+        }
+
+      } while(j++ < page.exits.length);
     }
 
-    function nextEnter() {
-      var fn = page.callbacks[i++];
+    function nextEnter(initValue) {
+      var nextCalled;
+      var processRecursively = false;
 
-      if (ctx.path !== page.current) {
-        ctx.handled = false;
-        return;
-      }
-      if (!fn) return unhandled(ctx);
-      fn(ctx, nextEnter);
+      var callbackWrapper = function() {
+        nextCalled = true;
+        if (processRecursively) {
+          return nextEnter(i + 1);
+        }
+      };
+
+      var i = initValue !== undefined ? initValue : 0;
+
+      do {
+        var fn = page.callbacks[i];
+        nextCalled = false;
+
+        if (ctx.path !== page.current) {
+          ctx.handled = false;
+          return;
+        }
+        if (!fn) return unhandled(ctx);
+
+        fn(ctx, callbackWrapper);
+        // No callback yet, which means the callback is asynchronous.
+        // Toggle flag so that the callback wrapper handles the rest.
+        if (!nextCalled) {
+          processRecursively = true;
+          return;
+        }
+      } while(i++ < page.callbacks.length);
     }
 
     if (prev) {

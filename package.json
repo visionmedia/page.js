@@ -26,7 +26,7 @@
   "devDependencies": {
     "chai": "^1.10.0",
     "coveralls": "^2.11.2",
-    "engine-dependencies": "^0.2.0",
+    "engine-dependencies": "^0.2.12",
     "express": "^4.10.2",
     "jade": "^1.7.0",
     "jscoverage": "^0.5.9",

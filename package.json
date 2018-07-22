@@ -1,8 +1,9 @@
 {
   "name": "react-page-router",
   "description": "Tiny client-side router",
-  "version": "1.9.1",
+  "version": "1.9.3",
   "license": "MIT",
+  "main": "./dist/react-page-router.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/PhoboSys/react-page-router.git"

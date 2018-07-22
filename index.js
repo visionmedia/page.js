@@ -7,7 +7,7 @@
    */
 
   var pathtoRegexp = require('path-to-regexp');
-  var reactTransition = require('./react-transition');
+  var transition = require('./react-transition');
 
 
   /**

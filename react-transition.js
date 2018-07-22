@@ -6,7 +6,7 @@ import findIndex from 'lodash.findindex'
 
 let prevNamesChain, elementsChain
 
-function createRouteTransitionMiddleware (parents) {
+function createRouteTransitionMiddleware (routemap, parents) {
   const names = map(parents, 'name')
   return (context, next) => {
     if (names !== prevNamesChain) {
@@ -22,9 +22,9 @@ function createRouteTransitionMiddleware (parents) {
   }
 }
 
-export function transitionRoutingMiddlewares (routingBranch) {
+export function transitionRoutingMiddlewares (routemap, routingBranch) {
   return [
-    createRouteTransitionMiddleware(routingBranch),
+    createRouteTransitionMiddleware(routemap, routingBranch),
     ...map(reverse(routingBranch), createRouteComponentTransitionMiddleware)
   ]
 }

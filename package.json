@@ -1,7 +1,7 @@
 {
   "name": "react-page-router",
   "description": "Tiny client-side router",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "license": "MIT",
   "main": "./dist/react-page-router.js",
   "repository": {

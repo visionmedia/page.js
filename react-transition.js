@@ -17,14 +17,15 @@ function createRouteTransitionMiddleware (parents) {
       elementsChain = {}
       prevNamesChain = names
     }
+    context.name = routemap.name
     next()
   }
 }
 
-export function createRouteComponentTransitionMiddlewares (parents) {
+export function transitionRoutingMiddlewares (routingBranch) {
   return [
-    createRouteTransitionMiddleware(parents),
-    ...map(reverse(parents), createRouteComponentTransitionMiddleware)
+    createRouteTransitionMiddleware(routingBranch),
+    ...map(reverse(routingBranch), createRouteComponentTransitionMiddleware)
   ]
 }
 
@@ -78,7 +79,7 @@ function createPrevComponent(context, routemap) {
   return null
 }
 
-export function createRenderTransitionMiddleware (renderer, transitionDuration) {
+export function transitionRenderingMiddleware (renderer, transitionDuration) {
   return (context, next) => {
     if (context.transition) {
       renderer.render(context.transition)

@@ -19,7 +19,8 @@
   page.Context = Context;
   page.Route = Route;
   page.sameOrigin = sameOrigin;
-  page.reactTransition = reactTransition
+  page.transitionRenderingMiddleware = transition.transitionRenderingMiddleware
+  page.transitionRoutingMiddlewares = transition.transitionRoutingMiddlewares
 
   /**
    * Short-cuts for global-object checks

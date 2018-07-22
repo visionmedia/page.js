@@ -4635,37 +4635,6 @@ module.exports = map;
  */
 
 /** Used for built-in method references. */
-var arrayProto = Array.prototype;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeReverse = arrayProto.reverse;
-
-/**
- * Reverses `array` so that the first element becomes the last, the second
- * element becomes the second to last, and so on.
- *
- * **Note:** This method mutates `array` and is based on
- * [`Array#reverse`](https://mdn.io/Array/reverse).
- *
- * @static
- * @memberOf _
- * @category Array
- * @returns {Array} Returns `array`.
- * @example
- *
- * var array = [1, 2, 3];
- *
- * _.reverse(array);
- * // => [3, 2, 1]
- *
- * console.log(array);
- * // => [3, 2, 1]
- */
-function reverse(array) {
-  return array ? nativeReverse.call(array) : array;
-}
-
-var lodash_reverse = reverse;
 
 var lodash_findindex = createCommonjsModule(function (module, exports) {
 /**
@@ -7064,102 +7033,6 @@ function property(path) {
 module.exports = findIndex;
 });
 
-let prevNamesChain;
-let elementsChain;
-
-function createRouteTransitionMiddleware (parents) {
-  const names = lodash_map(parents, 'name');
-  return (context, next) => {
-    if (names !== prevNamesChain) {
-      context.namesChain = names;
-      context.prevNamesChain = prevNamesChain || false;
-      context.prevElementsChain = elementsChain || {};
-
-      elementsChain = {};
-      prevNamesChain = names;
-    }
-    next();
-  }
-}
-
-function createRouteComponentTransitionMiddlewares (parents) {
-  return [
-    createRouteTransitionMiddleware(parents),
-    ...lodash_map(lodash_reverse(parents), createRouteComponentTransitionMiddleware)
-  ]
-}
-
-function createRouteComponentTransitionMiddleware (routemap) {
-  return (context, next) => {
-    elementsChain[routemap.name] = context.component;
-
-    const prevChain = createPrevComponent(context, routemap);
-    const transitionChain = context.transition
-      ? context.transition
-      : context.component;
-
-    if (
-      routemap.transition && prevChain ||
-      context.transition
-    ) {
-      context.transition = react.createElement(
-        routemap.component, null,
-        react.createElement(
-          'div',
-          { className: 'transition-in' },
-          transitionChain
-        ),
-        react.createElement(
-          'div',
-          { className: 'transition-out' },
-          prevChain
-        )
-      );
-    }
-
-    context.component = react.createElement(
-      routemap.component, null,
-      context.component
-    );
-
-    next();
-  }
-}
-
-function createPrevComponent(context, routemap) {
-  const diffIdx = lodash_findindex(context.namesChain,
-    (name, idx) => name !== context.prevNamesChain[idx]);
-
-  if (~diffIdx) {
-    const lastCommonName = context.namesChain[diffIdx - 1];
-    if (lastCommonName === routemap.name) {
-      return context.prevElementsChain[lastCommonName]
-    }
-  }
-  return null
-}
-
-function createRenderTransitionMiddleware (renderer, transitionDuration) {
-  return (context, next) => {
-    if (context.transition) {
-      renderer.render(context.transition);
-      setTimeout(
-        () => renderer.render(context.component),
-        +transitionDuration
-      );
-    } else {
-      renderer.render(context.component);
-    }
-  }
-}
-
-
-
-var reactTransition = Object.freeze({
-	createRouteComponentTransitionMiddlewares: createRouteComponentTransitionMiddlewares,
-	createRenderTransitionMiddleware: createRenderTransitionMiddleware
-});
-
 /**
    * Module dependencies.
    */
@@ -7172,12 +7045,13 @@ var reactTransition = Object.freeze({
    * Module exports.
    */
 
-  var reactPagejs = page;
+  var app = page;
   page.default = page;
   page.Context = Context;
   page.Route = Route;
   page.sameOrigin = sameOrigin;
-  page.reactTransition = reactTransition;
+  page.transitionRenderingMiddleware = transition.transitionRenderingMiddleware;
+  page.transitionRoutingMiddlewares = transition.transitionRoutingMiddlewares;
 
   /**
    * Short-cuts for global-object checks
@@ -7901,6 +7775,6 @@ var reactTransition = Object.freeze({
 
   page.sameOrigin = sameOrigin;
 
-return reactPagejs;
+return app;
 
 })));

@@ -68,7 +68,7 @@ function createRouteComponentTransitionMiddleware (routemap) {
   }
 }
 
-function createUrlParsingMiddleware () {
+export function createUrlParsingMiddleware () {
     return (context, next) => {
         const parsed = context.path.split('?')
         context.qpathname = context.pathname

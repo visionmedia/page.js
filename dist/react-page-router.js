@@ -10536,6 +10536,22 @@ function createRouteComponentTransitionMiddleware (routemap) {
   }
 }
 
+function createUrlParsingMiddleware () {
+    return (context, next) => {
+        const parsed = context.path.split('?');
+        context.qpathname = context.pathname;
+        context.pathname = parsed[0];
+        context.querystring = parsed[1] || '';
+        context.query = qs.parse(context.querystring);
+
+        const parsedloc = location.search.split('?');
+        const querystringloc = parsedloc[1] || '';
+        context.locationquery = qs.parse(querystringloc);
+
+        next();
+    }
+}
+
 function createPrevComponent(context, routemap) {
   const diffIdx = lodash_findindex(context.namesChain,
     (name, idx) => name !== context.prevNamesChain[idx]);
@@ -10625,6 +10641,7 @@ class PageRouter {
 			route => this.registerRouteBranch([], route)
 		);
 
+        PageRouter.page('*', createUrlParsingMiddleware());
 		PageRouter.page.base(this._config.base);
 		PageRouter.page.start(this._config);
 	}

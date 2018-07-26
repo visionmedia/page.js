@@ -11,7 +11,7 @@ import {
     transitionRenderingMiddleware,
     transitionRoutingMiddlewares,
     createUrlParsingMiddleware
-} from './react-transition'
+} from './middleware-factory'
 
 class PageRouter {
 	static init (routesTree, middlewares, renderer, config) {

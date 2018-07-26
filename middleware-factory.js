@@ -10,19 +10,19 @@ let prevNamesChain, elementsChain
 
 function createRouteTransitionMiddleware (routingBranch) {
   const routemap = last(routingBranch)
-  const names = map(routingBranch, 'name')
-  return (context, next) => {
-    if (names !== prevNamesChain) {
-      context.namesChain = names
-      context.prevNamesChain = prevNamesChain || false
-      context.prevElementsChain = elementsChain || {}
+    const names = map(routingBranch, 'name')
+    return (context, next) => {
+      if (names !== prevNamesChain) {
+        context.namesChain = names
+        context.prevNamesChain = prevNamesChain || false
+        context.prevElementsChain = elementsChain || {}
 
-      elementsChain = {}
-      prevNamesChain = names
+        elementsChain = {}
+        prevNamesChain = names
+      }
+      context.name = routemap.name
+      next()
     }
-    context.name = routemap.name
-    next()
-  }
 }
 
 export function transitionRoutingMiddlewares (routingBranch) {
@@ -46,7 +46,8 @@ function createRouteComponentTransitionMiddleware (routemap) {
       context.transition
     ) {
       context.transition = React.createElement(
-        routemap.component, null,
+        routemap.component,
+        null,
         React.createElement(
           'div',
           { className: 'transition-in' },
@@ -70,19 +71,19 @@ function createRouteComponentTransitionMiddleware (routemap) {
 }
 
 export function createUrlParsingMiddleware () {
-    return (context, next) => {
-        const parsed = context.path.split('?')
-        context.qpathname = context.pathname
-        context.pathname = parsed[0]
-        context.querystring = parsed[1] || ''
-        context.query = qs.parse(context.querystring)
+  return (context, next) => {
+    const parsed = context.path.split('?')
+    context.qpathname = context.pathname
+    context.pathname = parsed[0]
+    context.querystring = parsed[1] || ''
+    context.query = qs.parse(context.querystring)
 
-        const parsedloc = location.search.split('?')
-        const querystringloc = parsedloc[1] || ''
-        context.locationquery = qs.parse(querystringloc)
+    const parsedloc = location.search.split('?')
+    const querystringloc = parsedloc[1] || ''
+    context.locationquery = qs.parse(querystringloc)
 
-        next()
-    }
+    next()
+  }
 }
 
 function createPrevComponent(context, routemap) {

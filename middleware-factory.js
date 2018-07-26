@@ -3,11 +3,13 @@ import React from 'react'
 import map from 'lodash.map'
 import reverse from 'lodash.reverse'
 import findIndex from 'lodash.findindex'
+import last from 'lodash.last'
 
 let prevNamesChain, elementsChain
 
-function createRouteTransitionMiddleware (routemap, parents) {
-  const names = map(parents, 'name')
+function createRouteTransitionMiddleware (routingBranch) {
+  const routemap = last(routingBranch)
+  const names = map(routingBranch, 'name')
   return (context, next) => {
     if (names !== prevNamesChain) {
       context.namesChain = names
@@ -22,9 +24,9 @@ function createRouteTransitionMiddleware (routemap, parents) {
   }
 }
 
-export function transitionRoutingMiddlewares (routemap, routingBranch) {
+export function transitionRoutingMiddlewares (routingBranch) {
   return [
-    createRouteTransitionMiddleware(routemap, routingBranch),
+    createRouteTransitionMiddleware(routingBranch),
     ...map(reverse(routingBranch), createRouteComponentTransitionMiddleware)
   ]
 }
@@ -66,6 +68,22 @@ function createRouteComponentTransitionMiddleware (routemap) {
   }
 }
 
+function createUrlParsingMiddleware () {
+    return (context, next) => {
+        const parsed = context.path.split('?')
+        context.qpathname = context.pathname
+        context.pathname = parsed[0]
+        context.querystring = parsed[1] || ''
+        context.query = qs.parse(context.querystring)
+
+        const parsedloc = location.search.split('?')
+        const querystringloc = parsedloc[1] || ''
+        context.locationquery = qs.parse(querystringloc)
+
+        next()
+    }
+}
+
 function createPrevComponent(context, routemap) {
   const diffIdx = findIndex(context.namesChain,
     (name, idx) => name !== context.prevNamesChain[idx])
@@ -92,4 +110,3 @@ export function transitionRenderingMiddleware (renderer, transitionDuration) {
     }
   }
 }
-

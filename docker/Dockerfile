@@ -1,4 +1,4 @@
-FROM node:9
+FROM node:10
 
 RUN apt-get update -qqy \
   && apt-get -qqy install \
@@ -17,8 +17,8 @@ RUN mkdir /app
 WORKDIR /app
 
 ADD ./*.json /app/
-ADD ./*.js /app/
 RUN npm install
+ADD ./*.js /app/
 
 CMD ["npm", "run", "make"]
 

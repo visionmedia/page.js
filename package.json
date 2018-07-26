@@ -1,7 +1,7 @@
 {
   "name": "react-page-router",
   "description": "Tiny client-side router",
-  "version": "1.9.4",
+  "version": "1.9.8",
   "license": "MIT",
   "main": "./dist/react-page-router.js",
   "repository": {
@@ -10,15 +10,15 @@
   },
   "component": {
     "scripts": {
-      "react-page-router": "index.js"
+      "react-page-router": "react-router.js"
     }
   },
   "browser": "react-page-router",
   "scripts": {
     "engine-deps": "install-engine-dependencies",
-    "test": "jshint index.js test/tests.js && mocha test/tests.js",
+    "test": "jshint pagejs.js test/tests.js && mocha test/tests.js",
     "serve": "serve test",
-    "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
+    "test-cov": "jscoverage pagejs.js pagejs-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
     "make": "rollup -c rollup.config.js"
   },
   "dependencies": {
@@ -26,6 +26,13 @@
     "lodash.map": "4.6.0",
     "lodash.findindex": "4.6.0",
     "lodash.reverse": "4.0.1",
+    "lodash.trim": "4.5.1",
+    "lodash.foreach": "4.5.0",
+    "lodash.size": "4.2.0",
+    "lodash.last": "3.0.0",
+    "lodash.concat": "4.5.0",
+    "lodash.compact": "3.0.1",
+    "lodash.defaults": "4.2.0",
     "path-to-regexp": "~1.2.1"
   },
   "devDependencies": {

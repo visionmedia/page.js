@@ -7,8 +7,6 @@
    */
 
   var pathtoRegexp = require('path-to-regexp');
-  var transition = require('./react-transition');
-
 
   /**
    * Module exports.
@@ -19,8 +17,6 @@
   page.Context = Context;
   page.Route = Route;
   page.sameOrigin = sameOrigin;
-  page.transitionRenderingMiddleware = transition.transitionRenderingMiddleware
-  page.transitionRoutingMiddlewares = transition.transitionRoutingMiddlewares
 
   /**
    * Short-cuts for global-object checks

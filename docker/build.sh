@@ -6,7 +6,6 @@ IMAGE_NAME="mishadev/react-page-router-builder"
 DOCKERFILE="Dockerfile"
 
 docker rm -f $CONTAINER_NAME
-docker rmi -f $IMAGE_NAME
 echo =============================================================
 echo build image $IMAGE_NAME form file $DIR/${DOCKERFILE}
 echo =============================================================

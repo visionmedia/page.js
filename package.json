@@ -1,7 +1,7 @@
 {
   "name": "react-page-router",
   "description": "Tiny client-side router",
-  "version": "1.9.9",
+  "version": "1.9.11",
   "license": "MIT",
   "main": "./dist/react-page-router.js",
   "repository": {
@@ -33,6 +33,7 @@
     "lodash.concat": "4.5.0",
     "lodash.compact": "3.0.1",
     "lodash.defaults": "4.2.0",
+    "qs": "6.5.2",
     "path-to-regexp": "~1.2.1"
   },
   "devDependencies": {

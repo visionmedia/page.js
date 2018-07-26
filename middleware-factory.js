@@ -4,6 +4,7 @@ import map from 'lodash.map'
 import reverse from 'lodash.reverse'
 import findIndex from 'lodash.findindex'
 import last from 'lodash.last'
+import qs from 'qs'
 
 let prevNamesChain, elementsChain
 

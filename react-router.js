@@ -70,12 +70,13 @@ class PageRouter {
 	}
 
 	start () {
+        PageRouter.page('*', createUrlParsingMiddleware())
+
 		each(
 			this._routesTree,
 			route => this.registerRouteBranch([], route)
 		)
 
-        PageRouter.page('*', createUrlParsingMiddleware())
 		PageRouter.page.base(this._config.base)
 		PageRouter.page.start(this._config)
 	}

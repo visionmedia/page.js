@@ -13,75 +13,72 @@ import {
   createUrlParsingMiddleware
 } from './middleware-factory'
 
-class PageRouter {
-  static init (routesTree, middlewares, renderer, config) {
-    const router = new PageRouter(routesTree, middlewares, renderer, config)
-    router.start()
-  }
+function PageRouter (routesTree, middlewares, renderer, config) {
+  var _routesTree = routesTree
+  var _middlewares = middlewares
+  var _renderer = renderer
+  var _config = _addDefaultConfig(config || {})
 
-  constructor (routesTree, middlewares, renderer, config) {
-    this._routesTree  = routesTree
-    this._middlewares = middlewares
-    this._renderer = renderer
-    this._config = this.addDefaultConfig(config || {})
-  }
-
-  addDefaultConfig (config) {
+  function _addDefaultConfig (config) {
     return defaults(
       config,
       {
-        base: window.location.pathname + window.location.search,
-        transition_duration: 1000
+        base: window.location.pathname + window.location.search
       }
     )
   }
 
-  registerRoute (routeBranch) {
-    const path = '/' +
-      compact(
-        map(
-          routeBranch,
-          pmap => trim(pmap.path, '/')
-        )
-      ).join('/')
-
-    const args = concat(
-      transitionRoutingMiddlewares(routeBranch),
-      this._middlewares,
-      transitionRenderingMiddleware(
-        this._renderer,
-        this._config.transition_duration
+  function _generatePath (routeBranch) {
+    var path = compact(
+      map(
+        routeBranch,
+        pmap => trim(pmap.path, '/')
       )
-    )
-    args.unshift(path)
-    PageRouter.page.apply(PageRouter.page, args)
+    ).join('/')
+
+    return '/' + path
   }
 
-  registerRouteBranch (routeBranch, routemap) {
-    routeBranch = [...routeBranch, routemap]
+  function _registerRoute (routeBranch) {
+    var args = concat(
+      [_generatePath(routeBranch)],
+      transitionRoutingMiddlewares(routeBranch),
+      _middlewares,
+      transitionRenderingMiddleware(_renderer)
+    )
+    Reflect.apply(PageRouter.page, PageRouter.page, args)
+  }
+
+  function _registerRouteBranch (routeBranch, routemap) {
+    routeBranch = routeBranch.concat(routemap)
     if (size(routemap.children) > 0) {
       each(
         routemap.children,
-        route => this.registerRouteBranch(routeBranch, route)
+        route => _registerRouteBranch(routeBranch, route)
       )
     } else {
-      this.registerRoute(routeBranch)
+      _registerRoute(routeBranch)
     }
   }
 
-  start () {
-    PageRouter.page('*', createUrlParsingMiddleware())
+  this.start = function _start () {
+    PageRouter.page(createUrlParsingMiddleware())
 
     each(
-      this._routesTree,
-      route => this.registerRouteBranch([], route)
+      _routesTree,
+      route => _registerRouteBranch([], route)
     )
 
-    PageRouter.page.base(this._config.base)
-    PageRouter.page.start(this._config)
+    PageRouter.page.base(_config.base)
+    PageRouter.page.start(_config)
   }
 }
 
 PageRouter.page = pagejs
+PageRouter.init = function init (routesTree, middlewares, renderer, config) {
+  var router = new PageRouter(routesTree, middlewares, renderer, config)
+  router.start()
+}
 
 export default PageRouter
+

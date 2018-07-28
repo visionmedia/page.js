@@ -2,68 +2,67 @@ import React from 'react'
 
 import map from 'lodash.map'
 import reverse from 'lodash.reverse'
-import findIndex from 'lodash.findindex'
 import last from 'lodash.last'
+import defaults from 'lodash.defaults'
+import size from 'lodash.size'
+
 import qs from 'qs'
 
-let prevNamesChain, elementsChain
+import {
+  CSSTransition,
+  TransitionGroup
+} from 'react-transition-group'
+
+var _cssTransitionDefaults = {
+  classNames: 'route',
+  timeout: 1000
+}
 
 function createRouteTransitionMiddleware (routingBranch) {
-  const routemap = last(routingBranch)
-    const names = map(routingBranch, 'name')
-    return (context, next) => {
-      if (names !== prevNamesChain) {
-        context.namesChain = names
-        context.prevNamesChain = prevNamesChain || false
-        context.prevElementsChain = elementsChain || {}
-
-        elementsChain = {}
-        prevNamesChain = names
-      }
-      context.name = routemap.name
-      next()
-    }
+  var routemap = last(routingBranch)
+  return function (context, next) {
+    context.name = routemap.name
+    context.names = []
+    next()
+  }
 }
 
 export function transitionRoutingMiddlewares (routingBranch) {
   return [
-    createRouteTransitionMiddleware(routingBranch),
-    ...map(reverse(routingBranch), createRouteComponentTransitionMiddleware)
-  ]
+    createRouteTransitionMiddleware(routingBranch)
+  ].concat(
+    map(reverse(routingBranch), createRouteComponentTransitionMiddleware)
+  )
 }
 
 function createRouteComponentTransitionMiddleware (routemap) {
-  return (context, next) => {
-    elementsChain[routemap.name] = context.component
+  return function (context, next) {
+    var element = context.component
+    if (size(routemap.children) > 0 && routemap.transition) {
+      var transition = typeof routemap.transition === 'object'
+        ? routemap.transition
+        : {}
 
-    const prevChain = createPrevComponent(context, routemap)
-    const transitionChain = context.transition
-      ? context.transition
-      : context.component
-
-    if (
-      routemap.transition && prevChain ||
-      context.transition
-    ) {
-      context.transition = React.createElement(
-        routemap.component,
-        null,
+      transition = defaults(
+        { key: context.names[0] },
+        transition,
+        _cssTransitionDefaults
+      )
+      element = React.createElement(
+        TransitionGroup,
+        { key: routemap.name },
         React.createElement(
-          'div',
-          { className: 'transition-in' },
-          transitionChain
-        ),
-        React.createElement(
-          'div',
-          { className: 'transition-out' },
-          prevChain
+          CSSTransition,
+          transition,
+          context.component
         )
       )
     }
 
+    context.names.unshift(routemap.name)
     context.component = React.createElement(
-      routemap.component, null,
-      context.component
+      routemap.component,
+      null, element
     )
 
     next()
@@ -71,44 +70,23 @@ function createRouteComponentTransitionMiddleware (routemap) {
 }
 
 export function createUrlParsingMiddleware () {
-  return (context, next) => {
-    const parsed = context.path.split('?')
+  return function (context, next) {
+    var parsed = context.path.split('?')
     context.qpathname = context.pathname
     context.pathname = parsed[0]
     context.querystring = parsed[1] || ''
     context.query = qs.parse(context.querystring)
 
-    const parsedloc = location.search.split('?')
-    const querystringloc = parsedloc[1] || ''
+    var parsedloc = location.search.split('?')
+    var querystringloc = parsedloc[1] || ''
     context.locationquery = qs.parse(querystringloc)
 
     next()
   }
 }
 
-function createPrevComponent(context, routemap) {
-  const diffIdx = findIndex(context.namesChain,
-    (name, idx) => name !== context.prevNamesChain[idx])
-
-  if (~diffIdx) {
-    const lastCommonName = context.namesChain[diffIdx - 1]
-    if (lastCommonName === routemap.name) {
-      return context.prevElementsChain[lastCommonName]
-    }
-  }
-  return null
-}
-
-export function transitionRenderingMiddleware (renderer, transitionDuration) {
-  return (context, next) => {
-    if (context.transition) {
-      renderer.render(context.transition)
-      setTimeout(
-        () => renderer.render(context.component),
-        +transitionDuration
-      )
-    } else {
-      renderer.render(context.component)
-    }
+export function transitionRenderingMiddleware (renderer) {
+  return function (context, next) {
+    renderer.render(context.component)
   }
 }

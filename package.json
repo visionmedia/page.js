@@ -1,7 +1,7 @@
 {
   "name": "react-page-router",
   "description": "Tiny client-side router",
-  "version": "1.9.11",
+  "version": "1.10.1",
   "license": "MIT",
   "main": "./dist/react-page-router.js",
   "repository": {
@@ -22,9 +22,10 @@
     "make": "rollup -c rollup.config.js"
   },
   "dependencies": {
-    "react": "16.4.1",
+    "react": "15.5.1",
+    "react-dom": "15.5.4",
+    "react-transition-group": "2.4.0",
     "lodash.map": "4.6.0",
-    "lodash.findindex": "4.6.0",
     "lodash.reverse": "4.0.1",
     "lodash.trim": "4.5.1",
     "lodash.foreach": "4.5.0",

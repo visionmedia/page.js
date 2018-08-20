@@ -1058,7 +1058,18 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     // rebuild path
     // There aren't .pathname and .search properties in svg links, so we use href
     // Also, svg href is an object and its desired value is in .baseVal property
-    var path = svg ? el.href.baseVal : (el.pathname + el.search + (el.hash || ''));
+    var path
+    if (svg) {
+      path = el.href.baseVal
+    } else {
+      var pathname = el.pathname
+      if (!pathname) {
+        // In IE11 pathname contains an empty string for
+        // relative links. Use window.location.pathname instead.
+        pathname = window.location.pathname
+      }
+      path = pathname + el.search + (el.hash || '')
+    }
 
     path = path[0] !== '/' ? '/' + path : path;
 

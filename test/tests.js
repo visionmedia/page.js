@@ -329,6 +329,19 @@
           page.len = 0;
           page.back();
         });
+        
+        it('calling back() from a different app should make the page reload', function(done){
+          var loc = window.location.href;
+          var id  = page.id;
+          page('/another-app/route', function(ctx){
+            expect(loc).to.not.eql(ctx.path);
+            expect(ctx.state.router).to.not.eql(id);
+            done();
+          });
+          page.len = 0;
+          page.id = 'ANOTHER_PAGE_ROUTER';
+          page.back('/another-app/route');
+        });
       });
 
       describe('ctx.querystring', function() {

@@ -149,6 +149,7 @@ page('/default');
   - `dispatch` perform initial dispatch [__true__]
   - `hashbang` add `#!` before urls [__false__]
   - `decodeURLComponents` remove URL encoding from path components (query string, pathname, hash) [__true__]
+  - `routerId` an identifier for the page instance (should be unique between instances of page living under the same domain) [__PAGE_ROUTER__]
 
   If you wish to load serve initial content
   from the server you likely will want to

@@ -412,7 +412,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    * Module exports.
    */
 
-  var page_js = page;
+  var pagejs = page;
   page.default = page;
   page.Context = Context;
   page.Route = Route;
@@ -610,9 +610,9 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
       var loc = pageWindow.location;
 
       if(hashbang && ~loc.hash.indexOf('#!')) {
-        url = loc.hash.substr(2) + loc.search;
+        url = loc.hash.substr(2);
       } else if (hashbang) {
-        url = loc.search + loc.hash;
+        url = loc.hash;
       } else {
         url = loc.pathname + loc.search + loc.hash;
       }
@@ -993,6 +993,8 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
       if (e.state) {
         var path = e.state.path;
         page.replace(path, e.state);
+      } else if (isLocation && hashbang) {
+        page.show(pageWindow.location.hash, undefined, undefined, false);
       } else if (isLocation) {
         var loc = pageWindow.location;
         page.show(loc.pathname + loc.hash, undefined, undefined, false);
@@ -1138,6 +1140,6 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
   page.sameOrigin = sameOrigin;
 
-return page_js;
+return pagejs;
 
 })));

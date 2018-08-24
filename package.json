@@ -1,18 +1,18 @@
 {
-  "name": "page",
+  "name": "react-pagejs",
   "description": "Tiny client-side router",
-  "version": "1.8.6",
+  "version": "1.9.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/visionmedia/page.js.git"
+    "url": "git://github.com/PhoboSys/page.js.git"
   },
   "component": {
     "scripts": {
-      "page": "index.js"
+      "react-page": "index.js"
     }
   },
-  "browser": "page.js",
+  "browser": "react-pagejs",
   "scripts": {
     "engine-deps": "install-engine-dependencies",
     "test": "jshint index.js test/tests.js && mocha test/tests.js",
@@ -51,6 +51,6 @@
   },
   "files": [
     "index.js",
-    "page.js"
+    "dist/react-page.js"
   ]
 }

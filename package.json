@@ -1,26 +1,42 @@
 {
-  "name": "page",
+  "name": "react-page-router",
   "description": "Tiny client-side router",
-  "version": "1.8.6",
+  "version": "1.10.1",
   "license": "MIT",
+  "main": "./dist/react-page-router.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/visionmedia/page.js.git"
+    "url": "git://github.com/PhoboSys/react-page-router.git"
   },
   "component": {
     "scripts": {
-      "page": "index.js"
+      "react-page-router": "react-router.js"
     }
   },
-  "browser": "page.js",
+  "browser": "react-page-router",
   "scripts": {
     "engine-deps": "install-engine-dependencies",
-    "test": "jshint index.js test/tests.js && mocha test/tests.js",
+    "test": "jshint pagejs.js test/tests.js && mocha test/tests.js",
     "serve": "serve test",
-    "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
+    "test-cov": "jscoverage pagejs.js pagejs-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
     "make": "rollup -c rollup.config.js"
   },
   "dependencies": {
+    "react": "15.5.1",
+    "react-dom": "15.5.4",
+    "react-transition-group": "2.4.0",
+    "lodash.map": "4.6.0",
+    "lodash.reverse": "4.0.1",
+    "lodash.trim": "4.5.1",
+    "lodash.foreach": "4.5.0",
+    "lodash.size": "4.2.0",
+    "lodash.get": "4.4.2",
+    "lodash.find": "4.6.0",
+    "lodash.last": "3.0.0",
+    "lodash.concat": "4.5.0",
+    "lodash.compact": "3.0.1",
+    "lodash.defaults": "4.2.0",
+    "qs": "6.5.2",
     "path-to-regexp": "~1.2.1"
   },
   "devDependencies": {
@@ -51,6 +67,6 @@
   },
   "files": [
     "index.js",
-    "page.js"
+    "dist/react-page-router.js"
   ]
 }

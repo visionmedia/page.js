@@ -2,11 +2,11 @@ import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 
 export default {
-  input: 'index.js',
+  input: 'react-router.js',
   output: {
-    file: 'page.js',
+    file: 'dist/react-page-router.js',
     format: 'umd',
-    name: 'page'
+    name: 'react-page-router'
   },
   plugins: [
     nodeResolve({

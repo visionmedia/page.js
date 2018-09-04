@@ -49,37 +49,39 @@ function createRouteComponentTransitionMiddleware (routemap) {
   return function (context, next) {
     var element = context.component
     if (size(routemap.children) > 0 && routemap.transition) {
-      var rootTransition = typeof routemap.transition === 'object'
+      var parentTransition = typeof routemap.transition === 'object'
         ? routemap.transition
         : {}
 
-      var transition = get(find(routemap.children,
+      var childTransition = get(find(routemap.children,
         ['name', context.names[0]]), "transition")
 
-      transition = defaults(
+      var transition = defaults(
         {
-          key: context.names[0],
+          key: context.names[0]
+        },
+        childTransition,
+        parentTransition,
+        {
           onEnter: function () {
             callTransitionHook(context, context.names[0], "componentWillEnter")
           },
-          onEntering:function () {
+          onEntering: function () {
             callTransitionHook(context, context.names[0], "componentEntering")
           },
-          onEntered:function () {
+          onEntered: function () {
             callTransitionHook(context, context.names[0], "componentDidEnter")
           },
-          onExit:function () {
+          onExit: function () {
             callTransitionHook(context, context.names[0], "componentWillExit")
           },
-          onExiting:function () {
+          onExiting: function () {
             callTransitionHook(context, context.names[0], "componentExiting")
           },
-          onExited:function () {
+          onExited: function () {
             callTransitionHook(context, context.names[0], "componentDidExit")
           }
         },
-        transition,
-        rootTransition,
         _cssTransitionDefaults
       )
       element = React.createElement(

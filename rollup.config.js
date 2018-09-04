@@ -1,12 +1,13 @@
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
+import { uglify } from 'rollup-plugin-uglify';
 
 export default {
-  input: 'index.js',
+  input: 'react-router.js',
   output: {
-    file: 'page.js',
+    file: 'dist/react-page-router.js',
     format: 'umd',
-    name: 'page'
+    name: 'react-page-router'
   },
   plugins: [
     nodeResolve({
@@ -15,6 +16,7 @@ export default {
     }),
     commonjs({
       include: ['node_modules/**', '**']
-    })
+    }),
+    uglify()
   ]
 };

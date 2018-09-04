@@ -22,8 +22,6 @@
     "make": "rollup -c rollup.config.js"
   },
   "dependencies": {
-    "react": "15.5.1",
-    "react-dom": "15.5.4",
     "react-transition-group": "2.4.0",
     "lodash.map": "4.6.0",
     "lodash.reverse": "4.0.1",
@@ -48,9 +46,10 @@
     "jshint": "^2.5.10",
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
-    "rollup": "^0.54.1",
+    "rollup": "^0.65.0",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-resolve": "^3.0.2",
+    "rollup-plugin-uglify": "^5.0.2",
     "serve": "*",
     "should": "*"
   },

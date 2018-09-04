@@ -1,5 +1,6 @@
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
+import { uglify } from 'rollup-plugin-uglify';
 
 export default {
   input: 'react-router.js',
@@ -15,6 +16,7 @@ export default {
     }),
     commonjs({
       include: ['node_modules/**', '**']
-    })
+    }),
+    uglify()
   ]
 };

@@ -32,7 +32,9 @@ function PageRouter (routesTree, middlewares, renderer, config) {
     var path = compact(
       map(
         routeBranch,
-        pmap => trim(pmap.path, '/')
+        function(pmap) {
+          return trim(pmap.path, '/')
+        }
       )
     ).join('/')
 
@@ -54,7 +56,9 @@ function PageRouter (routesTree, middlewares, renderer, config) {
     if (size(routemap.children) > 0) {
       each(
         routemap.children,
-        route => _registerRouteBranch(routeBranch, route)
+        function(route) {
+          return _registerRouteBranch(routeBranch, route)
+        }
       )
     } else {
       _registerRoute(routeBranch)
@@ -66,7 +70,9 @@ function PageRouter (routesTree, middlewares, renderer, config) {
 
     each(
       _routesTree,
-      route => _registerRouteBranch([], route)
+      function(route) {
+        return _registerRouteBranch([], route)
+      }
     )
 
     PageRouter.page.base(_config.base)

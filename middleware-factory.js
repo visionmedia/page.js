@@ -5,6 +5,8 @@ import reverse from 'lodash.reverse'
 import last from 'lodash.last'
 import defaults from 'lodash.defaults'
 import size from 'lodash.size'
+import find from 'lodash.find'
+import get from 'lodash.get'
 
 import qs from 'qs'
 
@@ -23,6 +25,7 @@ function createRouteTransitionMiddleware (routingBranch) {
   return function (context, next) {
     context.name = routemap.name
     context.names = []
+    context.refs = {}
     next()
   }
 }
@@ -35,17 +38,48 @@ export function transitionRoutingMiddlewares (routingBranch) {
   )
 }
 
+function callTransitionHook(context, routeName, hookName) {
+  var callback = get(context,`refs.${routeName}.${hookName}`)
+  if (callback && typeof callback === "function") {
+    callback()
+  }
+}
+
 function createRouteComponentTransitionMiddleware (routemap) {
   return function (context, next) {
     var element = context.component
     if (size(routemap.children) > 0 && routemap.transition) {
-      var transition = typeof routemap.transition === 'object'
+      var rootTransition = typeof routemap.transition === 'object'
         ? routemap.transition
         : {}
 
+      var transition = get(find(routemap.children,
+        ['name', context.names[0]]), "transition")
+
       transition = defaults(
-        { key: context.names[0] },
+        {
+          key: context.names[0],
+          onEnter: function () {
+            callTransitionHook(context, context.names[0], "componentWillEnter")
+          },
+          onEntering:function () {
+            callTransitionHook(context, context.names[0], "componentEntering")
+          },
+          onEntered:function () {
+            callTransitionHook(context, context.names[0], "componentDidEnter")
+          },
+          onExit:function () {
+            callTransitionHook(context, context.names[0], "componentWillExit")
+          },
+          onExiting:function () {
+            callTransitionHook(context, context.names[0], "componentExiting")
+          },
+          onExited:function () {
+            callTransitionHook(context, context.names[0], "componentDidExit")
+          }
+        },
         transition,
+        rootTransition,
         _cssTransitionDefaults
       )
       element = React.createElement(
@@ -62,7 +96,9 @@ function createRouteComponentTransitionMiddleware (routemap) {
     context.names.unshift(routemap.name)
     context.component = React.createElement(
       routemap.component,
-      null, element
+      {
+        ref: ref => { if (ref) context.refs[routemap.name] = ref },
+      }, element
     )
 
     next()

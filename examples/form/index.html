@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Basic</title>
+    <script src="/page.js"></script>
+    <base href="/form/" >
+  </head>
+  <body>
+    <h1>GET form</h1>
+    <p></p>
+    <form class="form" method="get" action="/">
+      <p>
+        <label>Text (should):</label>
+        <input name="text">
+      </p>
+      <p>
+        <label>Textarea (should):</label>
+        <textarea name="textarea"></textarea>
+      </p>
+      <p>
+        <label>Radio (should selected):</label>
+        <input type="radio" name="radio" value="1"> 1
+        <input type="radio" name="radio" value="2"> 2
+      </p>
+      <p>
+        <label>Checkbox (should selected):</label>
+        <input name="checkbox1" type="checkbox"> checkbox1
+        <input name="checkbox2" type="checkbox"> checkbox2
+      </p>      
+      <p>
+        <label>Hidden (should but it's strange):</label>
+        <input name="hidden" type="hidden">
+      </p>     
+      <p>
+        <label>File (should with path to file):</label>
+        <input name="file" type="file">
+      </p>     
+      <p>
+        <label>Unnamed (shouldn't without name):</label>
+        <input class="unnamed">
+        <button type="button">find</button>
+      </p>      
+      <p>
+        <label>Disabled (shouldn't because disabled):</label>
+        <input name="disabled" disabled>
+      </p>
+      <p>
+        <label>Submit Buttons (should with its name/value):</label>
+        <button name="button" value="find">find</button>
+        <input name="button" type="submit" value="search">
+      </p>
+      <p>
+        <label>Regular Buttons (shouldn't):</label>     
+        <button type="button" name="button" value="find">find</button>
+        <input name="button" type="button" value="search">
+      </p>      
+      <p>
+        <label>Submit to Action Button (should with different action):</label>
+        <button formaction="/another" name="button" value="find">find</button>
+      </p>       
+
+    </form>
+
+    <script>
+      
+      page.base('/form');
+
+      page('/', index);
+
+      page('/:action', action);
+
+      page.start({
+        submit: true
+      });
+
+      function index(ctx) {
+        document.querySelector('p')
+          .textContent = 'searching index for ' + ctx.querystring;
+      }
+
+      function action(ctx) {
+        document.querySelector('p')
+          .textContent = 'another action ' + (ctx.params.action || '');
+      }
+    </script>
+  </body>
+</html>

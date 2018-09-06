@@ -53,6 +53,7 @@
   },
   "files": [
     "index.js",
-    "page.js"
+    "page.js",
+    "page.mjs"
   ]
 }

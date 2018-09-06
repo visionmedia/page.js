@@ -32,7 +32,7 @@ page()
   * [cdnjs](https://cdnjs.com/libraries/page.js)
   * [unpkg](https://unpkg.com/page/page.js)
 
-  Example usage is:
+  Using with global script tags:
 
   ```html
   <script src="https://unpkg.com/page/page.js"></script>
@@ -40,6 +40,16 @@ page()
     page('/about', function(){
       // Do stuff
     });
+  </script>
+  ```
+
+  Or with modules, in modern browsers:
+
+  ```html
+  <script type="module">
+    import page from "//unpkg.com/page/page.mjs";
+
+    page('/home', () => { ... });
   </script>
   ```
 

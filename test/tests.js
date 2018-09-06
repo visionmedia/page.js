@@ -256,7 +256,7 @@
 
           page('/', function() {});
 
-          page.exit('*', function(context) {
+          page.exit(function(context) {
             var path = context.path;
             setTimeout( function() {
               expect(path).to.equal('/');
@@ -587,7 +587,6 @@
             page('/whathever');
           });
         });
-
       });
     },
     afterTests = function() {
@@ -622,6 +621,16 @@
 
       fireEvent($('.query'), 'click');
       fireEvent($('.query-hash'), 'click');
+    });
+
+    describe('Configuration', function() {
+      it('Can disable popstate', function() {
+        page.configure({ popstate: false });
+      });
+
+      it('Can disable click handler', function() {
+        page.configure({ click: false });
+      });
     });
 
     after(function() {

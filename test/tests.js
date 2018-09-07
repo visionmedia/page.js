@@ -15,6 +15,7 @@
     chai = this.chai,
     expect = this.expect,
     page = this.page,
+    globalPage = this.page,
     baseTag,
     frame,
     $,
@@ -25,12 +26,13 @@
   }
 
   before(function() {
-
     if (isNode) {
       chai = require('chai');
       expect = chai.expect;
-      page = process.env.PAGE_COV ? require('../index-cov') : require('../index');
+      globalPage = process.env.PAGE_COV ?
+        require('../index-cov') : require('../index');
     } else {
+      globalPage = window.page;
       expect = chai.expect;
     }
 
@@ -40,7 +42,7 @@
 
   });
 
-  var fireEvent = function(node, eventName) {
+  var fireEvent = function(node, eventName, path) {
       var event;
 
       if(typeof testWindow().Event === 'function') {
@@ -64,15 +66,20 @@
         event.which = null;
       }
 
+      if(path) {
+        Object.defineProperty(event, 'path', {
+          value: path
+        });
+      }
+
       node.dispatchEvent(event);
     },
     testWindow = function(){
       return frame.contentWindow;
     },
     beforeTests = function(options, done) {
-      page.callbacks = [];
-      page.exits = [];
       options = options || {};
+      page = globalPage.create();
 
       page('/', function(ctx) {
         called = true;
@@ -81,6 +88,8 @@
 
       function onFrameLoad(){
         if(setbase) {
+          if(options.base)
+            page.base(options.base);
           var baseTag = frame.contentWindow.document.createElement('base');
           frame.contentWindow.document.head.appendChild(baseTag);
 
@@ -88,7 +97,9 @@
         }
 
         options.window = frame.contentWindow;
-        page(options);
+        if(options.strict != null)
+          page.strict(options.strict);
+        page.start(options);
         page(base ? base + '/' : '/');
         done();
       }
@@ -251,7 +262,7 @@
 
           page('/', function() {});
 
-          page.exit('*', function(context) {
+          page.exit(function(context) {
             var path = context.path;
             setTimeout( function() {
               expect(path).to.equal('/');
@@ -352,7 +363,10 @@
 
         it('should accommodate URL encoding', function(done) {
           page('/whatever', function(ctx) {
-            expect(ctx.querystring).to.equal(decodeURLComponents ? 'queryParam=string with whitespace' : 'queryParam=string%20with%20whitespace');
+            var expected = decodeURLComponents
+              ? 'queryParam=string with whitespace'
+              : 'queryParam=string%20with%20whitespace';
+            expect(ctx.querystring).to.equal(expected);
             done();
           });
 
@@ -482,6 +496,15 @@
 
           fireEvent($('.diff-domain'), 'click');
         });
+
+        it('works with shadow paths', function() {
+          page('/shadow', function() {
+            expect(true).to.equal(true);
+            page('/');
+          });
+    
+          fireEvent($('.shadow-path'), 'click', [$('.shadow-path')]);
+        });
       });
 
 
@@ -579,7 +602,6 @@
             page('/whathever');
           });
         });
-
       });
     },
     afterTests = function() {
@@ -591,6 +613,7 @@
       base = '';
       baseRoute = Function.prototype; // noop
       setbase = true;
+      decodeURLComponents = true;
       document.body.removeChild(frame);
     };
 
@@ -619,6 +642,24 @@
       afterTests();
     });
 
+  });
+
+  describe('Configuration', function() {
+    before(function(done) {
+      beforeTests(null, done);
+    });
+
+    it('Can disable popstate', function() {
+      page.configure({ popstate: false });
+    });
+
+    it('Can disable click handler', function() {
+      page.configure({ click: false });
+    });
+
+    after(function() {
+      afterTests();
+    });
   });
 
   describe('Hashbang option enabled', function() {
@@ -652,8 +693,9 @@
 
     before(function(done) {
       base = '/newBase';
-      page.base(base);
-      beforeTests(null, done);
+      beforeTests({
+        base: '/newBase'
+      }, done);
     });
 
     tests();
@@ -681,8 +723,9 @@
 
   describe('Strict path matching enabled', function() {
     before(function(done) {
-      page.strict(true);
-      beforeTests(null, done);
+      beforeTests({
+        strict: true
+      }, done);
     });
 
     tests();

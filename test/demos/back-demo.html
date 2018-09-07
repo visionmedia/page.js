@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<title>Blank page</title>
+<body>
+  <ul class="links">
+    <li><a class="current-page" href="./back-demo.html?key=val#hash">Click me</a></li>
+  </ul>
+
+  <script src="../page.js"></script>
+  <script>
+    page("/test/demos/back-demo.html", function(ctx){
+      console.assert(ctx.querystring === "key=val");
+    });
+  </script>
+</body>

@@ -842,7 +842,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
         page.replace(path, e.state);
       } else if (isLocation) {
         var loc = page._window.location;
-        page.show(loc.pathname + loc.hash, undefined, undefined, false);
+        page.show(loc.pathname + loc.search + loc.hash, undefined, undefined, false);
       }
     };
   })();

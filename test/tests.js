@@ -42,7 +42,7 @@
 
   });
 
-  var fireEvent = function(node, eventName) {
+  var fireEvent = function(node, eventName, path) {
       var event;
 
       if(typeof testWindow().Event === 'function') {
@@ -64,6 +64,12 @@
 
         event.button = 1;
         event.which = null;
+      }
+
+      if(path) {
+        Object.defineProperty(event, 'path', {
+          value: path
+        });
       }
 
       node.dispatchEvent(event);
@@ -490,6 +496,15 @@
 
           fireEvent($('.diff-domain'), 'click');
         });
+
+        it('works with shadow paths', function() {
+          page('/shadow', function() {
+            expect(true).to.equal(true);
+            page('/');
+          });
+    
+          fireEvent($('.shadow-path'), 'click', [$('.shadow-path')]);
+        });
       });
 
 
@@ -623,20 +638,28 @@
       fireEvent($('.query-hash'), 'click');
     });
 
-    describe('Configuration', function() {
-      it('Can disable popstate', function() {
-        page.configure({ popstate: false });
-      });
+    after(function() {
+      afterTests();
+    });
 
-      it('Can disable click handler', function() {
-        page.configure({ click: false });
-      });
+  });
+
+  describe('Configuration', function() {
+    before(function(done) {
+      beforeTests(null, done);
+    });
+
+    it('Can disable popstate', function() {
+      page.configure({ popstate: false });
+    });
+
+    it('Can disable click handler', function() {
+      page.configure({ click: false });
     });
 
     after(function() {
       afterTests();
     });
-
   });
 
   describe('Hashbang option enabled', function() {

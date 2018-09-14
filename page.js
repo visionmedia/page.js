@@ -1049,7 +1049,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
   function Context(path, state, pageInstance) {
     var _page = this.page = pageInstance || page;
     var window = _page._window;
-    var hashbang = _page.hashbang;
+    var hashbang = _page._hashbang;
 
     var pageBase = _page._getBase();
     if ('/' === path[0] && 0 !== path.indexOf(pageBase)) path = pageBase + (hashbang ? '#!' : '') + path;

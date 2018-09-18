@@ -467,7 +467,7 @@ page('/user/*', loadUser)
   would provide "/javascripts/jquery.js" as `ctx.params.file`:
 
 ```js
-page('/file/:file(*)', loadUser)
+page('/file/:file(.*)', loadUser)
 ```
 
   And of course `RegExp` literals, where the capture

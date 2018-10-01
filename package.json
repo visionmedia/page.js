@@ -15,12 +15,19 @@
   "main": "index.js",
   "browser": "page.js",
   "module": "page.mjs",
+  "files": [
+    "index.js",
+    "page.js",
+    "page.mjs"
+  ],
   "scripts": {
     "engine-deps": "install-engine-dependencies",
     "test": "jshint index.js test/tests.js && mocha test/tests.js",
     "serve": "serve test",
     "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
-    "make": "rollup -c rollup.config.js"
+    "build": "rollup -c rollup.config.js",
+    "watch": "rollup -c rollup.config.js --watch",
+    "prepublish": "npm run build && npm run test"
   },
   "dependencies": {
     "path-to-regexp": "~1.2.1"
@@ -50,10 +57,5 @@
         }
       }
     }
-  },
-  "files": [
-    "index.js",
-    "page.js",
-    "page.mjs"
-  ]
+  }
 }

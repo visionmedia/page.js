@@ -6,3 +6,5 @@ npm-debug.log
 index-cov.js
 .DS_Store
 package-lock.json
+page.js
+page.mjs

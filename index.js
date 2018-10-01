@@ -543,6 +543,7 @@
     pageFn.exit = pageInstance.exit.bind(pageInstance);
     pageFn.configure = pageInstance.configure.bind(pageInstance);
     pageFn.sameOrigin = pageInstance.sameOrigin.bind(pageInstance);
+    pageFn._onclick = pageInstance._onclick.bind(pageInstance);
 
     pageFn.create = createPage;
 

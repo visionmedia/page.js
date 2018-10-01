@@ -33,7 +33,7 @@
    * The page instance
    * @api private
    */
-  function Page(options) {
+  function Page() {
     // public things
     this.callbacks = [];
     this.exits = [];
@@ -51,8 +51,6 @@
     // bound functions
     this._onclick = this._onclick.bind(this);
     this._onpopstate = this._onpopstate.bind(this);
-
-    this.configure(options);
   }
 
   /**
@@ -429,7 +427,7 @@
   Page.prototype._onpopstate = (function () {
     var loaded = false;
     if ( ! hasWindow ) {
-      return;
+      return function () {};
     }
     if (hasDocument && document.readyState === 'complete') {
       loaded = true;
@@ -521,7 +519,7 @@
   /**
    * Create a new `page` instance and function
    */
-  function createPage(options) {
+  function createPage() {
     var pageInstance = new Page();
 
     function pageFn(/* args */) {

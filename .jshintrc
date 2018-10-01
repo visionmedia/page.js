@@ -9,7 +9,6 @@
   "curly": false,
   "eqeqeq": true,
   "immed": true,
-  "latedef": true,
   "newcap": true,
   "noarg": true,
   "quotmark": "single",

@@ -27,7 +27,7 @@
     "test-cov": "jscoverage index.js index-cov.js; PAGE_COV=1 mocha test/tests.js -R html-cov > coverage.html",
     "build": "rollup -c rollup.config.js",
     "watch": "rollup -c rollup.config.js --watch",
-    "prepublish": "npm run build && npm run test"
+    "prepublishOnly": "npm run build && npm run test"
   },
   "dependencies": {
     "path-to-regexp": "~1.2.1"
@@ -46,8 +46,7 @@
     "rollup": "^0.54.1",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-resolve": "^3.0.2",
-    "serve": "*",
-    "should": "*"
+    "serve": "*"
   },
   "engineDependencies": {
     "node": {

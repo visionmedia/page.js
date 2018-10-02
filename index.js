@@ -33,7 +33,7 @@
    * The page instance
    * @api private
    */
-  function Page() {
+  function Page(options) {
     // public things
     this.callbacks = [];
     this.exits = [];
@@ -51,6 +51,8 @@
     // bound functions
     this._onclick = this._onclick.bind(this);
     this._onpopstate = this._onpopstate.bind(this);
+
+    this.configure(options);
   }
 
   /**
@@ -69,25 +71,6 @@
     this._popstate = opts.popstate !== false && hasWindow;
     this._click = opts.click !== false && hasDocument;
     this._hashbang = !!opts.hashbang;
-
-    var _window = this._window;
-    if(this._popstate) {
-      _window.addEventListener('popstate', this._onpopstate, false);
-    } else if(hasWindow) {
-      _window.removeEventListener('popstate', this._onpopstate, false);
-    }
-
-    if (this._click) {
-      _window.document.addEventListener(clickEvent, this._onclick, false);
-    } else if(hasDocument) {
-      _window.document.removeEventListener(clickEvent, this._onclick, false);
-    }
-
-    if(this._hashbang && hasWindow && !hasHistory) {
-      _window.addEventListener('hashchange', this._onpopstate, false);
-    } else if(hasWindow) {
-      _window.removeEventListener('hashchange', this._onpopstate, false);
-    }
   };
 
   /**
@@ -143,6 +126,25 @@
 
   Page.prototype.start = function(options) {
     this.configure(options);
+
+    var _window = this._window;
+    if(this._popstate) {
+      _window.addEventListener('popstate', this._onpopstate, false);
+    } else if(hasWindow) {
+      _window.removeEventListener('popstate', this._onpopstate, false);
+    }
+
+    if (this._click) {
+      _window.document.addEventListener(clickEvent, this._onclick, false);
+    } else if(hasDocument) {
+      _window.document.removeEventListener(clickEvent, this._onclick, false);
+    }
+
+    if(this._hashbang && hasWindow && !hasHistory) {
+      _window.addEventListener('hashchange', this._onpopstate, false);
+    } else if(hasWindow) {
+      _window.removeEventListener('hashchange', this._onpopstate, false);
+    }
 
     if (!this._dispatch) return;
     this._running = true;
@@ -427,7 +429,7 @@
   Page.prototype._onpopstate = (function () {
     var loaded = false;
     if ( ! hasWindow ) {
-      return function () {};
+      return function() {};
     }
     if (hasDocument && document.readyState === 'complete') {
       loaded = true;
@@ -519,8 +521,8 @@
   /**
    * Create a new `page` instance and function
    */
-  function createPage() {
-    var pageInstance = new Page();
+  function createPage(options) {
+    var pageInstance = new Page(options);
 
     function pageFn(/* args */) {
       return page.apply(pageInstance, arguments);

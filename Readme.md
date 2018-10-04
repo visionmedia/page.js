@@ -218,6 +218,10 @@ var otherPage = page.create({ window: iframe.contentWindow });
 otherPage('/', main);
 ```
 
+### page.clickHandler
+
+This is the click handler used by page to handle routing when a user clicks an anchor like `<a href="/user/profile">`. This is exported for those who want to disable the click handling behavior with `page.start({ click: false })`, but still might want to dispatch based on the click handler's logic in some scenarios.
+
 ### Context
 
   Routes are passed `Context` objects, these may

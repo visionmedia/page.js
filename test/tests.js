@@ -735,6 +735,12 @@
     });
   });
 
+  describe('.clickHandler', function() {
+    it('is exported by the global page', function() {
+      expect(typeof page.clickHandler).to.equal('function');
+    });
+  });
+
   var describei = jsdomSupport ? describe : describe.skip;
 
   describei('File protocol', function() {

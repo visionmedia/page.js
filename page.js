@@ -815,7 +815,9 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
     if (this._hashbang) path = path.replace('#!', '');
 
-    if (pageBase && orig === path) return;
+    if (pageBase && orig === path && (!isLocation || this._window.location.protocol !== 'file:')) {
+      return;
+    }
 
     e.preventDefault();
     this.show(orig);

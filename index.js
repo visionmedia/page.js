@@ -415,7 +415,9 @@
 
     if (this._hashbang) path = path.replace('#!', '');
 
-    if (pageBase && orig === path) return;
+    if (pageBase && orig === path && (!isLocation || this._window.location.protocol !== 'file:')) {
+      return;
+    }
 
     e.preventDefault();
     this.show(orig);
@@ -429,7 +431,7 @@
   Page.prototype._onpopstate = (function () {
     var loaded = false;
     if ( ! hasWindow ) {
-      return;
+      return function() {};
     }
     if (hasDocument && document.readyState === 'complete') {
       loaded = true;

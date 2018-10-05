@@ -400,7 +400,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    * Module dependencies.
    */
 
-
+  
 
   /**
    * Short-cuts for global-object checks
@@ -809,7 +809,9 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
     if (this._hashbang) path = path.replace('#!', '');
 
-    if (pageBase && orig === path) return;
+    if (pageBase && orig === path && (!isLocation || this._window.location.protocol !== 'file:')) {
+      return;
+    }
 
     e.preventDefault();
     this.show(orig);
@@ -823,7 +825,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
   Page.prototype._onpopstate = (function () {
     var loaded = false;
     if ( ! hasWindow ) {
-      return;
+      return function() {};
     }
     if (hasDocument && document.readyState === 'complete') {
       loaded = true;

@@ -114,7 +114,16 @@
     var base = this._base;
     if(!!base) return base;
     var loc = hasWindow && this._window && this._window.location;
-    return (hasWindow && this._hashbang && loc && loc.protocol === 'file:') ? loc.pathname : base;
+
+    if(hasWindow && this._hashbang && loc && loc.protocol === 'file:') {
+      base = loc.pathname;
+      var match = base.match(/.*\//);
+      if(match) {
+        base = match[0].slice(0, -1);
+      }
+    }
+
+    return base;
   };
 
   /**

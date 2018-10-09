@@ -502,7 +502,7 @@
             expect(true).to.equal(true);
             page('/');
           });
-    
+
           fireEvent($('.shadow-path'), 'click', [$('.shadow-path')]);
         });
       });
@@ -754,11 +754,19 @@
       hashbang = false;
     });
 
-    it('test', function(){
+    it('simple route call', function(){
       page('/about', function(ctx){
         expect(ctx.path).to.equal('/about');
       });
       page('/about');
+    });
+
+    it('click routing', function(done){
+      page('/contact', function(ctx){
+        done();
+      });
+
+      fireEvent($('.contact'), 'click');
     });
   });
 

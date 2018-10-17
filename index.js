@@ -117,13 +117,7 @@
 
     if(hasWindow && this._hashbang && loc && loc.protocol === 'file:') {
       base = loc.pathname;
-      /** Get the dirname of the path */
-      var match = base.match(/.*\//);
-
-      /** Remove trailing slash */
-      if(match) {
-        base = match[0].slice(0, -1);
-      }
+      base = base.substring(0, base.lastIndexOf('/'));
     }
 
     return base;

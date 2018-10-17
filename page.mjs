@@ -511,10 +511,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
     if(hasWindow && this._hashbang && loc && loc.protocol === 'file:') {
       base = loc.pathname;
-      var match = base.match(/.*\//);
-      if(match) {
-        base = match[0].slice(0, -1);
-      }
+      base = base.substring(0, base.lastIndexOf('/'));
     }
 
     return base;

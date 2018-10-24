@@ -735,6 +735,28 @@
     });
   });
 
+  describe('.clickHandler', function() {
+    it('is exported by the global page', function() {
+      expect(typeof page.clickHandler).to.equal('function');
+    });
+  });
+
+  describe('Environments without the URL constructor', function() {
+    var URLC;
+    before(function(done) {
+      URLC = global.URL;
+      global.URL = undefined;
+      beforeTests(null, done);
+    });
+
+    tests();
+
+    after(function() {
+      global.URL = URLC;
+      afterTests();
+    });
+  });
+
   var describei = jsdomSupport ? describe : describe.skip;
 
   describei('File protocol', function() {

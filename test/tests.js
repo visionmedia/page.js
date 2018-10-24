@@ -760,14 +760,6 @@
       });
       page('/about');
     });
-
-    it('click routing', function(done){
-      page('/contact', function(ctx){
-        done();
-      });
-
-      fireEvent($('.contact'), 'click');
-    });
   });
 
 }).call(this);

@@ -437,7 +437,7 @@
   Page.prototype._onpopstate = (function () {
     var loaded = false;
     if ( ! hasWindow ) {
-      return function() {};
+      return function () {};
     }
     if (hasDocument && document.readyState === 'complete') {
       loaded = true;

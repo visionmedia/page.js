@@ -114,7 +114,13 @@
     var base = this._base;
     if(!!base) return base;
     var loc = hasWindow && this._window && this._window.location;
-    return (hasWindow && this._hashbang && loc && loc.protocol === 'file:') ? loc.pathname : base;
+
+    if(hasWindow && this._hashbang && loc && loc.protocol === 'file:') {
+      base = loc.pathname;
+      base = base.substring(0, base.lastIndexOf('/'));
+    }
+
+    return base;
   };
 
   /**
@@ -415,7 +421,9 @@
 
     if (this._hashbang) path = path.replace('#!', '');
 
-    if (pageBase && orig === path) return;
+    if (pageBase && orig === path && (!isLocation || this._window.location.protocol !== 'file:')) {
+      return;
+    }
 
     e.preventDefault();
     this.show(orig);

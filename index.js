@@ -185,7 +185,7 @@
     this._running = false;
 
     var window = this._window;
-    hasDocument && window.document.removeEventListener(clickEvent, this.clickHandler, false);
+    this._click && window.document.removeEventListener(clickEvent, this.clickHandler, false);
     hasWindow && window.removeEventListener('popstate', this._onpopstate, false);
     hasWindow && window.removeEventListener('hashchange', this._onpopstate, false);
   };

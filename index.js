@@ -117,7 +117,6 @@
 
     if(hasWindow && this._hashbang && loc && loc.protocol === 'file:') {
       base = loc.pathname;
-      base = base.substring(0, base.lastIndexOf('/'));
     }
 
     return base;

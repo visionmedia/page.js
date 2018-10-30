@@ -517,7 +517,6 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
     if(hasWindow && this._hashbang && loc && loc.protocol === 'file:') {
       base = loc.pathname;
-      base = base.substring(0, base.lastIndexOf('/'));
     }
 
     return base;
@@ -585,7 +584,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     this._running = false;
 
     var window = this._window;
-    hasDocument && window.document.removeEventListener(clickEvent, this.clickHandler, false);
+    this._click && window.document.removeEventListener(clickEvent, this.clickHandler, false);
     hasWindow && window.removeEventListener('popstate', this._onpopstate, false);
     hasWindow && window.removeEventListener('hashchange', this._onpopstate, false);
   };

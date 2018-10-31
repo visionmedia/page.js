@@ -427,7 +427,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    * The page instance
    * @api private
    */
-  function Page(options) {
+  function Page() {
     // public things
     this.callbacks = [];
     this.exits = [];
@@ -445,8 +445,6 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     // bound functions
     this.clickHandler = this.clickHandler.bind(this);
     this._onpopstate = this._onpopstate.bind(this);
-
-    this.configure(options);
   }
 
   /**
@@ -922,7 +920,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
   /**
    * Create a new `page` instance and function
    */
-  function createPage(options) {
+  function createPage() {
     var pageInstance = new Page();
 
     function pageFn(/* args */) {

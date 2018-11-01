@@ -41,7 +41,6 @@
     this.len = 0;
 
     // private things
-    this._dispatch = true;
     this._decodeURLComponents = true;
     this._base = '';
     this._strict = false;
@@ -64,7 +63,6 @@
     var opts = options || {};
 
     this._window = opts.window || (hasWindow && window);
-    this._dispatch = opts.dispatch !== false;
     this._decodeURLComponents = opts.decodeURLComponents !== false;
     this._popstate = opts.popstate !== false && hasWindow;
     this._click = opts.click !== false && hasDocument;
@@ -149,7 +147,7 @@
   Page.prototype.start = function(options) {
     this.configure(options);
 
-    if (!this._dispatch) return;
+    if (false === options.dispatch) return;
     this._running = true;
 
     var url;
@@ -166,7 +164,7 @@
       }
     }
 
-    this.replace(url, null, true, this._dispatch);
+    this.replace(url, null, true, options.dispatch);
   };
 
   /**
@@ -203,7 +201,7 @@
       prev = this.prevContext;
     this.prevContext = ctx;
     this.current = ctx.path;
-    if (this._dispatch) this.dispatch(ctx, prev);
+    if (false !== dispatch) this.dispatch(ctx, prev);
     if (false !== ctx.handled && false !== push) ctx.pushState();
     return ctx;
   };

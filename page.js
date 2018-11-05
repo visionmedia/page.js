@@ -680,6 +680,7 @@
       this.path = this.pathname = parts[0];
       this.hash = _page._decodeURLEncodedURIComponent(parts[1]) || '';
       this.querystring = this.querystring.split('#')[0];
+      this.pathname = this.pathname.split('#')[0];
     }
   }
 

@@ -790,4 +790,4 @@
 
   var globalPage = createPage();
   module.exports = globalPage;
-  page.default = globalPage;
+  module.exports.default = globalPage;

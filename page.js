@@ -545,9 +545,10 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    */
 
   Page.prototype.start = function(options) {
-    this.configure(options);
+    var opts = options || {};
+    this.configure(opts);
 
-    if (false === options.dispatch) return;
+    if (false === opts.dispatch) return;
     this._running = true;
 
     var url;
@@ -564,7 +565,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
       }
     }
 
-    this.replace(url, null, true, options.dispatch);
+    this.replace(url, null, true, opts.dispatch);
   };
 
   /**

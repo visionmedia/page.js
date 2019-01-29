@@ -1042,6 +1042,16 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
   }
 
   /**
+   * Escapes RegExp characters in the given string.
+   *
+   * @param {string} s
+   * @api private
+   */
+  function escapeRegExp(s) {
+    return s.replace(/([.+*?=^!:${}()[\]|/\\])/g, '\\$1');
+  }
+
+  /**
    * Initialize a new "request" `Context`
    * with the given `path` and optional initial `state`.
    *
@@ -1061,7 +1071,8 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;
-    this.path = path.replace(pageBase, '') || '/';
+    var re = new RegExp('^' + escapeRegExp(pageBase));
+    this.path = path.replace(re, '') || '/';
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = (hasDocument && window.document.title);

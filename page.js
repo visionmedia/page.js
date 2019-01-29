@@ -1119,7 +1119,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
   Context.prototype.save = function() {
     var page = this.page;
-    if (hasHistory && page._window.location.protocol !== 'file:') {
+    if (hasHistory) {
         page._window.history.replaceState(this.state, this.title,
           page._hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }

@@ -892,7 +892,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     var url = this._toURL(href);
     var window = this._window;
 
-    var loc = window.location;
+    var loc = this._toURL(window.location);
     return loc.protocol === url.protocol &&
       loc.hostname === url.hostname &&
       loc.port === url.port;

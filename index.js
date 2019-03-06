@@ -476,7 +476,17 @@
     } else if (hasDocument) {
       var anc = window.document.createElement('a');
       anc.href = href;
-      return anc;
+      var fakeUrl = {
+        protocol: anc.protocol,
+        hostname: anc.hostname,
+        port: anc.port
+      };
+      if ((anc.protocol === 'http:' && anc.port === '80') || 
+          (anc.protocol === 'https:' && anc.port === '443')) {
+        // older IE sets the port even if it was not specified
+        fakeUrl.port = '';
+      }
+      return fakeUrl;
     }
   };
 

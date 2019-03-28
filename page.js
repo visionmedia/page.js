@@ -895,7 +895,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     var loc = window.location;
     return loc.protocol === url.protocol &&
       loc.hostname === url.hostname &&
-      loc.port === url.port;
+      (loc.port === url.port || loc.port === '' && url.port === 80);
   };
 
   /**

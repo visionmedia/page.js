@@ -406,7 +406,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    * Module dependencies.
    */
 
-  
+
 
   /**
    * Short-cuts for global-object checks
@@ -893,9 +893,15 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     var window = this._window;
 
     var loc = window.location;
+
+    /*
+       when the port is the default http port 80, internet explorer 11
+       returns an empty string for loc.port, so we need to compare loc.port
+       with an empty string if url.port is the default port 80.
+    */
     return loc.protocol === url.protocol &&
       loc.hostname === url.hostname &&
-      loc.port === url.port;
+      (loc.port === url.port || loc.port === '' && url.port === 80);
   };
 
   /**

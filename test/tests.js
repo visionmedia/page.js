@@ -425,7 +425,7 @@
         
         it('should handle optional first param', function(done) {
           page(/^\/ctxparams\/(option1|option2)?$/, function(ctx) {
-            expect(ctx.params[0]).to.be.undefined
+            expect(ctx.params[0]).to.be.undefined;
             done();
           });
           page('/ctxparams/');

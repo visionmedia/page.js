@@ -81,7 +81,7 @@
       _window.document.removeEventListener(clickEvent, this.clickHandler, false);
     }
 
-    if(this._hashbang && hasWindow && !this._popstate) {
+    if(this._hashbang && hasWindow && (!hasHistory || !this._popstate)) {
       _window.addEventListener('hashchange', this._onpopstate, false);
     } else if(hasWindow) {
       _window.removeEventListener('hashchange', this._onpopstate, false);

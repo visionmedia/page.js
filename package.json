@@ -1,7 +1,7 @@
 {
   "name": "page",
   "description": "Tiny client-side router",
-  "version": "1.11.4",
+  "version": "1.11.5",
   "license": "MIT",
   "repository": {
     "type": "git",

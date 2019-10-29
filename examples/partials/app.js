@@ -1,4 +1,5 @@
 
+page.base(location.pathname.replace('/partials/', ''));
 page('*', init.ctx);
 page('/partials/home', route.home);
 page('/partials/portfolio', route.portfolio);

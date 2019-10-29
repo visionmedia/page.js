@@ -6,91 +6,156 @@
   var isNode = typeof window !== 'object',
     global = this,
     called = false,
+    baseRoute = Function.prototype, // noop
     html = '',
     base = '',
+    setbase = true,
     hashbang = false,
     decodeURLComponents = true,
     chai = this.chai,
     expect = this.expect,
     page = this.page,
+    globalPage = this.page,
     baseTag,
-    htmlWrapper,
-    $;
+    frame,
+    $,
+    jsdomSupport;
 
   if (isNode) {
-    require('./support/jsdom');
+    jsdomSupport = require('./support/jsdom');
   }
 
   before(function() {
-
     if (isNode) {
       chai = require('chai');
       expect = chai.expect;
-      page = process.env.PAGE_COV ? require('../index-cov') : require('../index');
+      globalPage = process.env.PAGE_COV ?
+        require('../index-cov') : require('../index');
     } else {
+      globalPage = window.page;
       expect = chai.expect;
     }
 
-    $ = document.querySelector.bind(document);
+    $ = function(sel) {
+      return frame.contentWindow.document.querySelector(sel);
+    };
 
   });
 
-  var fireEvent = function(node, eventName) {
+  var fireEvent = function(node, eventName, path) {
+      var event;
 
-      var event = document.createEvent('MouseEvents');
+      if(typeof testWindow().Event === 'function') {
+        var MouseEvent = testWindow().MouseEvent;
+        event = new MouseEvent(eventName, {
+          bubbles: true,
+          button: 1
+        });
+        Object.defineProperty(event, 'which', { value: null });
+      } else {
+        event = testWindow().document.createEvent('MouseEvents');
 
-      // https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
-      event.initEvent(
-        eventName, true, true, this, 0,
-        event.screenX, event.screenY, event.clientX, event.clientY,
-        false, false, false, false,
-        0, null);
+        // https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
+        event.initEvent(
+          eventName, true, true, this, 0,
+          event.screenX, event.screenY, event.clientX, event.clientY,
+          false, false, false, false,
+          0, null);
 
-      event.button = 1;
-      event.which = null;
-
-      node.dispatchEvent(event);
-
-    },
-    beforeTests = function(options) {
-      page.callbacks = [];
-      page.exits = [];
-      options = options || {};
-
-      page('/', function() {
-        called = true;
-      });
-
-      if (!baseTag) {
-        baseTag = document.createElement('base');
-        $('head').appendChild(baseTag);
+        event.button = 1;
+        event.which = null;
       }
 
-      baseTag.setAttribute('href', (base ? base + '/' : '/'));
+      if(path) {
+        Object.defineProperty(event, 'path', {
+          value: path
+        });
+      }
 
-      htmlWrapper = document.createElement('div');
+      node.dispatchEvent(event);
+    },
+    testWindow = function(){
+      return frame.contentWindow;
+    },
+    beforeTests = function(options, done) {
+      options = options || {};
+      page = globalPage.create();
 
-      html += '<ul class="links">';
-      html += '      <li><a class="index" href="./">/</a></li>';
-      html += '      <li><a class="whoop" href="#whoop">#whoop</a></li>';
-      html += '      <li><a class="about" href="./about">/about</a></li>';
-      html += '      <li><a class="contact" href="./contact">/contact</a></li>';
-      html += '      <li><a class="contact-me" href="./contact/me">/contact/me</a></li>';
-      html += '      <li><a class="not-found" href="./not-found?foo=bar">/not-found</a></li>';
-      html += '</ul>';
+      page('/', function(ctx) {
+        called = true;
+        baseRoute(ctx);
+      });
 
-      htmlWrapper.innerHTML = html;
-      document.body.appendChild(htmlWrapper);
+      function onFrameLoad(){
+        if(setbase) {
+          if(options.base)
+            page.base(options.base);
+          var baseTag = frame.contentWindow.document.createElement('base');
+          frame.contentWindow.document.head.appendChild(baseTag);
 
+          baseTag.setAttribute('href', (base ? base + '/' : '/'));
+        }
 
+        options.window = frame.contentWindow;
+        if(options.strict != null)
+          page.strict(options.strict);
+        page.start(options);
+        page(base ? base + '/' : '/');
+        done();
+      }
 
-      page(options);
+      frame = document.createElement('iframe');
+      document.body.appendChild(frame);
+      if(isNode) {
+        var cntn = require('fs').readFileSync(__dirname + '/test-page.html', 'utf8');
+        cntn = cntn.replace('<!doctype html>', '').trim();
+        cntn = cntn.replace('<html lang="en">', '');
+        frame.contentWindow.document.documentElement.innerHTML = cntn;
+        onFrameLoad();
+      } else {
+        frame.src = './test-page.html';
+        frame.addEventListener('load', onFrameLoad);
+      }
+    },
+    replaceable = function(route) {
+      function realCallback(ctx) {
+        obj.callback(ctx);
+      }
 
+      var obj = {
+        callback: Function.prototype,
+        replace: function(cb){
+          obj.callback = cb;
+        },
+        once: function(cb){
+          obj.replace(function(ctx){
+            obj.callback = Function.prototype;
+            cb(ctx);
+          });
+        }
+      };
+
+      page(route, realCallback);
+
+      return obj;
     },
     tests = function() {
       describe('on page load', function() {
         it('should invoke the matching callback', function() {
           expect(called).to.equal(true);
+        });
+
+        it('should invoke the matching async callbacks', function(done) {
+          page('/async', function(ctx, next) {
+            setTimeout(function() {
+              next();
+            }, 10);
+          }, function(ctx, next) {
+            setTimeout(function() {
+              done();
+            }, 10);
+          });
+          page('/async');
         });
       });
 
@@ -136,6 +201,27 @@
           page('/');
         });
 
+        it('should run async callbacks when exiting the page', function(done) {
+          var visited = false;
+          page('/async-exit', function() {
+            visited = true;
+          });
+
+          page.exit('/async-exit', function(ctx, next) {
+            setTimeout(function() {
+              next();
+            }, 10);
+          }, function(ctx, next) {
+            setTimeout(function () {
+              expect(visited).to.equal(true);
+              done();
+            }, 10);
+          });
+
+          page('/async-exit');
+          page('/');
+        });
+
         it('should only run on matched routes', function(done) {
           page('/should-exit', function() {});
           page('/', function() {});
@@ -170,25 +256,89 @@
         });
       });
 
+      describe('no dispatch', function() {
+        it('should use the previous context when not dispatching', function(done) {
+          var count = 0;
+
+          page('/', function() {});
+
+          page.exit(function(context) {
+            var path = context.path;
+            setTimeout( function() {
+              expect(path).to.equal('/');
+              page.replace( '/', null, false, false);
+              if ( count === 2 ) {
+                done();
+                return;
+              }
+              count++;
+            }, 0);
+          });
+
+          page('/');
+
+          page('/bootstrap');
+
+          setTimeout( function() {
+            page('/bootstrap');
+          }, 0 );
+        });
+
+
+        after(function() {
+          // remove exit handler that was added
+          page.exits.pop();
+        });
+      });
+
       describe('page.back', function() {
+        var first;
+
         before(function() {
-          page('/first', function() {});
+          first = replaceable('/first', function(){});
           page('/second', function() {});
           page('/first');
           page('/second');
         });
-        it('should move back to history', function() {
+
+        it('should move back to history', function(done) {
+          first.once(function(){
+            var path = hashbang
+              ? testWindow().location.hash.replace('#!', '')
+              : testWindow().location.pathname;
+            path = path.replace(base, '');
+            expect(path).to.be.equal('/first');
+            done();
+          });
+
           page.back('/first');
-          var path = hashbang
-            ? location.hash.replace('#!', '')
-            : location.pathname;
-          expect(path).to.be.equal('/first');
+
         });
+
         it('should decrement page.len on back()', function() {
           var lenAtFirst = page.len;
           page('/second');
           page.back('/first');
           expect(page.len).to.be.equal(lenAtFirst);
+        });
+
+        it('calling back() when there is nothing in the history should go to the given path', function(done){
+          page('/fourth', function(){
+            expect(page.len).to.be.equal(0);
+            done();
+          });
+          page.len = 0;
+          page.back('/fourth');
+        });
+
+        it('calling back with nothing in the history and no path should go to the base', function(done){
+          baseRoute = function(){
+            expect(page.len).to.be.equal(0);
+            baseRoute = Function.prototype;
+            done();
+          };
+          page.len = 0;
+          page.back();
         });
       });
 
@@ -213,7 +363,10 @@
 
         it('should accommodate URL encoding', function(done) {
           page('/whatever', function(ctx) {
-            expect(ctx.querystring).to.equal(decodeURLComponents ? 'queryParam=string with whitespace' : 'queryParam=string%20with%20whitespace');
+            var expected = decodeURLComponents
+              ? 'queryParam=string with whitespace'
+              : 'queryParam=string%20with%20whitespace';
+            expect(ctx.querystring).to.equal(expected);
             done();
           });
 
@@ -267,7 +420,15 @@
             expect(ctx.params).to.be.an('object');
             done();
           });
-          page('/ctxparams/test');
+          page('/ctxparams/test/');
+        });
+        
+        it('should handle optional first param', function(done) {
+          page(/^\/ctxparams\/(option1|option2)?$/, function(ctx) {
+            expect(ctx.params[0]).to.be.undefined;
+            done();
+          });
+          page('/ctxparams/');
         });
       });
 
@@ -283,12 +444,36 @@
       });
 
       describe('links dispatcher', function() {
-
         it('should invoke the callback', function(done) {
           page('/about', function() {
             done();
           });
+
           fireEvent($('.about'), 'click');
+        });
+
+        it('should handle trailing slashes in URL', function(done) {
+          page('/link-trailing', function() {
+            expect(page.strict()).to.equal(false);
+            done();
+          });
+          page('/link-trailing/', function() {
+            expect(page.strict()).to.equal(true);
+            done();
+          });
+          fireEvent($('.link-trailing'), 'click');
+        });
+
+        it('should handle trailing slashes in route', function(done) {
+          page('/link-no-trailing/', function() {
+            expect(page.strict()).to.equal(false);
+            done();
+          });
+          page('/link-no-trailing', function() {
+            expect(page.strict()).to.equal(true);
+            done();
+          });
+          fireEvent($('.link-no-trailing'), 'click');
         });
 
         it('should invoke the callback with the right params', function(done) {
@@ -306,6 +491,28 @@
           fireEvent($('.whoop'), 'click');
         });
 
+        it('should not fire when navigating to a different domain', function(done){
+          page('/diff-domain', function(ctx){
+            expect(true).to.equal(false);
+          });
+
+          testWindow().document.addEventListener('click', function onDocClick(ev){
+            ev.preventDefault();
+            testWindow().document.removeEventListener('click', onDocClick);
+            done();
+          });
+
+          fireEvent($('.diff-domain'), 'click');
+        });
+
+        it('works with shadow paths', function() {
+          page('/shadow', function() {
+            expect(true).to.equal(true);
+            page('/');
+          });
+
+          fireEvent($('.shadow-path'), 'click', [$('.shadow-path')]);
+        });
       });
 
 
@@ -335,6 +542,30 @@
           page('/user/tj');
         });
 
+        it('should handle trailing slashes in path', function(done) {
+          page('/no-trailing', function() {
+            expect(page.strict()).to.equal(false);
+            done();
+          });
+          page('/no-trailing/', function() {
+            expect(page.strict()).to.equal(true);
+            done();
+          });
+          page('/no-trailing/');
+        });
+
+        it('should handle trailing slashes in route', function(done) {
+          page('/trailing/', function() {
+            expect(page.strict()).to.equal(false);
+            done();
+          });
+          page('/trailing', function() {
+            expect(page.strict()).to.equal(true);
+            done();
+          });
+          page('/trailing');
+        });
+
         it('should populate ctx.params', function(done) {
           page('/blog/post/:name', function(ctx) {
             expect(ctx.params.name).to.equal('something');
@@ -342,6 +573,15 @@
           });
 
           page('/blog/post/something');
+        });
+
+        it('should not include hash in ctx.pathname', function(done){
+          page('/contact', function(ctx){
+            expect(ctx.pathname).to.equal('/contact');
+            done();
+          });
+
+          page(hashbang ? '/contact' : '/contact#bang');
         });
 
         describe('when next() is invoked', function() {
@@ -370,28 +610,41 @@
             page('/whathever');
           });
         });
-
       });
     },
     afterTests = function() {
-
-      document.body.removeChild(htmlWrapper);
-
       called = false;
       page.stop();
       page.base('');
-      page('/');
+      page.strict(false);
+      //page('/');
       base = '';
-
+      baseRoute = Function.prototype; // noop
+      setbase = true;
+      decodeURLComponents = true;
+      document.body.removeChild(frame);
     };
 
   describe('Html5 history navigation', function() {
 
-    before(function() {
-      beforeTests();
+    before(function(done) {
+      beforeTests(null, done);
     });
 
     tests();
+
+    it('Should dispatch when going to a hash on same path', function(done){
+      var cnt = 0;
+      page('/query', function(){
+        cnt++;
+        if(cnt === 2) {
+          done();
+        }
+      });
+
+      fireEvent($('.query'), 'click');
+      fireEvent($('.query-hash'), 'click');
+    });
 
     after(function() {
       afterTests();
@@ -399,18 +652,46 @@
 
   });
 
+  describe('Configuration', function() {
+    before(function(done) {
+      beforeTests(null, done);
+    });
+
+    it('Can disable popstate', function() {
+      page.configure({ popstate: false });
+    });
+
+    it('Can disable click handler', function() {
+      page.configure({ click: false });
+    });
+
+    after(function() {
+      afterTests();
+    });
+  });
+
   describe('Hashbang option enabled', function() {
 
-    before(function() {
+    before(function(done) {
       hashbang = true;
       beforeTests({
         hashbang: hashbang
-      });
+      }, done);
     });
 
     tests();
 
+    it('Using hashbang, url\'s pathname not included in path', function(done){
+      page.stop();
+      baseRoute = function(ctx){
+        expect(ctx.path).to.equal('/');
+        done();
+      };
+      page({ hashbang: true, window: frame.contentWindow });
+    });
+
     after(function() {
+      hashbang = false;
       afterTests();
     });
 
@@ -418,10 +699,11 @@
 
   describe('Different Base', function() {
 
-    before(function() {
+    before(function(done) {
       base = '/newBase';
-      page.base(base);
-      beforeTests();
+      beforeTests({
+        base: '/newBase'
+      }, done);
     });
 
     tests();
@@ -433,17 +715,80 @@
   });
 
   describe('URL path component decoding disabled', function() {
-    before(function() {
+    before(function(done) {
       decodeURLComponents = false;
       beforeTests({
         decodeURLComponents: decodeURLComponents
-      });
+      }, done);
     });
 
     tests();
 
     after(function() {
       afterTests();
+    });
+  });
+
+  describe('Strict path matching enabled', function() {
+    before(function(done) {
+      beforeTests({
+        strict: true
+      }, done);
+    });
+
+    tests();
+
+    after(function() {
+      afterTests();
+    });
+  });
+
+  describe('.clickHandler', function() {
+    it('is exported by the global page', function() {
+      expect(typeof page.clickHandler).to.equal('function');
+    });
+  });
+
+  describe('Environments without the URL constructor', function() {
+    var URLC;
+    before(function(done) {
+      URLC = global.URL;
+      global.URL = undefined;
+      beforeTests(null, done);
+    });
+
+    tests();
+
+    after(function() {
+      global.URL = URLC;
+      afterTests();
+    });
+  });
+
+  var describei = jsdomSupport ? describe : describe.skip;
+
+  describei('File protocol', function() {
+    before(function(done){
+      jsdomSupport.setup({
+        url: 'file:///var/html/index.html'
+      }, Function.prototype);
+
+      setbase = false;
+      hashbang = true;
+      beforeTests({
+        hashbang: hashbang
+      }, done);
+    });
+
+    after(function(){
+      hashbang = false;
+    });
+
+    it('simple route call', function(){
+      page('/about', function(ctx){
+        expect(ctx.path).to.equal('/about');
+      });
+      page('/about');
     });
   });
 

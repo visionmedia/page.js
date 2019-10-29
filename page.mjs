@@ -1,9 +1,3 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.page = factory());
-}(this, (function () { 'use strict';
-
 var isarray = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
@@ -1206,6 +1200,4 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
 page_js.default = default_1;
 
-return page_js;
-
-})));
+export default page_js;

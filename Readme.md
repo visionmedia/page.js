@@ -3,8 +3,8 @@
 Tiny Express-inspired client-side router.
 
  [![Build Status](https://travis-ci.org/visionmedia/page.js.svg?branch=master)](https://travis-ci.org/visionmedia/page.js)
-[![Coverage Status](https://coveralls.io/repos/visionmedia/page.js/badge.png?branch=master)](https://coveralls.io/r/visionmedia/page.js?branch=master)
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/visionmedia/page.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Coverage Status](https://coveralls.io/repos/visionmedia/page.js/badge.svg?branch=master)](https://coveralls.io/r/visionmedia/page.js?branch=master)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/visionmedia/page.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ```js
 page('/', index)
@@ -25,6 +25,32 @@ page()
   $ npm install page # for browserify
   $ component install visionmedia/page.js
   $ bower install visionmedia/page.js
+  ```
+
+  Or use with a CDN. We support:
+
+  * [cdnjs](https://cdnjs.com/libraries/page.js)
+  * [unpkg](https://unpkg.com/page/page.js)
+
+  Using with global script tags:
+
+  ```html
+  <script src="https://unpkg.com/page/page.js"></script>
+  <script>
+    page('/about', function(){
+      // Do stuff
+    });
+  </script>
+  ```
+
+  Or with modules, in modern browsers:
+
+  ```html
+  <script type="module">
+    import page from "//unpkg.com/page/page.mjs";
+
+    page('/home', () => { ... });
+  </script>
   ```
 
 ## Running examples
@@ -133,6 +159,7 @@ page('/default');
   - `dispatch` perform initial dispatch [__true__]
   - `hashbang` add `#!` before urls [__false__]
   - `decodeURLComponents` remove URL encoding from path components (query string, pathname, hash) [__true__]
+  - `window` provide a window to control (by default it will control the main window)
 
   If you wish to load serve initial content
   from the server you likely will want to
@@ -150,6 +177,11 @@ page('/default');
 
   Get or set the base `path`. For example if page.js
   is operating within `/blog/*` set the base path to "/blog".
+
+### page.strict([enable])
+
+  Get or set the strict path matching mode to `enable`. If enabled
+  `/blog` will not match "/blog/" and `/blog/` will not match "/blog".
 
 ### page.exit(path, callback[, callback ...])
 
@@ -173,6 +205,22 @@ page.exit('/sidebar', function(ctx, next) {
 ### page.exit(callback)
 
 Equivalent to `page.exit('*', callback)`.
+
+### page.create([options])
+
+Create a new page instance with the given options. Options provided
+are the same as provided in `page([options])` above. Use this if you need
+to control multiple windows (like iframes or popups) in addition
+to the main window.
+
+```js
+var otherPage = page.create({ window: iframe.contentWindow });
+otherPage('/', main);
+```
+
+### page.clickHandler
+
+This is the click handler used by page to handle routing when a user clicks an anchor like `<a href="/user/profile">`. This is exported for those who want to disable the click handling behavior with `page.start({ click: false })`, but still might want to dispatch based on the click handler's logic in some scenarios.
 
 ### Context
 
@@ -325,6 +373,8 @@ function show(ctx){
 page('/user/:id', load, show)
 ```
 
+**NOTE:** The value of `ctx.params.NAME` is decoded via `decodeURIComponent(sliceOfUrl)`. One exception though is the use of the plus sign (+) in the url, e.g. `/user/john+doe`, which is decoded to a space: `ctx.params.id == 'john doe'`. Also an encoded plus sign (`%2B`) is decoded to a space.
+
 ### Working with state
 
   When working with the `pushState` API,
@@ -333,13 +383,13 @@ page('/user/:id', load, show)
   the history.
 
   For example if you had a photo application
-  and you performed a relatively expensive
+  and you performed a relatively extensive
   search to populate a list of images,
   normally when a user clicks "back" in
   the browser the route would be invoked
   and the query would be made yet-again.
 
-  An example implemenation might look as follows:
+  An example implementation might look as follows:
 
 ```js
 function show(ctx){
@@ -421,7 +471,7 @@ page('/user/*', loadUser)
   would provide "/javascripts/jquery.js" as `ctx.params.file`:
 
 ```js
-page('/file/:file(*)', loadUser)
+page('/file/:file(.*)', loadUser)
 ```
 
   And of course `RegExp` literals, where the capture
@@ -501,9 +551,77 @@ Before calling `page.base()` use: `history.redirect([prefixType], [basepath])` -
 ### Pull Requests
 
   * Break commits into a single objective.
-  * An objective should be a chunk of code that is related but requires explaination.
+  * An objective should be a chunk of code that is related but requires explanation.
   * Commits should be in the form of what-it-is: how-it-does-it and or why-it's-needed or what-it-is for trivial changes
   * Pull requests and commits should be a guide to the code.
+
+## Server configuration
+
+  In order to load and update any URL managed by page.js, you need to configure your environment to point to your project's main file (index.html, for example) for each non-existent URL. Below you will find examples for most common server scenarios.
+
+### Nginx
+
+If using Nginx, add this to the .conf file related to your project (inside the "server" part), and **reload** your Nginx server:
+
+```nginx
+location / {
+    try_files $uri $uri/ /index.html?$args;
+}
+```
+
+### Apache
+
+If using Apache, create (or add to) the `.htaccess` file in the root of your public folder, with the code:
+
+```apache
+Options +FollowSymLinks
+RewriteEngine On
+
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond %{SCRIPT_FILENAME} !-f
+
+RewriteRule ^.*$ ./index.html
+```
+
+### Node.js - Express
+
+For development and/or production, using **Express**, you need to use `express-history-api-fallback` package. An example:
+
+```js
+import { join } from 'path';
+import express from 'express';
+import history from 'express-history-api-fallback';
+
+const app = express();
+const root = join(__dirname, '../public');
+
+app.use(express.static(root));
+app.use(history('index.html', { root }));
+
+const server = app.listen(process.env.PORT || 3000);
+
+export default server;
+```
+
+### Node.js - Browsersync
+
+For development using **Browsersync**, you need to use `history-api-fallback` package. An example:
+
+```js
+var browserSync = require("browser-sync").create();
+var historyApiFallback = require('connect-history-api-fallback');
+
+browserSync.init({
+	files: ["*.html", "css/*.css", "js/*.js"],
+	server: {
+		baseDir: ".",
+		middleware: [ historyApiFallback() ]
+	},
+	port: 3030
+});
+```
+
+## Integrations
 
 ## License
 

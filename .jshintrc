@@ -2,6 +2,7 @@
   "browser": true,
   "node":true,
   "expr": true,
+  "eqnull": true,
   "laxcomma": true,
   "-W079": true,
   "-W014": true,
@@ -19,5 +20,6 @@
   "trailing": false,
   "smarttabs": true,
   "latedef": false,
-  "indent": 2
+  "indent": 2,
+  "validthis": true
 }

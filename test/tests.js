@@ -542,6 +542,14 @@
           page('/user/tj');
         });
 
+        it('should handle routes that may match page base', function(done) {
+          page('/enroll', function(ctx) {
+            done();
+          });
+
+          page('/enroll');
+        });
+
         it('should handle trailing slashes in path', function(done) {
           page('/no-trailing', function() {
             expect(page.strict()).to.equal(false);
@@ -699,10 +707,12 @@
 
   describe('Different Base', function() {
 
+    /* test a page base we might typically see in localization, which will
+       exercise a test of a url like '/enroll' above */
     before(function(done) {
-      base = '/newBase';
+      base = '/en';
       beforeTests({
-        base: '/newBase'
+        base: '/en'
       }, done);
     });
 

@@ -670,7 +670,6 @@
 
     var pageBase = _page._getBase();
     if ('/' === path[0] && path !== pageBase && 0 !== path.indexOf(pageBase + '/') && 0 !== path.indexOf(pageBase + '?') && 0 !== path.indexOf(pageBase + '#')) path = pageBase + (hashbang ? '#!' : '') + path;
-//    if ('/' === path[0] && 0 !== path.indexOf(pageBase)) path = pageBase + (hashbang ? '#!' : '') + path;
     var i = path.indexOf('?');
 
     this.canonicalPath = path;

@@ -792,6 +792,8 @@
 
     if (!m) return false;
 
+    delete params[0];
+
     for (var i = 1, len = m.length; i < len; ++i) {
       var key = keys[i - 1];
       var val = this.page._decodeURLEncodedURIComponent(m[i]);

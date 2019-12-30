@@ -485,7 +485,6 @@
    * @param {string} href
    * @api public
    */
-
   Page.prototype.sameOrigin = function(href) {
     if(!href || !isLocation) return false;
 
@@ -495,13 +494,16 @@
     var loc = window.location;
 
     /*
-       when the port is the default http port 80, internet explorer 11
-       returns an empty string for loc.port, so we need to compare loc.port
-       with an empty string if url.port is the default port 80.
+       When the port is the default http port 80 for http, or 443 for
+       https, internet explorer 11 returns an empty string for loc.port,
+       so we need to compare loc.port with an empty string if url.port
+       is the default port 80 or 443.
+       Also the comparition with `port` is changed from `===` to `==` because
+       `port` can be a string sometimes. This only applies to ie11.
     */
     return loc.protocol === url.protocol &&
       loc.hostname === url.hostname &&
-      (loc.port === url.port || loc.port === '' && url.port === 80);
+      (loc.port === url.port || loc.port === '' && (url.port == 80 || url.port == 443)); // jshint ignore:line
   };
 
   /**

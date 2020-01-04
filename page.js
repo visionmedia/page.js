@@ -1128,8 +1128,11 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
   Context.prototype.save = function() {
     var page = this.page;
     if (hasHistory) {
-        page._window.history.replaceState(this.state, this.title,
-          page._hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+      var pathWithoutQuerystring = this.path.replace('?' + this.querystring, '');
+      pathWithoutQuerystring = pathWithoutQuerystring === '' ? '/' : pathWithoutQuerystring;
+
+      page._window.history.replaceState(this.state, this.title,
+        page._hashbang && (pathWithoutQuerystring !== '/' || this.querystring !== '') ? page._window.location.pathname + '#!' + this.path : this.canonicalPath);
     }
   };
 
@@ -1211,11 +1214,11 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    */
 
   var globalPage = createPage();
-  var page_1 = globalPage;
+  var page_js = globalPage;
   var default_1 = globalPage;
 
-page_1.default = default_1;
+page_js.default = default_1;
 
-return page_1;
+return page_js;
 
 })));

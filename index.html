@@ -227,7 +227,7 @@ set <code>dispatch</code> to <strong>false</strong>.</p>
   next()
 })
 
-page.exit(<span class="pl-s1"><span class="pl-pds">'</span>/sidebar<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">next</span>) {
+page.exit(<span class="pl-s1"><span class="pl-pds">'</span>/sidebar<span class="pl-pds">'</span></span>, <span class="pl-st">function</span>(<span class="pl-vpf">ctx</span>, <span class="pl-vpf">next</span>) {
   sidebar.open <span class="pl-k">=</span> <span class="pl-c1">false</span>
   next()
 })</pre></div>

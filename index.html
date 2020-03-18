@@ -468,7 +468,7 @@ page(<span class="pl-s1"><span class="pl-pds">'</span>*<span class="pl-pds">'</s
 <p>Named wildcard accessed, for example <code>/file/javascripts/jquery.js</code>
   would provide "/javascripts/jquery.js" as <code>ctx.params.file</code>:</p>
 
-<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/file/:file(*)<span class="pl-pds">'</span></span>, loadUser)</pre></div>
+<div class="highlight highlight-js"><pre>page(<span class="pl-s1"><span class="pl-pds">'</span>/file/:file(.*)<span class="pl-pds">'</span></span>, loadUser)</pre></div>
 
 <p>And of course <code>RegExp</code> literals, where the capture
   groups are available via <code>ctx.params[N]</code> where <strong>N</strong>

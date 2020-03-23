@@ -841,7 +841,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     return function onpopstate(e) {
       if (!loaded) return;
       var page = this;
-      if (e.state && e.state.path) {
+      if (e.state && typeof e.state === 'object' && 'path' in e.state) {
         var path = e.state.path;
         page.replace(path, e.state);
       } else if (isLocation) {

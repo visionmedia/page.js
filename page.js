@@ -1169,7 +1169,11 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
   Route.prototype.middleware = function(fn) {
     var self = this;
     return function(ctx, next) {
-      if (self.match(ctx.path, ctx.params)) return fn(ctx, next);
+      
+      if (self.match(ctx.path, ctx.params)) {
+        ctx.routePath = self.path;
+        return fn(ctx, next);
+      }
       next();
     };
   };

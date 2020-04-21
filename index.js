@@ -751,7 +751,7 @@
   function Route(path, options, page) {
     var _page = this.page = page || globalPage;
     var opts = options || {};
-    opts.strict = opts.strict || page._strict;
+    opts.strict = opts.strict || _page._strict;
     this.path = (path === '*') ? '(.*)' : path;
     this.method = 'GET';
     this.regexp = pathtoRegexp(this.path, this.keys = [], opts);

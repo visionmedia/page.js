@@ -792,4 +792,18 @@
     });
   });
 
+  describe('Route', function() {
+    before(function(done) {
+      beforeTests(null, done);
+    });
+
+    it('Can create Route', function() {
+      var r = new page.Route('/');
+    });
+
+    after(function() {
+      afterTests();
+    });
+  });
+
 }).call(this);

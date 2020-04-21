@@ -430,6 +430,14 @@
           });
           page('/ctxparams/');
         });
+
+        it('should have the original routePath', function(done) {
+          page('/route/:param', function(ctx) {
+            expect(ctx.routePath).to.equal('/route/:param');
+            done();
+          });
+          page('/route/value');
+        });
       });
 
       describe('ctx.handled', function() {

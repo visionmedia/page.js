@@ -791,7 +791,7 @@
     var keys = this.keys,
       qsIndex = path.indexOf('?'),
       pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
-      m = this.regexp.exec(decodeURIComponent(pathname));
+      m = this.regexp.exec(pathname);
 
     if (!m) return false;
 

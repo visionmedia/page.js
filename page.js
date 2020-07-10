@@ -1066,11 +1066,12 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    * @constructor
    * @param {string} path
    * @param {Object=} state
+   * @param {Page=} pageInstance
    * @api public
    */
 
   function Context(path, state, pageInstance) {
-    var _page = this.page = pageInstance || page;
+    var _page = this.page = pageInstance || new Page();
     var window = _page._window;
     var hashbang = _page._hashbang;
 

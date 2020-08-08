@@ -345,7 +345,7 @@
   Page.prototype.clickHandler = function(e) {
     if (1 !== this._which(e)) return;
 
-    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (e.defaultPrevented) return;
 
     // ensure link

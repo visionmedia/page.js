@@ -24,7 +24,6 @@ page()
   ```bash
   $ npm install page # for browserify
   $ component install visionmedia/page.js
-  $ bower install visionmedia/page.js
   ```
 
   Or use with a CDN. We support:

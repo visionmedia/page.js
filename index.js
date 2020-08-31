@@ -498,7 +498,7 @@
        https, internet explorer 11 returns an empty string for loc.port,
        so we need to compare loc.port with an empty string if url.port
        is the default port 80 or 443.
-       Also the comparition with `port` is changed from `===` to `==` because
+       Also the comparison with `port` is changed from `===` to `==` because
        `port` can be a string sometimes. This only applies to ie11.
     */
     return loc.protocol === url.protocol &&

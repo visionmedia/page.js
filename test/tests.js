@@ -800,6 +800,30 @@
     });
   });
 
+  describei('When hashbang option enabled with base query params', function() {
+    before(function(done){
+      jsdomSupport.setup({
+        qs: '?hello=there'
+      }, done);
+    });
+
+    it('prevents duplicate query params added to hash', function(done) {
+      var count = 0;
+
+      baseRoute = function () {
+        expect(window.location.search).to.equal('?hello=there');
+        expect(window.location.hash).to.equal('#!?hello=there');
+
+        count++;
+        count === 2 && done();
+      };
+
+      page({ hashbang: true });
+      page({ hashbang: true });
+    });
+  });
+
+
   describe('Route', function() {
     before(function(done) {
       beforeTests(null, done);

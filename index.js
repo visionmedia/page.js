@@ -157,7 +157,7 @@
       var loc = window.location;
 
       if(this._hashbang && ~loc.hash.indexOf('#!')) {
-        url = loc.hash.substr(2) + loc.search;
+        url = loc.hash.substr(2) + (~loc.hash.indexOf('?') ? '' : loc.search);
       } else if (this._hashbang) {
         url = loc.search + loc.hash;
       } else {

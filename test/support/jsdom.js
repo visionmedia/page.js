@@ -8,7 +8,7 @@ function setupJsdom(options, next) {
   function setupGlobals(window) {
     window.console = console;
     if(window.location.protocol !== 'file:')
-      window.history.replaceState(null, '', '/');
+      window.history.replaceState(null, '', '/' + options.qs || '');
     global.window = window;
     global.location = window.location;
     global.document = window.document;

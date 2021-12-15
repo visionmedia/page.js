@@ -694,6 +694,7 @@
     this.hash = '';
     if (!hashbang) {
       if (!~this.path.indexOf('#')) return;
+      if (this.path.indexOf('?') > -1) return;
       var parts = this.path.split('#');
       this.path = this.pathname = parts[0];
       this.hash = _page._decodeURLEncodedURIComponent(parts[1]) || '';

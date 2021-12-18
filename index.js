@@ -526,6 +526,7 @@
    * @api private
    */
   Page.prototype._decodeURLEncodedURIComponent = function(val) {
+    if (val.indexOf(".") == 0) val = val.substring(1);
     if (typeof val !== 'string') { return val; }
     return this._decodeURLComponents ? decodeURIComponent(val.replace(/\+/g, ' ')) : val;
   };

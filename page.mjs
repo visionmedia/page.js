@@ -856,7 +856,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
    */
   Page.prototype._which = function(e) {
     e = e || (hasWindow && this._window.event);
-    return null == e.which ? e.button : e.which;
+    return e.button !== undefined ? e.button : e.which;
   };
 
   /**

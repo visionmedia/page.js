@@ -798,7 +798,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
     // rebuild path
     // There aren't .pathname and .search properties in svg links, so we use href
     // Also, svg href is an object and its desired value is in .baseVal property
-    var path = svg ? el.href.baseVal : (el.pathname + el.search + (el.hash || ''));
+    var path = svg ? el.href.baseVal : location.href.substring(location.href.lastIndexOf("/"));
 
     path = path[0] !== '/' ? '/' + path : path;
 
@@ -1128,7 +1128,7 @@ pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
   Context.prototype.save = function() {
     var page = this.page;
     if (hasHistory) {
-        page._window.history.replaceState(this.state, this.title,
+        page._window.history.pushState(this.state, this.title,
           page._hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
     }
   };
